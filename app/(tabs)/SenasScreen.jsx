@@ -22,6 +22,7 @@ const GIFS_ABECEDARIO = {
   A: require("../../assets/gifs/abecedario/A.gif"),
   B: require("../../assets/gifs/abecedario/B.gif"),
   C: require("../../assets/gifs/abecedario/C.gif"),
+  Ch: require("../../assets/gifs/abecedario/Ch.gif"),
   D: require("../../assets/gifs/abecedario/D.gif"),
   E: require("../../assets/gifs/abecedario/E.gif"),
   F: require("../../assets/gifs/abecedario/F.gif"),
@@ -31,6 +32,7 @@ const GIFS_ABECEDARIO = {
   J: require("../../assets/gifs/abecedario/J.gif"),
   K: require("../../assets/gifs/abecedario/K.gif"),
   L: require("../../assets/gifs/abecedario/L.gif"),
+  Ll: require("../../assets/gifs/abecedario/Ll.gif"),
   M: require("../../assets/gifs/abecedario/M.gif"),
   N: require("../../assets/gifs/abecedario/N.gif"),
   Ñ: require("../../assets/gifs/abecedario/NN.gif"),
@@ -106,6 +108,7 @@ const CATEGORIAS = [
       "A",
       "B",
       "C",
+      "Ch",
       "D",
       "E",
       "F",
@@ -115,6 +118,7 @@ const CATEGORIAS = [
       "J",
       "K",
       "L",
+      "Ll",
       "M",
       "N",
       "Ñ",
@@ -238,7 +242,12 @@ const VideoModal = ({ visible, items, indice, onNavegar, onClose }) => {
               onPress={() => indice > 0 && onNavegar(indice - 1)}
               activeOpacity={indice > 0 ? 0.7 : 1}
             >
-              <Text style={[styles.arrowTxt, indice === 0 && styles.arrowTxtDisabled]}>
+              <Text
+                style={[
+                  styles.arrowTxt,
+                  indice === 0 && styles.arrowTxtDisabled,
+                ]}
+              >
                 ‹
               </Text>
             </TouchableOpacity>
