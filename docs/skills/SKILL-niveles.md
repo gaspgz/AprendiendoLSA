@@ -1,0 +1,172 @@
+---
+name: aprendiendo-lsa-niveles
+description: Estructura detallada del sistema de niveles, secciones y tipos de ejercicios del proyecto Aprendiendo LSA. Usar este skill siempre que se hable de implementar ejercicios, secciones, tipos de preguntas, el flujo de lección, o cuando se mencionen ejercicios de "elegí la seña", "qué letra es esta", "qué palabra está deletreando", múltiple choice con GIFs, o cualquier lógica de gamificación relacionada con los módulos de aprendizaje de la app.
+---
+
+# Sistema de Niveles — Aprendiendo LSA
+
+## Jerarquía completa
+
+```
+NIVEL  (ej: Nivel 1 — Abecedario)
+  └── SECCIÓN  (ej: Sección 1 — Letras A–E)
+        └── 20 ITEMS por sección
+              ├── GIFs de enseñanza (introducción)
+              └── Ejercicios de práctica (distintos tipos)
+```
+
+---
+
+## Ejemplo concreto: Nivel 1 — Abecedario
+
+### Sección 1 → Letras A–E (20 items totales)
+
+| Items | Tipo | Descripción |
+|-------|------|-------------|
+| 1–5   | GIFs de enseñanza | Se muestran los 5 GIFs de las letras A, B, C, D, E una por una, sin pregunta. El usuario simplemente las ve y las aprende antes de ser evaluado. |
+| 6–10  | Ejercicio Tipo 1 | "Elegí la seña correcta" — dado el nombre de una letra, elegir cuál imagen/GIF es la seña correcta |
+| 11–15 | Ejercicio Tipo 2 | "¿Qué letra es esta?" — dado un GIF/imagen de la seña, elegir cuál letra corresponde |
+| 16–19 | Ejercicio Tipo 3 | "¿Qué palabra está deletreando?" — dada una secuencia de señas, identificar la palabra |
+
+---
+
+## Tipos de ejercicios definidos
+
+### 🟢 Tipo 1 — "Elegí la seña correcta"
+El usuario ve el **nombre de una letra** (ej: "A") y debe elegir **cuál de 3 imágenes/GIFs** muestra la seña correcta.
+
+```
+Pregunta: "Elegí la seña correcta para la letra A"
+
+Opciones visuales:
+[ GIF_incorrecto ] [ GIF_incorrecto ] [ GIF_correcto ✓ ]
+
+Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
+```
+
+**Mecánica clave:**
+- Las opciones son GIFs o imágenes de señas (no texto)
+- 3 opciones siempre
+- Una sola correcta
+- Feedback inmediato verde/rojo
+
+---
+
+### 🔵 Tipo 2 — "¿Qué letra es esta?"
+El usuario ve un **GIF o imagen de una seña** y debe elegir **cuál letra corresponde** entre opciones de texto.
+
+```
+Pregunta: "¿Qué letra es esta?"
+
+[ GIF de la seña ]
+
+Opciones de texto: [ B ]  [ h ]  [ w ]
+
+Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
+```
+
+**Mecánica clave:**
+- El estímulo es visual (GIF/imagen), la respuesta es textual (letra)
+- Es el inverso del Tipo 1
+- Puede incluir letras visualmente similares como distractores
+
+---
+
+### 🟡 Tipo 3 — "¿Qué palabra está deletreando?"
+El usuario ve una **secuencia de señas** (una por cada letra de la palabra) y debe identificar **qué palabra se está deletreando** eligiendo entre opciones de palabras completas.
+
+```
+Pregunta: "¿Qué palabra está deletreando?"
+
+Secuencia de GIFs: [ b ] [ e ] [ b ] [ é ]
+                  (señas de cada letra)
+
+Opciones: ( bebé )  ( cada )  ( debe )
+
+Nota: las letras se repiten intencionalmente para dificultar
+```
+
+**Mecánica clave:**
+- Se muestran N GIFs en secuencia (uno por letra de la palabra)
+- Las opciones son palabras completas, no letras sueltas
+- Las palabras distractoras comparten letras con la correcta para dificultar
+- Letras repetidas en la secuencia son intencionales (ej: "bebé" repite la B)
+
+---
+
+## Estado de implementación
+
+### ✅ Implementado actualmente
+Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en texto y 4 opciones también en texto. Es funcional pero no usa GIFs como opciones visuales.
+
+```jsx
+// Estructura actual en index.jsx
+{
+  pregunta: "¿Cuál es la seña de la letra A?",
+  opciones: ["Puño cerrado con pulgar al lado", "Mano abierta", ...],
+  correcta: 0
+}
+```
+
+### ⏳ Por implementar (por orden de prioridad)
+1. **Fase introducción con GIFs** — los N items iniciales de cada sección son de visualización pura, sin pregunta
+2. **Tipo 1** — opciones visuales (GIFs) en lugar de texto
+3. **Tipo 2** — estímulo visual (GIF) + opciones de texto (letras)
+4. **Tipo 3** — secuencia de GIFs + opciones de palabras completas
+
+---
+
+## Estructura de datos planificada
+
+### Sección (reemplazará a "lección" en el futuro)
+```js
+{
+  id: 1,
+  titulo: "Letras A–E",
+  letras: ["A", "B", "C", "D", "E"],  // las letras que cubre esta sección
+  xp: 50,
+  items: [
+    // Items tipo GIF de enseñanza (sin pregunta)
+    { tipo: "ensenanza", gifSource: GIFS["A"], letra: "A" },
+    { tipo: "ensenanza", gifSource: GIFS["B"], letra: "B" },
+    // ...
+
+    // Items tipo ejercicio
+    { tipo: "elegir_sena", letra: "A", opcionesGifs: [...], correcta: 2 },
+    { tipo: "que_letra",   gifSource: GIFS["B"], opciones: ["B","h","w"], correcta: 0 },
+    { tipo: "que_palabra", secuenciaGifs: [...], opciones: ["bebé","cada","debe"], correcta: 0 },
+  ]
+}
+```
+
+---
+
+## Reglas de diseño pedagógico
+
+- Cada sección cubre exactamente 5 letras (o unidades de vocabulario en otros niveles)
+- Siempre empieza con la fase de enseñanza (GIFs sin presión) antes de evaluar
+- El Tipo 3 usa palabras que comparten letras entre sí para forzar atención
+- El orden dentro de la sección es fijo: enseñanza → Tipo 1 → Tipo 2 → Tipo 3
+- Las vidas y el sistema de "debe responder bien para avanzar" aplican igual a todos los tipos
+
+---
+
+## Niveles planificados (estructura general)
+
+| Nivel | Tema | Secciones estimadas |
+|-------|------|-------------------|
+| 1 | Abecedario dactilológico (27 letras) | 6 secciones de ~5 letras |
+| 2 | Saludos y presentaciones | Por definir |
+| 3 | Números del 1 al 20 | Por definir |
+| 4 | Familia | Por definir |
+| 5 | Colores | Por definir |
+
+---
+
+## Lo que NO cambiar al implementar los nuevos tipos
+
+- El sistema de vidas global (3 vidas, 2h de regeneración) aplica igual
+- La regla de "debe responder correctamente para avanzar" aplica a todos los tipos
+- La navegación sigue siendo por estado interno (no Expo Router)
+- Los GIFs siguen siendo `require()` estático (no dinámico)
+- El progreso se guarda como `{ leccionesCompletadas: { nivelId: [seccionId] } }` — mismo formato, solo cambia que la unidad ahora se llama "sección" en lugar de "lección"

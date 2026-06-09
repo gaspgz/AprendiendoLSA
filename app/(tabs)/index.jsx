@@ -35,14 +35,14 @@ const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
 // ══════════════════════════════════════════════════════════════════════
 const NIVELES = [
   {
-    id: 1,
+    id: 1, // NIVEL 1
     nombre: "Abecedario dactilológico",
     descripcion: "Aprendé las 27 letras del alfabeto en LSA.",
     totalXP: 150,
     lecciones: [
       {
         id: 1,
-        titulo: "Letras A–F",
+        titulo: "Letras A–F", // MODULO 1, nivel 1
         descripcion: "Las primeras seis letras.",
         xp: 30,
         ejercicios: [
@@ -90,7 +90,7 @@ const NIVELES = [
       },
       {
         id: 2,
-        titulo: "Letras G–M",
+        titulo: "Letras G–M", // MODULO 2, nivel 1
         descripcion: "Del séptimo al décimo tercer lugar.",
         xp: 30,
         ejercicios: [
@@ -133,7 +133,7 @@ const NIVELES = [
       },
       {
         id: 3,
-        titulo: "Letras N–S",
+        titulo: "Letras N–S", // MODULO 3, nivel 1
         descripcion: "Segundo grupo del alfabeto.",
         xp: 30,
         ejercicios: [
@@ -181,7 +181,7 @@ const NIVELES = [
       },
       {
         id: 4,
-        titulo: "Letras T–Z",
+        titulo: "Letras T–Z", // MODULO 4, nivel 1
         descripcion: "Las últimas letras del abecedario.",
         xp: 30,
         ejercicios: [
@@ -223,7 +223,7 @@ const NIVELES = [
         ],
       },
       {
-        id: 5,
+        id: 5, // MODULO 5, nivel 1
         titulo: "Repaso completo",
         descripcion: "Practicá todo el abecedario.",
         xp: 30,
@@ -255,13 +255,13 @@ const NIVELES = [
     ],
   },
   {
-    id: 2,
+    id: 2, // NIVEL 2
     nombre: "Saludos y presentaciones",
     descripcion: "Hola, chau, ¿cómo estás? y más.",
     totalXP: 150,
     lecciones: [
       {
-        id: 1,
+        id: 1, // MODULO 1, nivel 2
         titulo: "Hola y Chau",
         descripcion: "Las señas más básicas para saludar.",
         xp: 30,
@@ -309,7 +309,7 @@ const NIVELES = [
         ],
       },
       {
-        id: 2,
+        id: 2, // MODULO 2, nivel 2
         titulo: "¿Cómo estás?",
         descripcion: "Preguntá y respondé sobre tu estado.",
         xp: 30,
@@ -357,7 +357,7 @@ const NIVELES = [
         ],
       },
       {
-        id: 3,
+        id: 3, // MODULO 3, nivel 2
         titulo: "Me llamo...",
         descripcion: "Presentate con tu nombre en LSA.",
         xp: 30,
@@ -400,7 +400,7 @@ const NIVELES = [
         ],
       },
       {
-        id: 4,
+        id: 4, // MODULO 4, nivel 2
         titulo: "Mucho gusto",
         descripcion: "El saludo formal en LSA.",
         xp: 30,
@@ -448,7 +448,7 @@ const NIVELES = [
         ],
       },
       {
-        id: 5,
+        id: 5, // MODULO 5, nivel 2
         titulo: "Repaso de saludos",
         descripcion: "Practicá todos los saludos.",
         xp: 30,
