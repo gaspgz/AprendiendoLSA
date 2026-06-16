@@ -22,17 +22,22 @@ NIVEL  (ej: Nivel 1 — Abecedario)
 ### Sección 1 → Letras A–E (20 items totales)
 
 | Items | Tipo | Descripción |
-|-------|------|-------------|
-| 1–5   | GIFs de enseñanza | Se muestran los 5 GIFs de las letras A, B, C, D, E una por una, sin pregunta. El usuario simplemente las ve y las aprende antes de ser evaluado. |
-| 6–10  | Ejercicio Tipo 1 | "Elegí la seña correcta" — dado el nombre de una letra, elegir cuál imagen/GIF es la seña correcta |
-| 11–15 | Ejercicio Tipo 2 | "¿Qué letra es esta?" — dado un GIF/imagen de la seña, elegir cuál letra corresponde |
-| 16–19 | Ejercicio Tipo 3 | "¿Qué palabra está deletreando?" — dada una secuencia de señas, identificar la palabra |
+|-------|------|-------------| TIPO 1
+| 1–5 | GIFs de enseñanza | Se muestran los 5 GIFs de las letras A, B, C, D, E una por una, sin pregunta. El usuario simplemente las ve y las aprende antes de ser evaluado. |
+| 6–10 | Ejercicio TIPO 2 | "Elegí la seña correcta" — dado el nombre de una letra, elegir cuál imagen/GIF es la seña correcta |
+| 11–15 | Ejercicio TIPO 3 | "¿Qué letra es esta?" — dado un GIF/imagen de la seña, elegir cuál letra corresponde |
+| 16–19 | Ejercicio TIPO 4 | "¿Qué palabra está deletreando?" — dada una secuencia de señas, identificar la palabra |
 
 ---
 
 ## Tipos de ejercicios definidos
 
-### 🟢 Tipo 1 — "Elegí la seña correcta"
+### ⚫ TIPO 1 - GIFS de enseñanza
+
+| 1–5 | GIFs de enseñanza | Se muestran los 5 GIFs de las letras una por una, sin pregunta. El usuario simplemente las ve y las aprende antes de ser evaluado. |
+
+### 🟢 Tipo 2 — "Elegí la seña correcta"
+
 El usuario ve el **nombre de una letra** (ej: "A") y debe elegir **cuál de 3 imágenes/GIFs** muestra la seña correcta.
 
 ```
@@ -45,6 +50,7 @@ Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
 ```
 
 **Mecánica clave:**
+
 - Las opciones son GIFs o imágenes de señas (no texto)
 - 3 opciones siempre
 - Una sola correcta
@@ -52,7 +58,8 @@ Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
 
 ---
 
-### 🔵 Tipo 2 — "¿Qué letra es esta?"
+### 🔵 Tipo 3 — "¿Qué letra es esta?"
+
 El usuario ve un **GIF o imagen de una seña** y debe elegir **cuál letra corresponde** entre opciones de texto.
 
 ```
@@ -66,13 +73,15 @@ Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
 ```
 
 **Mecánica clave:**
+
 - El estímulo es visual (GIF/imagen), la respuesta es textual (letra)
 - Es el inverso del Tipo 1
 - Puede incluir letras visualmente similares como distractores
 
 ---
 
-### 🟡 Tipo 3 — "¿Qué palabra está deletreando?"
+### 🟡 Tipo 4 — "¿Qué palabra está deletreando?"
+
 El usuario ve una **secuencia de señas** (una por cada letra de la palabra) y debe identificar **qué palabra se está deletreando** eligiendo entre opciones de palabras completas.
 
 ```
@@ -87,6 +96,7 @@ Nota: las letras se repiten intencionalmente para dificultar
 ```
 
 **Mecánica clave:**
+
 - Se muestran N GIFs en secuencia (uno por letra de la palabra)
 - Las opciones son palabras completas, no letras sueltas
 - Las palabras distractoras comparten letras con la correcta para dificultar
@@ -97,10 +107,11 @@ Nota: las letras se repiten intencionalmente para dificultar
 ## Estado de implementación
 
 ### ✅ Implementado actualmente
+
 Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en texto y 4 opciones también en texto. Es funcional pero no usa GIFs como opciones visuales.
 
 ```jsx
-// Estructura actual en index.jsx
+// Estructura actual en index.jsx a cambiar
 {
   pregunta: "¿Cuál es la seña de la letra A?",
   opciones: ["Puño cerrado con pulgar al lado", "Mano abierta", ...],
@@ -109,6 +120,7 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 ```
 
 ### ⏳ Por implementar (por orden de prioridad)
+
 1. **Fase introducción con GIFs** — los N items iniciales de cada sección son de visualización pura, sin pregunta
 2. **Tipo 1** — opciones visuales (GIFs) en lugar de texto
 3. **Tipo 2** — estímulo visual (GIF) + opciones de texto (letras)
@@ -119,6 +131,7 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 ## Estructura de datos planificada
 
 ### Sección (reemplazará a "lección" en el futuro)
+
 ```js
 {
   id: 1,
@@ -153,15 +166,15 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 
 ## Niveles planificados (estructura general)
 
-| Nivel | Tema | Secciones estimadas |
-|-------|------|-------------------|
-| 1 | Abecedario dactilológico (27 letras) | 6 secciones de ~5 letras |
-| 2 | Saludos y presentaciones | Por definir |
-| 3 | Números del 1 al 20 | Por definir |
-| 4 | Familia | Por definir |
-| 5 | Colores | Por definir |
+| Nivel | Tema                                 | Secciones estimadas      |
+| ----- | ------------------------------------ | ------------------------ |
+| 1     | Abecedario dactilológico (27 letras) | 6 secciones de ~5 letras |
+| 2     | Presentaciones                       | Por definir              |
+| 3     | Palabras basicas                     | Por definir              |
+| 4     | Sentimientos                         | Por definir              |
+| 5     | A DEFINIR CATEGORIA                  | Por definir              |
 
----
+## | MAS NIVELES A DEFINIR MAS ADELANTE
 
 ## Lo que NO cambiar al implementar los nuevos tipos
 

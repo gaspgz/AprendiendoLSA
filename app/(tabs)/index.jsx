@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
+  Image,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -23,6 +24,14 @@ import { StatusBar } from "react-native";
 />;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
+const GIFS = {
+  A: require("../../assets/gifs/abecedario/A.gif"),
+  B: require("../../assets/gifs/abecedario/B.gif"),
+  C: require("../../assets/gifs/abecedario/C.gif"),
+  D: require("../../assets/gifs/abecedario/D.gif"),
+  E: require("../../assets/gifs/abecedario/E.gif"),
+};
+
 // ══════════════════════════════════════════════════════════════════════
 //  CONFIG API  — reemplazá la URL cuando tengas MockAPI listo
 // ══════════════════════════════════════════════════════════════════════
@@ -42,50 +51,34 @@ const NIVELES = [
     lecciones: [
       {
         id: 1,
-        titulo: "Letras A–F", // MODULO 1, nivel 1
-        descripcion: "Las primeras seis letras.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuál es la seña de la letra A?",
-            opciones: [
-              "Puño cerrado con pulgar al lado",
-              "Mano abierta",
-              "Dos dedos arriba",
-              "Palma abajo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra B?",
-            opciones: [
-              "Cuatro dedos juntos arriba",
-              "Puño cerrado",
-              "Índice señalando",
-              "Mano en C",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra C?",
-            opciones: [
-              "Mano curvada en forma de C",
-              "Puño cerrado",
-              "Mano abierta",
-              "Dos dedos abajo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra D?",
-            opciones: [
-              "Índice arriba con resto curvo",
-              "Mano abierta",
-              "Puño cerrado",
-              "Palma girada",
-            ],
-            correcta: 0,
-          },
+        titulo: "Letras A–E",
+        descripcion: "Las primeras cinco letras con GIFs y ejercicios.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza", letra: "A" },
+          { tipo: "ensenanza", letra: "B" },
+          { tipo: "ensenanza", letra: "C" },
+          { tipo: "ensenanza", letra: "D" },
+          { tipo: "ensenanza", letra: "E" },
+          // ── Bloque 2 (items 6-10): Tipo 2,3,2,4,3 ──
+          { tipo: "elegir_sena", letra: "A", opcionesLetras: ["C", "D", "A"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "B", opciones: ["D", "C", "B", "E"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "D", opcionesLetras: ["A", "E", "D"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["B","E","B","E"], palabraCorrecta: "BEBE", letrasDisponibles: ["A","K","Q","S","C","E","B","F","E","B","W","Q","C","P","E","A"] },
+          { tipo: "que_letra", gifLetra: "E", opciones: ["A", "E", "C", "D"], correcta: 1 },
+          // ── Bloque 3 (items 11-15): Tipo 4,3,2,3,4 ──
+          { tipo: "que_palabra", secuencia: ["C","E","D","E"], palabraCorrecta: "CEDE", letrasDisponibles: ["A","K","Q","S","C","E","B","D","E","B","W","Q","C","P","E","A"] },
+          { tipo: "que_letra", gifLetra: "C", opciones: ["C", "A", "D", "E"], correcta: 0 },
+          { tipo: "elegir_sena", letra: "C", opcionesLetras: ["B", "E", "C"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "A", opciones: ["D", "A", "B", "E"], correcta: 1 },
+          { tipo: "que_palabra", secuencia: ["C","A","D","A"], palabraCorrecta: "CADA", letrasDisponibles: ["A","C","D","S","H","E","J","F","E","L","W","Q","C","P","E","A"] },
+          // ── Bloque 4 (items 16-20): Tipo 4,2,3,2,4 ──
+          { tipo: "que_palabra", secuencia: ["C","A","B","E"], palabraCorrecta: "CABE", letrasDisponibles: ["A","K","D","S","C","E","J","F","E","B","W","Q","C","P","E","A"] },
+          { tipo: "elegir_sena", letra: "E", opcionesLetras: ["A", "C", "E"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "D", opciones: ["E", "B", "A", "D"], correcta: 3 },
+          { tipo: "elegir_sena", letra: "B", opcionesLetras: ["D", "A", "B"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["D","E","B","E"], palabraCorrecta: "DEBE", letrasDisponibles: ["A","D","Q","S","C","E","B","S","E","B","W","Q","C","P","E","A"] },
         ],
       },
       {
@@ -936,7 +929,371 @@ const LeccionCard = ({ leccion, index, onPress, bloqueada }) => {
   );
 };
 
-// ── Ejercicio ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+//  NUEVOS TIPOS DE EJERCICIO (items)
+// ══════════════════════════════════════════════════════════════════════
+
+const EjercicioHeader = ({ idx, total, vidasGlobales, onSalir }) => (
+  <View style={styles.ejercicioHeader}>
+    <TouchableOpacity onPress={onSalir} style={styles.cerrarBtn}>
+      <Text style={styles.cerrarTxt}>✕</Text>
+    </TouchableOpacity>
+    <View style={styles.ejercicioBarraWrap}>
+      <View style={styles.ejercicioBarraFondo}>
+        <View
+          style={[styles.ejercicioBarraRelleno, { width: `${(idx / total) * 100}%` }]}
+        />
+      </View>
+    </View>
+    <View style={styles.vidasWrap}>
+      {[...Array(3)].map((_, i) => (
+        <Text key={i} style={{ fontSize: 18, opacity: i < vidasGlobales ? 1 : 0.2 }}>
+          ❤️
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const ItemEnsenanza = ({ item, idx, total, vidasGlobales, onContinuar, onSalir }) => (
+  <View style={styles.ejercicioContainer}>
+    <EjercicioHeader idx={idx} total={total} vidasGlobales={vidasGlobales} onSalir={onSalir} />
+    <ScrollView contentContainerStyle={styles.ejercicioContent}>
+      <View style={styles.itemCard}>
+        <Text style={styles.itemCardLetraGrande}>{item.letra}</Text>
+        <Text style={styles.itemCardTitulo}>Letra {item.letra}</Text>
+        <Text style={styles.itemCardSub}>Mirá bien la seña</Text>
+      </View>
+      <View style={styles.gifGrandeWrap}>
+        <Image
+          source={GIFS[item.letra]}
+          style={styles.gifGrande}
+          resizeMode="contain"
+        />
+      </View>
+    </ScrollView>
+    <View style={styles.ejercicioBtnWrap}>
+      <TouchableOpacity style={styles.btnPrincipal} onPress={onContinuar}>
+        <Text style={styles.btnPrincipalTxt}>Continuar →</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+const ItemElegirSena = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderVida, onSalir }) => {
+  const [seleccionado, setSelec] = useState(null);
+  const [confirmado, setConf] = useState(false);
+  const esCorrecta = seleccionado === item.correcta;
+
+  const confirmar = () => {
+    if (seleccionado === null) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (!esCorrecta) { setSelec(null); setConf(false); }
+    else onCorrecto();
+  };
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader idx={idx} total={total} vidasGlobales={vidasGlobales} onSalir={onSalir} />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardLetraGrande}>{item.letra}</Text>
+          <Text style={styles.itemCardTitulo}>Letra {item.letra}</Text>
+          <Text style={styles.itemCardSub}>Elegí la seña correcta</Text>
+        </View>
+        <View style={styles.gifOpcionesWrap}>
+          {item.opcionesLetras.map((letra, i) => {
+            let borderColor = "#E0E0E0";
+            let bgColor = "#F5F6FA";
+            if (confirmado) {
+              if (i === item.correcta) { borderColor = "#2E7D32"; bgColor = "#C8F5D3"; }
+              else if (i === seleccionado) { borderColor = "#C62828"; bgColor = "#FFCDD2"; }
+            } else if (seleccionado === i) {
+              borderColor = "#3D4FBB"; bgColor = "#EEF1FB";
+            }
+            return (
+              <View key={i} style={{ elevation: confirmado ? 0 : 3, borderRadius: 16, marginBottom: 4 }}>
+                <TouchableOpacity
+                  style={[styles.gifOpcionBtn, { borderColor, backgroundColor: bgColor }]}
+                  onPress={() => !confirmado && setSelec(i)}
+                  activeOpacity={confirmado ? 1 : 0.75}
+                >
+                  <View style={styles.gifOpcionImgWrap}>
+                    <Image source={GIFS[letra]} style={styles.gifOpcion} resizeMode="contain" />
+                  </View>
+                  <View style={[styles.radioCircle, seleccionado === i && !confirmado && styles.radioCircleSelec]} />
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+      {confirmado && (
+        <View style={[styles.feedbackBanner, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}>
+          <Text style={[styles.feedbackTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+            {esCorrecta ? "¡Correcto! 🎉" : "Incorrecto ❌ — Intentá de nuevo"}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { opacity: seleccionado === null ? 0.45 : 1 }]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}
+            onPress={siguiente}
+          >
+            <Text style={[styles.btnPrincipalTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+const ItemQueLEtra = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderVida, onSalir }) => {
+  const [seleccionado, setSelec] = useState(null);
+  const [confirmado, setConf] = useState(false);
+  const esCorrecta = seleccionado === item.correcta;
+
+  const confirmar = () => {
+    if (seleccionado === null) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (!esCorrecta) { setSelec(null); setConf(false); }
+    else onCorrecto();
+  };
+
+  const bgOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
+    if (i === item.correcta) return "#C8F5D3";
+    if (i === seleccionado) return "#FFCDD2";
+    return "#F5F6FA";
+  };
+  const bdOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
+    if (i === item.correcta) return "#2E7D32";
+    if (i === seleccionado) return "#C62828";
+    return "#E0E0E0";
+  };
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader idx={idx} total={total} vidasGlobales={vidasGlobales} onSalir={onSalir} />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardTitulo}>Mirá bien la seña</Text>
+          <Text style={styles.itemCardSub}>¿Qué letra es esta?</Text>
+        </View>
+        <View style={styles.gifGrandeWrap}>
+          <Image source={GIFS[item.gifLetra]} style={styles.gifGrande} resizeMode="contain" />
+        </View>
+        <View style={styles.opcionesWrap}>
+          {item.opciones.map((op, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[styles.opcion, { backgroundColor: bgOp(i), borderColor: bdOp(i) }]}
+              onPress={() => !confirmado && setSelec(i)}
+              activeOpacity={confirmado ? 1 : 0.75}
+            >
+              <Text style={styles.opcionLetra}>{["A", "B", "C", "D"][i]}</Text>
+              <Text style={styles.opcionTxt}>{op}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+      {confirmado && (
+        <View style={[styles.feedbackBanner, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}>
+          <Text style={[styles.feedbackTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+            {esCorrecta ? "¡Correcto! 🎉" : `Incorrecto ❌ — La respuesta es ${item.opciones[item.correcta]}`}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { opacity: seleccionado === null ? 0.45 : 1 }]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}
+            onPress={siguiente}
+          >
+            <Text style={[styles.btnPrincipalTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+const ItemQuePalabra = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderVida, onSalir }) => {
+  const n = item.secuencia.length;
+  const [slots, setSlots] = useState(() => Array(n).fill(null));
+  const [confirmado, setConf] = useState(false);
+
+  const letrasUsadas = new Set(slots.filter((s) => s !== null));
+  const palabraIngresada = slots.map((s) => (s !== null ? item.letrasDisponibles[s] : "")).join("");
+  const esCorrecta = palabraIngresada === item.palabraCorrecta;
+  const completo = slots.every((s) => s !== null);
+
+  const tapLetra = (letraIdx) => {
+    if (confirmado || letrasUsadas.has(letraIdx)) return;
+    const primerVacio = slots.findIndex((s) => s === null);
+    if (primerVacio === -1) return;
+    const nuevo = [...slots];
+    nuevo[primerVacio] = letraIdx;
+    setSlots(nuevo);
+  };
+
+  const tapSlot = (slotIdx) => {
+    if (confirmado || slots[slotIdx] === null) return;
+    const nuevo = [...slots];
+    nuevo[slotIdx] = null;
+    setSlots(nuevo);
+  };
+
+  const confirmar = () => {
+    if (!completo) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+
+  const siguiente = () => {
+    if (!esCorrecta) { setSlots(Array(n).fill(null)); setConf(false); }
+    else onCorrecto();
+  };
+
+  const gifW = Math.floor((SCREEN_WIDTH - 56) / 4);
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader idx={idx} total={total} vidasGlobales={vidasGlobales} onSalir={onSalir} />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardTitulo}>Formá la palabra</Text>
+          <Text style={styles.itemCardSub}>Mirá los GIFs y seleccioná las letras</Text>
+        </View>
+
+        {/* GIFs + slots */}
+        <View style={styles.palabraGifsRow}>
+          {item.secuencia.map((letra, i) => (
+            <View key={i} style={styles.palabraGifCol}>
+              <View style={[styles.palabraGifWrap, { width: gifW, height: gifW * 1.3 }]}>
+                <Image
+                  source={GIFS[letra]}
+                  style={{ width: gifW, height: gifW * 1.3 }}
+                  resizeMode="cover"
+                />
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.palabraSlot,
+                  { width: gifW },
+                  slots[i] !== null && styles.palabraSlotLleno,
+                  confirmado && esCorrecta && styles.palabraSlotCorrecto,
+                  confirmado && !esCorrecta && styles.palabraSlotError,
+                ]}
+                onPress={() => tapSlot(i)}
+              >
+                <Text style={styles.palabraSlotLetra}>
+                  {slots[i] !== null ? item.letrasDisponibles[slots[i]] : ""}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.letrasDisponiblesLabel}>Letras disponibles</Text>
+        <View style={styles.letrasDisponiblesGrid}>
+          {item.letrasDisponibles.map((letra, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[styles.letraBtn, letrasUsadas.has(i) && styles.letraBtnUsada]}
+              onPress={() => tapLetra(i)}
+              activeOpacity={letrasUsadas.has(i) ? 1 : 0.7}
+            >
+              <Text style={[styles.letraBtnTxt, letrasUsadas.has(i) && styles.letraBtnTxtUsada]}>
+                {letra}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+
+      {confirmado && (
+        <View style={[styles.feedbackBanner, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}>
+          <Text style={[styles.feedbackTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+            {esCorrecta ? "¡Correcto! 🎉" : `Incorrecto ❌ — La palabra era ${item.palabraCorrecta}`}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { opacity: completo ? 1 : 0.45 }]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" }]}
+            onPress={siguiente}
+          >
+            <Text style={[styles.btnPrincipalTxt, { color: esCorrecta ? "#1B5E20" : "#B71C1C" }]}>
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+const PantallaEjercicioNueva = ({ leccion, vidasGlobales, onTerminar, onPerderVida }) => {
+  const [idx, setIdx] = useState(0);
+  const items = leccion.items;
+  const total = items.length;
+  const item = items[idx];
+
+  const avanzar = () => {
+    if (idx + 1 >= total) onTerminar({ completada: true, xp: leccion.xp });
+    else setIdx((i) => i + 1);
+  };
+  const salir = () => onTerminar({ completada: false });
+
+  const common = { idx, total, vidasGlobales, onCorrecto: avanzar, onPerderVida, onSalir: salir };
+
+  if (item.tipo === "ensenanza")
+    return <ItemEnsenanza key={idx} item={item} {...common} onContinuar={avanzar} />;
+  if (item.tipo === "elegir_sena")
+    return <ItemElegirSena key={idx} item={item} {...common} />;
+  if (item.tipo === "que_letra")
+    return <ItemQueLEtra key={idx} item={item} {...common} />;
+  if (item.tipo === "que_palabra")
+    return <ItemQuePalabra key={idx} item={item} {...common} />;
+  return null;
+};
+
+// ── Ejercicio (texto — lecciones antiguas) ─────────────────────────────────────────────────────────
 const PantallaEjercicio = ({
   leccion,
   vidasGlobales,
@@ -1349,12 +1706,21 @@ export default function HomeScreen() {
           />
         ) : (
           <>
-            <PantallaEjercicio
-              leccion={leccionActiva}
-              vidasGlobales={vidasData.vidas}
-              onTerminar={handleTerminarEjercicio}
-              onPerderVida={handlePerderVida}
-            />
+            {leccionActiva.items ? (
+              <PantallaEjercicioNueva
+                leccion={leccionActiva}
+                vidasGlobales={vidasData.vidas}
+                onTerminar={handleTerminarEjercicio}
+                onPerderVida={handlePerderVida}
+              />
+            ) : (
+              <PantallaEjercicio
+                leccion={leccionActiva}
+                vidasGlobales={vidasData.vidas}
+                onTerminar={handleTerminarEjercicio}
+                onPerderVida={handlePerderVida}
+              />
+            )}
             <ModalResultado
               visible={modalResultadoVisible}
               xpGanado={xpUltimaLeccion}
@@ -1888,6 +2254,166 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnPrincipalTxt: { fontSize: 17, fontWeight: "bold", color: "#1A1A2E" },
+
+  // ── Nuevos tipos de ejercicio ──────────────────────────────────────
+  itemCard: {
+    backgroundColor: "#EEF1FB",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 1.5,
+    borderColor: "#C8D3F5",
+  },
+  itemCardLetraGrande: {
+    fontSize: 56,
+    fontWeight: "900",
+    color: "#3D4FBB",
+    marginBottom: 4,
+  },
+  itemCardTitulo: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#3D4FBB",
+    marginBottom: 4,
+  },
+  itemCardSub: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+  },
+  gifGrandeWrap: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 20,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  gifGrande: {
+    width: SCREEN_WIDTH - 40,
+    height: 240,
+  },
+  // elegir_sena
+  gifOpcionesWrap: {
+    gap: 10,
+  },
+  gifOpcionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 16,
+    borderWidth: 2.5,
+    padding: 8,
+    gap: 10,
+    overflow: "hidden",
+  },
+  gifOpcionImgWrap: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#F5F5F5",
+  },
+  gifOpcion: {
+    width: "100%",
+    height: 140,
+  },
+  radioCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#BDBDBD",
+    backgroundColor: "#fff",
+    flexShrink: 0,
+  },
+  radioCircleSelec: {
+    borderColor: "#3D4FBB",
+    backgroundColor: "#3D4FBB",
+  },
+  // que_palabra
+  palabraGifsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  palabraGifCol: {
+    alignItems: "center",
+    gap: 8,
+  },
+  palabraGifWrap: {
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#F0F0F0",
+  },
+  palabraSlot: {
+    height: 36,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#C8D3F5",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#EEF1FB",
+  },
+  palabraSlotLleno: {
+    borderColor: "#3D4FBB",
+    backgroundColor: "#C8D3F5",
+  },
+  palabraSlotCorrecto: {
+    borderColor: "#2E7D32",
+    backgroundColor: "#C8F5D3",
+  },
+  palabraSlotError: {
+    borderColor: "#C62828",
+    backgroundColor: "#FFCDD2",
+  },
+  palabraSlotLetra: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#1A1A2E",
+  },
+  letrasDisponiblesLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#3D4FBB",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  letrasDisponiblesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+  },
+  letraBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    borderWidth: 1.5,
+    borderColor: "#C8D3F5",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+  },
+  letraBtnUsada: {
+    backgroundColor: "#F0F0F0",
+    borderColor: "#E0E0E0",
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  letraBtnTxt: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1A1A2E",
+  },
+  letraBtnTxtUsada: {
+    color: "#BDBDBD",
+  },
 
   // XP badge
   xpBadge: {
