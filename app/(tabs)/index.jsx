@@ -25,11 +25,35 @@ import { StatusBar } from "react-native";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const GIFS = {
-  A: require("../../assets/gifs/abecedario/A.gif"),
-  B: require("../../assets/gifs/abecedario/B.gif"),
-  C: require("../../assets/gifs/abecedario/C.gif"),
-  D: require("../../assets/gifs/abecedario/D.gif"),
-  E: require("../../assets/gifs/abecedario/E.gif"),
+  A:  require("../../assets/gifs/abecedario/A.gif"),
+  B:  require("../../assets/gifs/abecedario/B.gif"),
+  C:  require("../../assets/gifs/abecedario/C.gif"),
+  CH: require("../../assets/gifs/abecedario/Ch.gif"),
+  D:  require("../../assets/gifs/abecedario/D.gif"),
+  E:  require("../../assets/gifs/abecedario/E.gif"),
+  F:  require("../../assets/gifs/abecedario/F.gif"),
+  G:  require("../../assets/gifs/abecedario/G.gif"),
+  H:  require("../../assets/gifs/abecedario/H.gif"),
+  I:  require("../../assets/gifs/abecedario/I.gif"),
+  J:  require("../../assets/gifs/abecedario/J.gif"),
+  K:  require("../../assets/gifs/abecedario/K.gif"),
+  L:  require("../../assets/gifs/abecedario/L.gif"),
+  LL: require("../../assets/gifs/abecedario/Ll.gif"),
+  M:  require("../../assets/gifs/abecedario/M.gif"),
+  N:  require("../../assets/gifs/abecedario/N.gif"),
+  Ñ:  require("../../assets/gifs/abecedario/NN.gif"),
+  O:  require("../../assets/gifs/abecedario/O.gif"),
+  P:  require("../../assets/gifs/abecedario/P.gif"),
+  Q:  require("../../assets/gifs/abecedario/Q.gif"),
+  R:  require("../../assets/gifs/abecedario/R.gif"),
+  S:  require("../../assets/gifs/abecedario/S.gif"),
+  T:  require("../../assets/gifs/abecedario/T.gif"),
+  U:  require("../../assets/gifs/abecedario/U.gif"),
+  V:  require("../../assets/gifs/abecedario/V.gif"),
+  W:  require("../../assets/gifs/abecedario/W.gif"),
+  X:  require("../../assets/gifs/abecedario/X.gif"),
+  Y:  require("../../assets/gifs/abecedario/Y.gif"),
+  Z:  require("../../assets/gifs/abecedario/Z.gif"),
 };
 
 // ══════════════════════════════════════════════════════════════════════
@@ -47,7 +71,7 @@ const NIVELES = [
     id: 1, // NIVEL 1
     nombre: "Abecedario dactilológico",
     descripcion: "Aprendé las 27 letras del alfabeto en LSA.",
-    totalXP: 150,
+    totalXP: 290,
     lecciones: [
       {
         id: 1,
@@ -81,168 +105,160 @@ const NIVELES = [
           { tipo: "que_palabra", secuencia: ["D","E","B","E"], palabraCorrecta: "DEBE", letrasDisponibles: ["A","D","Q","S","C","E","B","S","E","B","W","Q","C","P","E","A"] },
         ],
       },
+      // ── Sección 2: F G H I J ───────────────────────────────────────
       {
         id: 2,
-        titulo: "Letras G–M", // MODULO 2, nivel 1
-        descripcion: "Del séptimo al décimo tercer lugar.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuál es la seña de la letra G?",
-            opciones: [
-              "Índice y pulgar apuntando al costado",
-              "Puño cerrado",
-              "Mano abierta",
-              "Tres dedos arriba",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra H?",
-            opciones: [
-              "Índice y medio apuntando al costado",
-              "Puño cerrado",
-              "Palma hacia adelante",
-              "Mano en O",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra M?",
-            opciones: [
-              "Tres dedos sobre el pulgar",
-              "Mano abierta",
-              "Puño al frente",
-              "Índice curvo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué letra se hace con los 4 dedos sobre el pulgar?",
-            opciones: ["N", "M", "B", "A"],
-            correcta: 1,
-          },
+        titulo: "Letras F–J",
+        descripcion: "Cinco nuevas letras con GIFs y ejercicios.",
+        xp: 50,
+        items: [
+          { tipo: "ensenanza", letra: "F" },
+          { tipo: "ensenanza", letra: "G" },
+          { tipo: "ensenanza", letra: "H" },
+          { tipo: "ensenanza", letra: "I" },
+          { tipo: "ensenanza", letra: "J" },
+          // Bloque 2: 2,3,2,2,4
+          { tipo: "elegir_sena", letra: "I", opcionesLetras: ["H","J","I"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "I", opciones: ["A","I","F","J"], correcta: 1 },
+          { tipo: "elegir_sena", letra: "G", opcionesLetras: ["F","H","G"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "F", opcionesLetras: ["G","I","F"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["J","E","F","E"], palabraCorrecta: "JEFE", letrasDisponibles: ["A","C","D","S","H","E","J","F","E","L","W","Q","C","P","E","A"] },
+          // Bloque 3: 3,3,2,4,3
+          { tipo: "que_letra", gifLetra: "H", opciones: ["J","H","B","E"], correcta: 1 },
+          { tipo: "que_letra", gifLetra: "F", opciones: ["F","I","J","E"], correcta: 0 },
+          { tipo: "elegir_sena", letra: "H", opcionesLetras: ["I","J","H"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["A","B","E","J","A"], palabraCorrecta: "ABEJA", letrasDisponibles: ["A","K","Q","S","C","E","B","D","E","B","J","Q","C","P","E","A"] },
+          { tipo: "que_letra", gifLetra: "J", opciones: ["F","B","J","H"], correcta: 2 },
+          // Bloque 4: 2,4,4,3,4
+          { tipo: "elegir_sena", letra: "J", opcionesLetras: ["I","H","J"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["H","I","J","O"], palabraCorrecta: "HIJO", letrasDisponibles: ["I","K","D","S","C","E","J","D","E","H","W","Q","C","P","S","O"] },
+          { tipo: "que_palabra", secuencia: ["D","E","J","A"], palabraCorrecta: "DEJA", letrasDisponibles: ["A","J","Q","S","C","E","B","F","E","B","W","D","C","P","E","A"] },
+          { tipo: "que_letra", gifLetra: "G", opciones: ["B","J","C","G"], correcta: 3 },
+          { tipo: "que_palabra", secuencia: ["B","A","J","E"], palabraCorrecta: "BAJE", letrasDisponibles: ["A","D","Q","S","C","E","B","S","J","B","W","Q","C","P","E","A"] },
         ],
       },
+      // ── Sección 3: K L M N Ñ ───────────────────────────────────────
       {
         id: 3,
-        titulo: "Letras N–S", // MODULO 3, nivel 1
-        descripcion: "Segundo grupo del alfabeto.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuál es la seña de la letra N?",
-            opciones: [
-              "Dos dedos sobre el pulgar",
-              "Mano abierta",
-              "Puño al frente",
-              "Índice curvo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra O?",
-            opciones: [
-              "Dedos y pulgar formando un círculo",
-              "Mano abierta",
-              "Puño cerrado",
-              "Tres dedos arriba",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra S?",
-            opciones: [
-              "Puño cerrado con pulgar adentro",
-              "Mano abierta",
-              "Cuatro dedos arriba",
-              "Palma abajo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿La letra R se hace con qué dedos cruzados?",
-            opciones: [
-              "Índice y medio",
-              "Anular y meñique",
-              "Pulgar e índice",
-              "Índice y anular",
-            ],
-            correcta: 0,
-          },
+        titulo: "Letras K–Ñ",
+        descripcion: "Cinco nuevas letras con GIFs y ejercicios.",
+        xp: 50,
+        items: [
+          { tipo: "ensenanza", letra: "K" },
+          { tipo: "ensenanza", letra: "L" },
+          { tipo: "ensenanza", letra: "M" },
+          { tipo: "ensenanza", letra: "N" },
+          { tipo: "ensenanza", letra: "Ñ" },
+          // Bloque 2: 3,2,4,2,2
+          { tipo: "que_letra", gifLetra: "L", opciones: ["A","F","L","D"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "K", opcionesLetras: ["L","M","K"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["G","E","N","I","A","L"], palabraCorrecta: "GENIAL", letrasDisponibles: ["L","D","G","S","I","E","A","S","J","B","N","M","C","P","E","A"] },
+          { tipo: "elegir_sena", letra: "L", opcionesLetras: ["K","N","L"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "M", opcionesLetras: ["N","L","M"], correcta: 2 },
+          // Bloque 3: 2,3,4,3,4
+          { tipo: "elegir_sena", letra: "N", opcionesLetras: ["M","Ñ","N"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "M", opciones: ["F","I","M","E"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["N","I","Ñ","A"], palabraCorrecta: "NIÑA", letrasDisponibles: ["I","O","D","Ñ","C","E","G","O","N","B","W","M","G","I","S","A"] },
+          { tipo: "que_letra", gifLetra: "K", opciones: ["D","L","M","K"], correcta: 3 },
+          { tipo: "que_palabra", secuencia: ["B","I","E","N"], palabraCorrecta: "BIEN", letrasDisponibles: ["A","J","O","I","C","E","G","A","E","B","L","D","C","P","E","N"] },
+          // Bloque 4: 4,3,4,3,2
+          { tipo: "que_palabra", secuencia: ["M","E","D","I","A"], palabraCorrecta: "MEDIA", letrasDisponibles: ["A","C","B","S","D","O","E","F","M","L","W","N","C","P","I","A"] },
+          { tipo: "que_letra", gifLetra: "Ñ", opciones: ["K","L","Ñ","N"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["K","I","L","O","G","R","A","M","O"], palabraCorrecta: "KILOGRAMO", letrasDisponibles: ["A","K","G","O","C","E","B","I","R","O","J","Q","M","P","L","A"] },
+          { tipo: "que_letra", gifLetra: "N", opciones: ["H","N","E","Ñ"], correcta: 1 },
+          { tipo: "elegir_sena", letra: "Ñ", opcionesLetras: ["N","M","Ñ"], correcta: 2 },
         ],
       },
+      // ── Sección 4: O P Q R S ───────────────────────────────────────
       {
         id: 4,
-        titulo: "Letras T–Z", // MODULO 4, nivel 1
-        descripcion: "Las últimas letras del abecedario.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuál es la seña de la letra T?",
-            opciones: [
-              "Pulgar entre índice y medio",
-              "Mano abierta",
-              "Puño cerrado",
-              "Índice arriba",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra V?",
-            opciones: [
-              "Índice y medio en V",
-              "Puño cerrado",
-              "Mano abierta",
-              "Tres dedos arriba",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuál es la seña de la letra Z?",
-            opciones: [
-              "Trazar Z con el índice en el aire",
-              "Puño cerrado",
-              "Mano abierta",
-              "Pulgar arriba",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Cuántas letras tiene el abecedario dactilológico LSA?",
-            opciones: ["27", "26", "28", "25"],
-            correcta: 0,
-          },
+        titulo: "Letras O–S",
+        descripcion: "Cinco nuevas letras con GIFs y ejercicios.",
+        xp: 50,
+        items: [
+          { tipo: "ensenanza", letra: "O" },
+          { tipo: "ensenanza", letra: "P" },
+          { tipo: "ensenanza", letra: "Q" },
+          { tipo: "ensenanza", letra: "R" },
+          { tipo: "ensenanza", letra: "S" },
+          // Bloque 2: 3,2,2,4,3
+          { tipo: "que_letra", gifLetra: "S", opciones: ["I","S","H","J"], correcta: 1 },
+          { tipo: "elegir_sena", letra: "O", opcionesLetras: ["P","Q","O"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "Q", opcionesLetras: ["O","R","Q"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["P","I","S","O"], palabraCorrecta: "PISO", letrasDisponibles: ["A","C","D","S","H","O","J","P","E","L","I","Q","C","P","L","A"] },
+          { tipo: "que_letra", gifLetra: "R", opciones: ["Q","I","R","E"], correcta: 2 },
+          // Bloque 3: 3,2,4,3,4
+          { tipo: "que_letra", gifLetra: "Q", opciones: ["Q","O","S","R"], correcta: 0 },
+          { tipo: "elegir_sena", letra: "R", opcionesLetras: ["Q","S","R"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["R","E","A","L"], palabraCorrecta: "REAL", letrasDisponibles: ["I","K","I","S","C","E","J","D","L","E","R","W","Q","C","A","S","O"] },
+          { tipo: "que_letra", gifLetra: "O", opciones: ["B","L","D","O"], correcta: 3 },
+          { tipo: "que_palabra", secuencia: ["S","E","Ñ","O","R","A"], palabraCorrecta: "SEÑORA", letrasDisponibles: ["A","Ñ","Q","S","C","E","B","O","E","R","J","Q","C","P","E","A"] },
+          // Bloque 4: 3,2,4,2,4
+          { tipo: "que_letra", gifLetra: "P", opciones: ["Q","P","C","L"], correcta: 1 },
+          { tipo: "elegir_sena", letra: "S", opcionesLetras: ["R","Q","S"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["E","M","P","L","E","O"], palabraCorrecta: "EMPLEO", letrasDisponibles: ["P","J","Q","S","L","E","B","F","S","E","M","W","D","N","O","R","A"] },
+          { tipo: "elegir_sena", letra: "P", opcionesLetras: ["Q","R","P"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["P","R","E","M","I","O"], palabraCorrecta: "PREMIO", letrasDisponibles: ["A","D","Q","M","C","E","B","O","J","I","W","R","C","P","E","A"] },
         ],
       },
+      // ── Sección 5: T U V W X ───────────────────────────────────────
       {
-        id: 5, // MODULO 5, nivel 1
-        titulo: "Repaso completo",
-        descripcion: "Practicá todo el abecedario.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta:
-              "¿Qué letra se hace con un puño cerrado y el pulgar al costado?",
-            opciones: ["A", "S", "E", "M"],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué letra se hace trazando su forma en el aire?",
-            opciones: ["Z", "A", "O", "C"],
-            correcta: 0,
-          },
-          {
-            pregunta:
-              "¿Qué letra se hace con cuatro dedos juntos apuntando arriba?",
-            opciones: ["B", "D", "F", "H"],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué letra se hace con índice y medio cruzados?",
-            opciones: ["R", "V", "U", "H"],
-            correcta: 0,
-          },
+        id: 5,
+        titulo: "Letras T–X",
+        descripcion: "Cinco nuevas letras con GIFs y ejercicios.",
+        xp: 50,
+        items: [
+          { tipo: "ensenanza", letra: "T" },
+          { tipo: "ensenanza", letra: "U" },
+          { tipo: "ensenanza", letra: "V" },
+          { tipo: "ensenanza", letra: "W" },
+          { tipo: "ensenanza", letra: "X" },
+          // Bloque 2: 2,2,3,4,2
+          { tipo: "elegir_sena", letra: "V", opcionesLetras: ["U","W","V"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "T", opcionesLetras: ["U","V","T"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "T", opciones: ["W","T","I","G"], correcta: 1 },
+          { tipo: "que_palabra", secuencia: ["T","E","X","T","O"], palabraCorrecta: "TEXTO", letrasDisponibles: ["I","K","I","T","C","E","T","D","L","E","R","W","Q","X","A","K","O"] },
+          { tipo: "elegir_sena", letra: "W", opcionesLetras: ["V","X","W"], correcta: 2 },
+          // Bloque 3: 4,3,2,3,4
+          { tipo: "que_palabra", secuencia: ["R","U","T","A"], palabraCorrecta: "RUTA", letrasDisponibles: ["E","D","Q","A","C","U","B","T","J","I","W","R","C","P","E","A"] },
+          { tipo: "que_letra", gifLetra: "V", opciones: ["J","X","V","U"], correcta: 2 },
+          { tipo: "elegir_sena", letra: "X", opcionesLetras: ["W","V","X"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "X", opciones: ["F","W","X","R"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["W","I","F","I"], palabraCorrecta: "WIFI", letrasDisponibles: ["A","I","Q","S","W","E","B","T","E","R","I","Q","C","F","E","A"] },
+          // Bloque 4: 4,2,4,3,3
+          { tipo: "que_palabra", secuencia: ["A","U","T","O"], palabraCorrecta: "AUTO", letrasDisponibles: ["A","C","D","S","H","O","J","P","E","L","I","Q","T","P","L","A","U"] },
+          { tipo: "elegir_sena", letra: "U", opcionesLetras: ["T","V","U"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["V","E","N","T","A","N","A"], palabraCorrecta: "VENTANA", letrasDisponibles: ["N","M","Q","T","L","E","B","F","S","E","A","W","D","N","O","V","A"] },
+          { tipo: "que_letra", gifLetra: "W", opciones: ["V","W","U","L"], correcta: 1 },
+          { tipo: "que_letra", gifLetra: "U", opciones: ["X","O","T","U"], correcta: 3 },
+        ],
+      },
+      // ── Sección 6: Y Z CH LL ───────────────────────────────────────
+      {
+        id: 6,
+        titulo: "Letras Y, Z, CH, LL",
+        descripcion: "Las últimas letras del abecedario LSA.",
+        xp: 40,
+        items: [
+          { tipo: "ensenanza", letra: "Y" },
+          { tipo: "ensenanza", letra: "Z" },
+          { tipo: "ensenanza", letra: "CH" },
+          { tipo: "ensenanza", letra: "LL" },
+          // Bloque 2: 3,2,3,4
+          { tipo: "que_letra", gifLetra: "Z", opciones: ["B","Y","CH","Z"], correcta: 3 },
+          { tipo: "elegir_sena", letra: "CH", opcionesLetras: ["LL","Y","CH"], correcta: 2 },
+          { tipo: "que_letra", gifLetra: "Y", opciones: ["Z","Y","G","S"], correcta: 1 },
+          { tipo: "que_palabra", secuencia: ["Z","O","N","A"], palabraCorrecta: "ZONA", letrasDisponibles: ["I","K","Z","S","C","E","J","D","L","E","R","W","N","C","A","S","O"] },
+          // Bloque 3: 3,2,4,2
+          { tipo: "que_letra", gifLetra: "CH", opciones: ["CH","X","LL","Y"], correcta: 0 },
+          { tipo: "elegir_sena", letra: "Y", opcionesLetras: ["Z","CH","Y"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["M","A","Y","O","R"], palabraCorrecta: "MAYOR", letrasDisponibles: ["A","Ñ","O","S","R","E","B","M","Y","R","J","Q","C","P","E","A"] },
+          { tipo: "elegir_sena", letra: "Z", opcionesLetras: ["Y","LL","Z"], correcta: 2 },
+          // Bloque 4: 4,2,4,3
+          { tipo: "que_palabra", secuencia: ["LL","A","V","E"], palabraCorrecta: "LLAVE", letrasDisponibles: ["V","C","D","LL","A","O","J","P","E","L","I","Q","C","P","L","A"] },
+          { tipo: "elegir_sena", letra: "LL", opcionesLetras: ["CH","Y","LL"], correcta: 2 },
+          { tipo: "que_palabra", secuencia: ["CH","O","Q","U","E"], palabraCorrecta: "CHOQUE", letrasDisponibles: ["P","U","Q","S","L","E","B","CH","S","Q","M","C","D","N","O","R","E"] },
+          { tipo: "que_letra", gifLetra: "LL", opciones: ["I","LL","H","Z"], correcta: 1 },
         ],
       },
     ],
@@ -1181,7 +1197,7 @@ const ItemQuePalabra = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderV
     else onCorrecto();
   };
 
-  const gifW = Math.floor((SCREEN_WIDTH - 56) / 4);
+  const gifW = n <= 4 ? Math.floor((SCREEN_WIDTH - 56) / 4) : 72;
 
   return (
     <View style={styles.ejercicioContainer}>
@@ -1193,7 +1209,12 @@ const ItemQuePalabra = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderV
         </View>
 
         {/* GIFs + slots */}
-        <View style={styles.palabraGifsRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[styles.palabraGifsRow, { paddingHorizontal: 4 }]}
+          style={{ marginBottom: 16 }}
+        >
           {item.secuencia.map((letra, i) => (
             <View key={i} style={styles.palabraGifCol}>
               <View style={[styles.palabraGifWrap, { width: gifW, height: gifW * 1.3 }]}>
@@ -1219,7 +1240,7 @@ const ItemQuePalabra = ({ item, idx, total, vidasGlobales, onCorrecto, onPerderV
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </ScrollView>
 
         <Text style={styles.letrasDisponiblesLabel}>Letras disponibles</Text>
         <View style={styles.letrasDisponiblesGrid}>
