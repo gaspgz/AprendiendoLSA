@@ -557,22 +557,30 @@ const formatCountdown = (ms) => {
 //  HELPERS — PROGRESO / NIVELES
 // ══════════════════════════════════════════════════════════════════════
 
-const getNivelEstado = (nivel, leccionesCompletadas) => {
-  const completadasEnNivel = leccionesCompletadas[nivel.id] || [];
-  const totalLecciones = nivel.lecciones.length;
+const contarCompletadasValidas = (ids, lecciones) => {
+  const validIds = new Set(lecciones.map((l) => l.id));
+  return [...new Set(ids)].filter((id) => validIds.has(id)).length;
+};
 
-  if (totalLecciones === 0) return "bloqueado"; // sin contenido todavía
+const getNivelEstado = (nivel, leccionesCompletadas) => {
+  const totalLecciones = nivel.lecciones.length;
+  if (totalLecciones === 0) return "bloqueado";
+
+  const completadas = contarCompletadasValidas(
+    leccionesCompletadas[nivel.id] || [],
+    nivel.lecciones,
+  );
 
   if (nivel.id === 1) {
-    return completadasEnNivel.length >= totalLecciones
-      ? "completado"
-      : "actual";
+    return completadas >= totalLecciones ? "completado" : "actual";
   }
   const nivelAnterior = NIVELES.find((n) => n.id === nivel.id - 1);
-  const completadasAnterior = leccionesCompletadas[nivelAnterior.id] || [];
-  if (completadasAnterior.length < nivelAnterior.lecciones.length)
-    return "bloqueado";
-  return completadasEnNivel.length >= totalLecciones ? "completado" : "actual";
+  const completadasAnterior = contarCompletadasValidas(
+    leccionesCompletadas[nivelAnterior.id] || [],
+    nivelAnterior.lecciones,
+  );
+  if (completadasAnterior < nivelAnterior.lecciones.length) return "bloqueado";
+  return completadas >= totalLecciones ? "completado" : "actual";
 };
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1685,7 +1693,12 @@ export default function HomeScreen() {
 
   // ── utilidades de render ──
   const completadasDelNivel = nivelAbierto
-    ? leccionesComp[nivelAbierto.id] || []
+    ? (() => {
+        const validIds = new Set(nivelAbierto.lecciones.map((l) => l.id));
+        return [...new Set(leccionesComp[nivelAbierto.id] || [])].filter((id) =>
+          validIds.has(id),
+        );
+      })()
     : [];
 
   const esBloqueadaLeccion = (leccion, index) => {
@@ -1790,7 +1803,7 @@ export default function HomeScreen() {
         <View style={styles.progresoWrap}>
           <BarraProgreso completadas={completadas} total={total} />
           <Text style={styles.progresoTxt}>
-            {completadas === total
+            {completadas >= total
               ? "¡Nivel completado! 🏆"
               : `${total - completadas} lecciones restantes`}
           </Text>
@@ -1813,7 +1826,7 @@ export default function HomeScreen() {
               />
             );
           })}
-          {completadas === total && (
+          {completadas >= total && (
             <View style={styles.nivelCompletoBanner}>
               <Text style={{ fontSize: 48, marginBottom: 8 }}>🎓</Text>
               <Text style={styles.nivelCompletoTxt}>
