@@ -104,6 +104,60 @@ Nota: las letras se repiten intencionalmente para dificultar
 
 ---
 
+### 🟠 Tipo 6 — "Elegí la seña correcta" (para palabras)
+
+**Aplica a Nivel 2 en adelante.** Es el inverso del Tipo 5 y el equivalente del Tipo 2 pero para vocabulario completo. El usuario ve el **nombre de una palabra** y debe elegir **cuál de 3 GIFs** muestra la seña correcta.
+
+```
+Pregunta: "Elegí la seña correcta para 'gracias'"
+
+Opciones visuales:
+[ GIF_incorrecto ] [ GIF_incorrecto ] [ GIF_correcto ✓ ]
+
+Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
+```
+
+**Mecánica clave:**
+
+- Igual al Tipo 2 pero el enunciado es una palabra completa (no una letra)
+- Las opciones son GIFs de señas de vocabulario (no dactilología)
+- 3 opciones siempre, una sola correcta
+- Los GIFs incorrectos son señas de palabras similares o del mismo nivel para dificultar
+
+**Estructura de datos:**
+```js
+{ tipo: "elegir_sena_palabra", palabra: "gracias", opcionesGifs: [...], correcta: 2 }
+```
+
+---
+
+### 🔴 Tipo 5 — "¿Cuál es esta palabra?" (escritura libre)
+
+**Aplica a Nivel 2 en adelante.** El usuario ve el **GIF de una seña completa** (una palabra, no una letra del abecedario) y debe **escribir la respuesta** en un campo de texto libre.
+
+```
+Pregunta: "¿Cuál es esta palabra?"
+
+[ GIF de la seña — ej: "hola", "gracias", "nombre" ]
+
+Escribí la palabra aquí:
+[ ________________________ ]
+
+[ Confirmar ]
+
+Feedback: ✅ CORRECTA  /  ❌ INCORRECTA
+```
+
+**Mecánica clave:**
+
+- El estímulo es visual (GIF de una seña de vocabulario completo, no dactilológico)
+- La respuesta es texto libre escrito por el usuario (no selección de opciones)
+- La comparación es case-insensitive y sin tildes (ej: "Hola", "hola", "HOLA" son todas correctas)
+- Es el tipo más difícil porque no hay opciones para guiarse
+- Pensado para Nivel 2+ donde las señas son palabras/frases, no letras sueltas
+
+---
+
 ## Estado de implementación
 
 ### ✅ Implementado actualmente
@@ -122,9 +176,11 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 ### ⏳ Por implementar (por orden de prioridad)
 
 1. **Fase introducción con GIFs** — los N items iniciales de cada sección son de visualización pura, sin pregunta
-2. **Tipo 1** — opciones visuales (GIFs) en lugar de texto
-3. **Tipo 2** — estímulo visual (GIF) + opciones de texto (letras)
-4. **Tipo 3** — secuencia de GIFs + opciones de palabras completas
+2. **Tipo 2** — opciones visuales (GIFs) en lugar de texto
+3. **Tipo 3** — estímulo visual (GIF) + opciones de texto (letras)
+4. **Tipo 4** — secuencia de GIFs + opciones de palabras completas
+5. **Tipo 5** — GIF de una seña completa + campo de escritura libre (Nivel 2+)
+6. **Tipo 6** — nombre de una palabra + elegir el GIF correcto entre 3 opciones (Nivel 2+)
 
 ---
 
@@ -148,6 +204,9 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
     { tipo: "elegir_sena", letra: "A", opcionesGifs: [...], correcta: 2 },
     { tipo: "que_letra",   gifSource: GIFS["B"], opciones: ["B","h","w"], correcta: 0 },
     { tipo: "que_palabra", secuenciaGifs: [...], opciones: ["bebé","cada","debe"], correcta: 0 },
+
+    // Tipo 5 — escritura libre (Nivel 2+)
+    { tipo: "escritura_libre", gifSource: GIFS_PALABRAS["hola"], respuestaCorrecta: "hola" },
   ]
 }
 ```
@@ -159,7 +218,7 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 - Cada sección cubre exactamente 5 letras (o unidades de vocabulario en otros niveles)
 - Siempre empieza con la fase de enseñanza (GIFs sin presión) antes de evaluar
 - El Tipo 3 usa palabras que comparten letras entre sí para forzar atención
-- El orden dentro de la sección es fijo: enseñanza → Tipo 1 → Tipo 2 → Tipo 3
+- El orden dentro de la sección es fijo: enseñanza → Tipo 2 → Tipo 3 → Tipo 4 (el orden de Nivel 2+ con Tipo 5 está por definir)
 - Las vidas y el sistema de "debe responder bien para avanzar" aplican igual a todos los tipos
 
 ---
