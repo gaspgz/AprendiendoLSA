@@ -4,11 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -55,6 +58,47 @@ const GIFS = {
   Y: require("../../assets/gifs/abecedario/Y.gif"),
   Z: require("../../assets/gifs/abecedario/Z.gif"),
 };
+
+// GIFs de VOCABULARIO (Nivel 2+). Keys = nombre del archivo sin acentos ni signos.
+const GIFS_PALABRAS = {
+  apellido: require("../../assets/gifs/presentaciones/apellido.gif"),
+  comoestas: require("../../assets/gifs/presentaciones/comoestas.gif"),
+  como: require("../../assets/gifs/presentaciones/como.gif"),
+  comotellamas: require("../../assets/gifs/presentaciones/comotellamas.gif"),
+  cual: require("../../assets/gifs/presentaciones/cual.gif"),
+  cualestuedad: require("../../assets/gifs/presentaciones/cualestuedad.gif"),
+  cuando: require("../../assets/gifs/presentaciones/cuando.gif"),
+  cuanto: require("../../assets/gifs/presentaciones/cuanto.gif"),
+  deque: require("../../assets/gifs/presentaciones/deque.gif"),
+  dni: require("../../assets/gifs/presentaciones/dni.gif"),
+  donde: require("../../assets/gifs/presentaciones/donde.gif"),
+  nombre: require("../../assets/gifs/presentaciones/nombre.gif"),
+  oyente: require("../../assets/gifs/presentaciones/oyente.gif"),
+  paraque: require("../../assets/gifs/presentaciones/paraque.gif"),
+  porque: require("../../assets/gifs/presentaciones/porque.gif"),
+  presentandonos: require("../../assets/gifs/presentaciones/presentandonos.gif"),
+  que: require("../../assets/gifs/presentaciones/que.gif"),
+  quedice: require("../../assets/gifs/presentaciones/quedice.gif"),
+  quien: require("../../assets/gifs/presentaciones/quien.gif"),
+  sordo: require("../../assets/gifs/presentaciones/sordo.gif"),
+};
+
+// Normaliza texto para comparar respuestas libres: minúsculas, sin tildes ni signos.
+const normalizarTexto = (s) =>
+  (s || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize("NFD") // separa cada vocal de su tilde (á -> a + ´)
+    .split("")
+    .filter((c) => {
+      const code = c.charCodeAt(0);
+      return code < 0x0300 || code > 0x036f; // descarta marcas diacríticas combinantes
+    })
+    .join("")
+    .replace(/[¿?¡!.,]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 // ══════════════════════════════════════════════════════════════════════
 //  CONFIG API  — reemplazá la URL cuando tengas MockAPI listo
@@ -1201,102 +1245,214 @@ const NIVELES = [
   {
     id: 2, // NIVEL 2
     nombre: "Saludos y presentaciones",
-    descripcion: "Hola, chau, ¿cómo estás? y más.",
-    totalXP: 150,
+    descripcion: "Nombre, apellido, DNI y preguntas básicas.",
+    totalXP: 190,
     lecciones: [
       {
-        id: 1, // MODULO 1, nivel 2
-        titulo: "Hola y Chau",
-        descripcion: "Las señas más básicas para saludar.",
-        xp: 30,
-        ejercicios: [
+        id: 1, // SECCIÓN 1, nivel 2
+        titulo: "Nombre y datos",
+        descripcion: "apellido, DNI, nombre, oyente y presentándonos.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "apellido", nombre: "apellido" },
+          { tipo: "ensenanza_palabra", gifPalabra: "dni", nombre: "DNI" },
+          { tipo: "ensenanza_palabra", gifPalabra: "nombre", nombre: "nombre" },
+          { tipo: "ensenanza_palabra", gifPalabra: "oyente", nombre: "oyente" },
           {
-            pregunta: "¿Cuál es la seña para 'Hola'?",
-            opciones: [
-              "Mano abierta moviéndose de lado a lado",
-              "Puño cerrado arriba",
-              "Dos dedos señalando",
-              "Palma abajo",
-            ],
+            tipo: "ensenanza_palabra",
+            gifPalabra: "presentandonos",
+            nombre: "presentándonos",
+          },
+          // ── Bloque 2 (items 6-10): Tipo 2,3,2,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "apellido",
+            opcionesGifs: ["nombre", "dni", "apellido"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "oyente",
+            opciones: ["sordo", "DNI", "oyente", "nombre"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nombre",
+            opcionesGifs: ["presentandonos", "nombre", "oyente"],
+            correcta: 1,
+          },
+          { tipo: "escritura_libre", gifPalabra: "dni", respuestaCorrecta: "DNI" },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "presentandonos",
+            opciones: ["oyente", "presentándonos", "apellido", "nombre"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,2,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nombre",
+            respuestaCorrecta: "nombre",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "apellido",
+            opciones: ["apellido", "presentándonos", "nombre", "DNI"],
             correcta: 0,
           },
           {
-            pregunta: "¿Cómo se dice 'Chau' en LSA?",
-            opciones: [
-              "Mano en el pecho",
-              "Mano abierta moviéndose de lado a lado",
-              "Índice al cielo",
-              "Palma girada adentro",
-            ],
+            tipo: "elegir_sena_palabra",
+            palabra: "presentándonos",
+            opcionesGifs: ["apellido", "oyente", "presentandonos"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "dni",
+            opciones: ["oyente", "DNI", "nombre", "sordo"],
             correcta: 1,
           },
           {
-            pregunta: "¿Cuándo se usa la seña de 'Hola'?",
-            opciones: [
-              "Al saludar al llegar",
-              "Al despedirse",
-              "Al agradecer",
-              "Al pedir algo",
-            ],
+            tipo: "escritura_libre",
+            gifPalabra: "oyente",
+            respuestaCorrecta: "oyente",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 5,2,5,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "apellido",
+            respuestaCorrecta: "apellido",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "oyente",
+            opcionesGifs: ["oyente", "nombre", "dni"],
             correcta: 0,
           },
           {
-            pregunta: "¿La seña de 'Chau' se hace con la mano...?",
-            opciones: [
-              "Abierta moviéndose",
-              "Cerrada quieta",
-              "En forma de C",
-              "Señalando",
-            ],
+            tipo: "escritura_libre",
+            gifPalabra: "presentandonos",
+            respuestaCorrecta: "presentándonos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nombre",
+            opciones: ["sordo", "oyente", "apellido", "nombre"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "DNI",
+            opcionesGifs: ["dni", "nombre", "apellido"],
             correcta: 0,
           },
         ],
       },
       {
-        id: 2, // MODULO 2, nivel 2
-        titulo: "¿Cómo estás?",
-        descripcion: "Preguntá y respondé sobre tu estado.",
-        xp: 30,
-        ejercicios: [
+        id: 2, // SECCIÓN 2, nivel 2
+        titulo: "Preguntas básicas",
+        descripcion: "sordo y las preguntas ¿cómo?, ¿cuál? y ¿cuándo?.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "sordo", nombre: "sordo" },
           {
-            pregunta: "¿Qué seña expresa 'Bien'?",
-            opciones: [
-              "Pulgar hacia arriba",
-              "Mano abierta al pecho",
-              "Índice y medio cruzados",
-              "Mano cerrada afuera",
-            ],
+            tipo: "ensenanza_palabra",
+            gifPalabra: "comoestas",
+            nombre: "¿cómo estás?",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "como", nombre: "¿cómo?" },
+          { tipo: "ensenanza_palabra", gifPalabra: "cual", nombre: "¿cuál?" },
+          { tipo: "ensenanza_palabra", gifPalabra: "cuando", nombre: "¿cuándo?" },
+          // ── Bloque 2 (items 6-10): Tipo 2,3,2,2,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo?",
+            opcionesGifs: ["comoestas", "como", "cual"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cuando",
+            opciones: ["¿qué?", "¿cuánto?", "¿cómo estás?", "¿cuándo?"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sordo",
+            opcionesGifs: ["sordo", "como", "cuando"],
             correcta: 0,
           },
           {
-            pregunta: "¿Qué seña expresa 'Mal'?",
-            opciones: [
-              "Pulgar hacia abajo",
-              "Mano en el aire",
-              "Puño cerrado",
-              "Dedos abiertos",
-            ],
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo estás?",
+            opcionesGifs: ["como", "comoestas", "cual"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cual",
+            respuestaCorrecta: "¿cuál?",
+          },
+          // ── Bloque 3 (items 11-15): Tipo 3,3,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sordo",
+            opciones: ["¿cómo estás?", "sordo", "oyente", "¿cuál?"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comoestas",
+            opciones: ["¿cuándo?", "¿cómo estás?", "¿cómo?", "¿cuál?"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuándo?",
+            opcionesGifs: ["cual", "cuando", "como"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "como",
+            respuestaCorrecta: "¿cómo?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cual",
+            opciones: ["¿cómo?", "¿cuándo?", "¿cuál?", "¿quién?"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 2,5,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuál?",
+            opcionesGifs: ["cuando", "cual", "comoestas"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comoestas",
+            respuestaCorrecta: "¿cómo estás?",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sordo",
+            respuestaCorrecta: "sordo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "como",
+            opciones: ["¿cómo?", "¿cuánto?", "¿cuál?", "¿cómo estás?"],
             correcta: 0,
           },
           {
-            pregunta: "¿Cómo se pregunta '¿Cómo estás?' en LSA?",
-            opciones: [
-              "Mano moviéndose con expresión interrogativa",
-              "Solo mover la cabeza",
-              "Señalar al otro",
-              "Cruzar los brazos",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "La expresión facial en LSA es...?",
-            opciones: [
-              "Parte esencial del mensaje",
-              "Opcional",
-              "Solo para emociones",
-              "Irrelevante",
-            ],
-            correcta: 0,
+            tipo: "escritura_libre",
+            gifPalabra: "cuando",
+            respuestaCorrecta: "¿cuándo?",
           },
         ],
       },
@@ -2413,6 +2569,440 @@ const ItemQuePalabra = ({
   );
 };
 
+// ── Tipo 1 (palabras): enseñanza de vocabulario ───────────────────────
+const ItemEnsenanzaPalabra = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onContinuar,
+  onSalir,
+}) => (
+  <View style={styles.ejercicioContainer}>
+    <EjercicioHeader
+      idx={idx}
+      total={total}
+      vidasGlobales={vidasGlobales}
+      onSalir={onSalir}
+    />
+    <ScrollView contentContainerStyle={styles.ejercicioContent}>
+      <View style={styles.itemCard}>
+        <Text style={styles.itemCardPalabraGrande}>{item.nombre}</Text>
+        <Text style={styles.itemCardSub}>Mirá bien la seña</Text>
+      </View>
+      <View style={styles.gifGrandeWrap}>
+        <Image
+          source={GIFS_PALABRAS[item.gifPalabra]}
+          style={styles.gifGrande}
+          resizeMode="contain"
+        />
+      </View>
+    </ScrollView>
+    <View style={styles.ejercicioBtnWrap}>
+      <TouchableOpacity style={styles.btnPrincipal} onPress={onContinuar}>
+        <Text style={styles.btnPrincipalTxt}>Continuar →</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+// ── Tipo 6: "Elegí la seña correcta" para una palabra (3 GIFs) ─────────
+const ItemElegirSenaPalabra = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onCorrecto,
+  onPerderVida,
+  onSalir,
+}) => {
+  const [seleccionado, setSelec] = useState(null);
+  const [confirmado, setConf] = useState(false);
+  const esCorrecta = seleccionado === item.correcta;
+
+  const confirmar = () => {
+    if (seleccionado === null) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (!esCorrecta) {
+      setSelec(null);
+      setConf(false);
+    } else onCorrecto();
+  };
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader
+        idx={idx}
+        total={total}
+        vidasGlobales={vidasGlobales}
+        onSalir={onSalir}
+      />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardPalabraGrande}>{item.palabra}</Text>
+          <Text style={styles.itemCardSub}>Elegí la seña correcta</Text>
+        </View>
+        <View style={styles.gifOpcionesWrap}>
+          {item.opcionesGifs.map((clave, i) => {
+            let borderColor = "#E0E0E0";
+            let bgColor = "#F5F6FA";
+            if (confirmado) {
+              if (i === item.correcta) {
+                borderColor = "#2E7D32";
+                bgColor = "#C8F5D3";
+              } else if (i === seleccionado) {
+                borderColor = "#C62828";
+                bgColor = "#FFCDD2";
+              }
+            } else if (seleccionado === i) {
+              borderColor = "#3D4FBB";
+              bgColor = "#EEF1FB";
+            }
+            return (
+              <View
+                key={i}
+                style={{
+                  elevation: confirmado ? 0 : 3,
+                  borderRadius: 16,
+                  marginBottom: 4,
+                }}
+              >
+                <TouchableOpacity
+                  style={[
+                    styles.gifOpcionBtn,
+                    { borderColor, backgroundColor: bgColor },
+                  ]}
+                  onPress={() => !confirmado && setSelec(i)}
+                  activeOpacity={confirmado ? 1 : 0.75}
+                >
+                  <View style={styles.gifOpcionImgWrap}>
+                    <Image
+                      source={GIFS_PALABRAS[clave]}
+                      style={styles.gifOpcion}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <View
+                    style={[
+                      styles.radioCircle,
+                      seleccionado === i &&
+                        !confirmado &&
+                        styles.radioCircleSelec,
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+      {confirmado && (
+        <View
+          style={[
+            styles.feedbackBanner,
+            { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.feedbackTxt,
+              { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+            ]}
+          >
+            {esCorrecta ? "¡Correcto! 🎉" : "Incorrecto ❌ — Intentá de nuevo"}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { opacity: seleccionado === null ? 0.45 : 1 },
+            ]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+            ]}
+            onPress={siguiente}
+          >
+            <Text
+              style={[
+                styles.btnPrincipalTxt,
+                { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+              ]}
+            >
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+// ── Tipo 3 (palabras): "¿Qué palabra es esta?" (GIF -> 4 opciones texto) ─
+const ItemQuePalabraOpciones = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onCorrecto,
+  onPerderVida,
+  onSalir,
+}) => {
+  const [seleccionado, setSelec] = useState(null);
+  const [confirmado, setConf] = useState(false);
+  const esCorrecta = seleccionado === item.correcta;
+
+  const confirmar = () => {
+    if (seleccionado === null) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (!esCorrecta) {
+      setSelec(null);
+      setConf(false);
+    } else onCorrecto();
+  };
+
+  const bgOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
+    if (i === item.correcta) return "#C8F5D3";
+    if (i === seleccionado) return "#FFCDD2";
+    return "#F5F6FA";
+  };
+  const bdOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
+    if (i === item.correcta) return "#2E7D32";
+    if (i === seleccionado) return "#C62828";
+    return "#E0E0E0";
+  };
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader
+        idx={idx}
+        total={total}
+        vidasGlobales={vidasGlobales}
+        onSalir={onSalir}
+      />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardTitulo}>Mirá bien la seña</Text>
+          <Text style={styles.itemCardSub}>¿Qué palabra es esta?</Text>
+        </View>
+        <View style={styles.gifGrandeWrap}>
+          <Image
+            source={GIFS_PALABRAS[item.gifPalabra]}
+            style={styles.gifGrande}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.opcionesWrap}>
+          {item.opciones.map((op, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[
+                styles.opcion,
+                { backgroundColor: bgOp(i), borderColor: bdOp(i) },
+              ]}
+              onPress={() => !confirmado && setSelec(i)}
+              activeOpacity={confirmado ? 1 : 0.75}
+            >
+              <Text style={styles.opcionLetra}>{["A", "B", "C", "D"][i]}</Text>
+              <Text style={styles.opcionTxt}>{op}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+      {confirmado && (
+        <View
+          style={[
+            styles.feedbackBanner,
+            { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.feedbackTxt,
+              { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+            ]}
+          >
+            {esCorrecta
+              ? "¡Correcto! 🎉"
+              : `Incorrecto ❌ — La respuesta es ${item.opciones[item.correcta]}`}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { opacity: seleccionado === null ? 0.45 : 1 },
+            ]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+            ]}
+            onPress={siguiente}
+          >
+            <Text
+              style={[
+                styles.btnPrincipalTxt,
+                { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+              ]}
+            >
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
+// ── Tipo 5: "¿Cuál es esta palabra?" (escritura libre) ────────────────
+const ItemEscrituraLibre = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onCorrecto,
+  onPerderVida,
+  onSalir,
+}) => {
+  const [texto, setTexto] = useState("");
+  const [confirmado, setConf] = useState(false);
+  const esCorrecta =
+    normalizarTexto(texto) === normalizarTexto(item.respuestaCorrecta);
+
+  const confirmar = () => {
+    if (!texto.trim()) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (!esCorrecta) {
+      setTexto("");
+      setConf(false);
+    } else onCorrecto();
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.ejercicioContainer}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <EjercicioHeader
+        idx={idx}
+        total={total}
+        vidasGlobales={vidasGlobales}
+        onSalir={onSalir}
+      />
+      <ScrollView
+        contentContainerStyle={styles.ejercicioContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardTitulo}>Mirá bien la seña</Text>
+          <Text style={styles.itemCardSub}>¿Cuál es esta palabra?</Text>
+        </View>
+        <View style={styles.gifGrandeWrap}>
+          <Image
+            source={GIFS_PALABRAS[item.gifPalabra]}
+            style={styles.gifGrande}
+            resizeMode="contain"
+          />
+        </View>
+        <Text style={styles.escrituraLabel}>Escribí la palabra aquí</Text>
+        <TextInput
+          style={[
+            styles.escrituraInput,
+            confirmado &&
+              (esCorrecta ? styles.escrituraInputOk : styles.escrituraInputErr),
+          ]}
+          value={texto}
+          onChangeText={(t) => !confirmado && setTexto(t)}
+          editable={!confirmado}
+          placeholder="Escribí tu respuesta..."
+          placeholderTextColor="#9CA3AF"
+          autoCapitalize="none"
+          autoCorrect={false}
+          onSubmitEditing={confirmar}
+          returnKeyType="done"
+        />
+      </ScrollView>
+      {confirmado && (
+        <View
+          style={[
+            styles.feedbackBanner,
+            { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.feedbackTxt,
+              { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+            ]}
+          >
+            {esCorrecta
+              ? "¡Correcto! 🎉"
+              : `Incorrecto ❌ — La respuesta es ${item.respuestaCorrecta}`}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { opacity: texto.trim() ? 1 : 0.45 },
+            ]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+            ]}
+            onPress={siguiente}
+          >
+            <Text
+              style={[
+                styles.btnPrincipalTxt,
+                { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+              ]}
+            >
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
 const PantallaEjercicioNueva = ({
   leccion,
   vidasGlobales,
@@ -2443,12 +3033,27 @@ const PantallaEjercicioNueva = ({
     return (
       <ItemEnsenanza key={idx} item={item} {...common} onContinuar={avanzar} />
     );
+  if (item.tipo === "ensenanza_palabra")
+    return (
+      <ItemEnsenanzaPalabra
+        key={idx}
+        item={item}
+        {...common}
+        onContinuar={avanzar}
+      />
+    );
   if (item.tipo === "elegir_sena")
     return <ItemElegirSena key={idx} item={item} {...common} />;
+  if (item.tipo === "elegir_sena_palabra")
+    return <ItemElegirSenaPalabra key={idx} item={item} {...common} />;
   if (item.tipo === "que_letra")
     return <ItemQueLEtra key={idx} item={item} {...common} />;
+  if (item.tipo === "que_palabra_opciones")
+    return <ItemQuePalabraOpciones key={idx} item={item} {...common} />;
   if (item.tipo === "que_palabra")
     return <ItemQuePalabra key={idx} item={item} {...common} />;
+  if (item.tipo === "escritura_libre")
+    return <ItemEscrituraLibre key={idx} item={item} {...common} />;
   return null;
 };
 
@@ -3577,6 +4182,40 @@ const styles = StyleSheet.create({
   },
   letraBtnTxtUsada: {
     color: "#BDBDBD",
+  },
+
+  // ── Vocabulario (Nivel 2+): título de palabra y escritura libre ──
+  itemCardPalabraGrande: {
+    fontSize: 30,
+    fontWeight: "900",
+    color: "#3D4FBB",
+    marginBottom: 6,
+    textAlign: "center",
+  },
+  escrituraLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1A1A2E",
+    marginBottom: 10,
+  },
+  escrituraInput: {
+    borderWidth: 2,
+    borderColor: "#E0E0E0",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: "#1A1A2E",
+    backgroundColor: "#F5F6FA",
+    minHeight: 54,
+  },
+  escrituraInputOk: {
+    borderColor: "#2E7D32",
+    backgroundColor: "#C8F5D3",
+  },
+  escrituraInputErr: {
+    borderColor: "#C62828",
+    backgroundColor: "#FFCDD2",
   },
 
   // XP badge
