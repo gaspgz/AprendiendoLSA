@@ -1246,7 +1246,7 @@ const NIVELES = [
     id: 2, // NIVEL 2
     nombre: "Saludos y presentaciones",
     descripcion: "Nombre, apellido, DNI y preguntas básicas.",
-    totalXP: 190,
+    totalXP: 280,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 2
@@ -1457,126 +1457,581 @@ const NIVELES = [
         ],
       },
       {
-        id: 3, // MODULO 3, nivel 2
-        titulo: "Me llamo...",
-        descripcion: "Presentate con tu nombre en LSA.",
-        xp: 30,
-        ejercicios: [
+        id: 3, // SECCIÓN 3, nivel 2
+        titulo: "Cuánto, dónde y por qué",
+        descripcion: "¿cuánto?, ¿cuál es tu edad?, ¿dónde?, ¿para qué?, ¿por qué?.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "cuanto", nombre: "¿cuánto?" },
           {
-            pregunta: "Para deletrear tu nombre en LSA usás:",
-            opciones: [
-              "El abecedario dactilológico",
-              "Señas compuestas",
-              "Solo expresión facial",
-              "Movimiento de hombros",
-            ],
-            correcta: 0,
+            tipo: "ensenanza_palabra",
+            gifPalabra: "cualestuedad",
+            nombre: "¿cuál es tu edad?",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "donde", nombre: "¿dónde?" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "paraque",
+            nombre: "¿para qué?",
           },
           {
-            pregunta: "¿Qué parte del cuerpo es central al presentarte?",
-            opciones: [
-              "Las manos y la cara",
-              "Los pies",
-              "Los hombros",
-              "El torso",
-            ],
-            correcta: 0,
+            tipo: "ensenanza_palabra",
+            gifPalabra: "porque",
+            nombre: "¿por qué?",
           },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,5,2,2 ──
           {
-            pregunta: "¿Dónde se hace la seña 'yo' o 'me llamo'?",
-            opciones: [
-              "Señalando al pecho propio",
-              "Señalando arriba",
-              "Señalando al otro",
-              "En el aire",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "Al presentarte, ¿qué información podés dar primero?",
-            opciones: ["Tu nombre", "Tu edad", "Tu trabajo", "Tu ciudad"],
-            correcta: 0,
-          },
-        ],
-      },
-      {
-        id: 4, // MODULO 4, nivel 2
-        titulo: "Mucho gusto",
-        descripcion: "El saludo formal en LSA.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuándo se usa 'Mucho gusto' en LSA?",
-            opciones: [
-              "Al conocer a alguien",
-              "Al despedirse",
-              "Al pedir algo",
-              "Al agradecer",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿'Mucho gusto' es un saludo...?",
-            opciones: [
-              "Formal",
-              "Informal",
-              "Solo para amigos",
-              "Para despedidas",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué expresión facial acompaña 'Mucho gusto'?",
-            opciones: [
-              "Sonrisa y contacto visual",
-              "Cara seria",
-              "Ojos cerrados",
-              "Mirada hacia abajo",
-            ],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Se puede combinar 'Hola' con 'Mucho gusto'?",
-            opciones: [
-              "Sí, en una primera presentación",
-              "No, nunca",
-              "Solo con desconocidos adultos",
-              "Solo en contextos formales",
-            ],
-            correcta: 0,
-          },
-        ],
-      },
-      {
-        id: 5, // MODULO 5, nivel 2
-        titulo: "Repaso de saludos",
-        descripcion: "Practicá todos los saludos.",
-        xp: 30,
-        ejercicios: [
-          {
-            pregunta: "¿Cuál de estas NO es una seña de saludo?",
-            opciones: ["Gracias", "Hola", "Chau", "Mucho gusto"],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué seña usarías al entrar a un lugar?",
-            opciones: ["Hola", "Chau", "Mucho gusto", "¿Cómo estás?"],
-            correcta: 0,
-          },
-          {
-            pregunta: "¿Qué seña usarías al irte?",
-            opciones: ["Chau", "Hola", "Me llamo", "Mucho gusto"],
+            tipo: "que_palabra_opciones",
+            gifPalabra: "donde",
+            opciones: ["¿cómo estás?", "¿dónde?", "oyente", "¿cuál?"],
             correcta: 1,
           },
           {
-            pregunta: "¿La expresión facial cambia el significado de una seña?",
-            opciones: [
-              "Sí, completamente",
-              "No, nunca",
-              "Solo a veces",
-              "Solo en preguntas",
-            ],
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuál es tu edad?",
+            opcionesGifs: ["donde", "cualestuedad", "paraque"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porque",
+            respuestaCorrecta: "¿por qué?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿para qué?",
+            opcionesGifs: ["porque", "cuanto", "paraque"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuánto?",
+            opcionesGifs: ["cuanto", "donde", "cualestuedad"],
             correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 2,3,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿dónde?",
+            opcionesGifs: ["paraque", "donde", "porque"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cualestuedad",
+            opciones: ["¿cuál es tu edad?", "¿cómo estás?", "oyente", "¿cuál?"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cuanto",
+            respuestaCorrecta: "¿cuánto?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porque",
+            opciones: ["¿cómo te sentís?", "¿por qué?", "¿cuánto?", "¿para qué?"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "paraque",
+            respuestaCorrecta: "¿para qué?",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "donde",
+            respuestaCorrecta: "¿dónde?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "paraque",
+            opciones: ["¿cómo estás?", "¿cuál?", "¿por qué?", "¿para qué?"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cualestuedad",
+            respuestaCorrecta: "¿cuál es tu edad?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cuanto",
+            opciones: ["¿cuánto?", "¿cuál?", "¿cómo?", "¿de qué?"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿por qué?",
+            opcionesGifs: ["porque", "paraque", "cuanto"],
+            correcta: 0,
+          },
+        ],
+      },
+      {
+        id: 4, // SECCIÓN 4, nivel 2
+        titulo: "Qué, quién y de qué",
+        descripcion: "¿qué decís?, ¿qué?, ¿quién?, ¿cómo te llamas?, ¿de qué?.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "quedice",
+            nombre: "¿qué decís?",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "que", nombre: "¿qué?" },
+          { tipo: "ensenanza_palabra", gifPalabra: "quien", nombre: "¿quién?" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "comotellamas",
+            nombre: "¿cómo te llamas?",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "deque", nombre: "¿de qué?" },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "quien",
+            opciones: ["¿cuál?", "¿quién?", "¿quién?", "¿cómo?"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo te llamás?",
+            opcionesGifs: ["quedice", "comotellamas", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿qué?",
+            opcionesGifs: ["que", "quien", "deque"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "deque",
+            respuestaCorrecta: "¿de qué?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "quedice",
+            opciones: ["¿qué?", "¿qué decís?", "¿de qué?", "¿cómo te llamas?"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 3,2,5,3,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "que",
+            opciones: ["¿de qué?", "¿qué?", "¿quién?", "¿cómo?"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿de qué?",
+            opcionesGifs: ["que", "deque", "quien"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "quedice",
+            respuestaCorrecta: "¿qué decís?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comotellamas",
+            opciones: [
+              "¿cuál es tu edad?",
+              "¿cómo te llamas?",
+              "¿cómo estás?",
+              "¿de qué?",
+            ],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "quien",
+            respuestaCorrecta: "¿quién?",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,2,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deque",
+            opciones: ["¿quién?", "¿para qué?", "¿por qué?", "¿de qué?"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿quién?",
+            opcionesGifs: ["que", "quien", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comotellamas",
+            respuestaCorrecta: "¿cómo te llamas?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿qué decís?",
+            opcionesGifs: ["comotellamas", "quedice", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "que",
+            respuestaCorrecta: "¿qué?",
+          },
+        ],
+      },
+      {
+        id: 5, // SECCIÓN 5, nivel 2
+        titulo: "Repaso del nivel",
+        descripcion: "Practicá las 20 señas del nivel.",
+        xp: 80,
+        items: [
+          // ── Bloque 1 (items 1-10): Tipo 2,3,2,5,3,2,5,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuál?",
+            opcionesGifs: ["cuando", "cual", "como"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sordo",
+            opciones: ["¿cómo estás?", "oyente", "sordo", "¿cuál?"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "apellido",
+            opcionesGifs: ["nombre", "apellido", "dni"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comoestas",
+            respuestaCorrecta: "¿cómo estás?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "que",
+            opciones: ["¿de qué?", "¿quién?", "¿qué?", "¿cómo?"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "oyente",
+            opcionesGifs: ["oyente", "nombre", "sordo"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cuanto",
+            respuestaCorrecta: "¿cuánto?",
+          },
+          { tipo: "escritura_libre", gifPalabra: "dni", respuestaCorrecta: "DNI" },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comotellamas",
+            opciones: ["¿cómo te llamas?", "¿cuál es tu edad?", "¿cómo estás?"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sordo",
+            opcionesGifs: ["sordo", "oyente", "cual"],
+            correcta: 0,
+          },
+          // ── Bloque 2 (items 11-20): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comoestas",
+            opciones: ["¿cuándo?", "¿cómo estás?", "¿cómo?", "¿cuál?"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿dónde?",
+            opcionesGifs: ["paraque", "donde", "porque"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "quien",
+            respuestaCorrecta: "¿quién?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo?",
+            opcionesGifs: ["comoestas", "como", "cual"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿qué?",
+            opcionesGifs: ["que", "quien", "deque"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "apellido",
+            opciones: ["DNI", "presentándonos", "nombre", "apellido"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cual",
+            respuestaCorrecta: "¿cuál?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuál es tu edad?",
+            opcionesGifs: ["donde", "cualestuedad", "comoestas"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comotellamas",
+            respuestaCorrecta: "¿cómo te llamas?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "quien",
+            opciones: ["¿cuál?", "¿quién?", "¿quién?", "¿cómo?"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 21-30): Tipo 2,3,2,2,5,3,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿qué decís?",
+            opcionesGifs: ["que", "quedice", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "oyente",
+            opciones: ["oyente", "DNI", "sordo", "nombre"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "presentándonos",
+            opcionesGifs: ["apellido", "oyente", "presentandonos"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿para qué?",
+            opcionesGifs: ["porque", "cuanto", "paraque"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sordo",
+            respuestaCorrecta: "sordo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "quedice",
+            opciones: ["¿qué?", "¿qué decís?", "¿de qué?", "¿cómo te llamas?"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿por qué?",
+            opcionesGifs: ["porque", "paraque", "cuanto"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cuando",
+            respuestaCorrecta: "¿cuándo?",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "como",
+            respuestaCorrecta: "¿cómo?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "donde",
+            opciones: ["¿cómo estás?", "¿dónde?", "¿quién?", "¿cuál?"],
+            correcta: 1,
+          },
+          // ── Bloque 4 (items 31-40): Tipo 5,3,5,3,2,2,5,3,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "que",
+            respuestaCorrecta: "¿qué?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "paraque",
+            opciones: ["¿cómo estás?", "¿cuál?", "¿por qué?", "¿para qué?"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cualestuedad",
+            respuestaCorrecta: "¿cuál es tu edad?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cuanto",
+            opciones: ["¿cuánto?", "¿cuál?", "¿cómo?", "¿de qué?"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿quién?",
+            opcionesGifs: ["que", "quien", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo estás?",
+            opcionesGifs: ["como", "comoestas", "cual"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nombre",
+            respuestaCorrecta: "nombre",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deque",
+            opciones: ["¿quién?", "¿para qué?", "¿por qué?", "¿de qué?"],
+            correcta: 3,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porque",
+            opciones: ["¿cómo te sentís?", "¿por qué?", "¿cuánto?", "¿para qué?"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "apellido",
+            respuestaCorrecta: "apellido",
+          },
+          // ── Bloque 5 (items 41-50): Tipo 5,2,3,2,5,3,2,5,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "quedice",
+            respuestaCorrecta: "¿qué decís?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cómo te llamás?",
+            opcionesGifs: ["quedice", "comotellamas", "deque"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "presentandonos",
+            opciones: ["hola", "presentándonos", "apellido", "nombre"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuánto?",
+            opcionesGifs: ["cuanto", "donde", "cualestuedad"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "deque",
+            respuestaCorrecta: "¿de qué?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cualestuedad",
+            opciones: ["¿cuál es tu edad?", "¿cómo estás?", "oyente", "¿cuál?"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nombre",
+            opcionesGifs: ["apellido", "nombre", "oyente"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porque",
+            respuestaCorrecta: "¿por qué?",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "DNI",
+            opcionesGifs: ["dni", "nombre", "apellido"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cual",
+            opciones: ["¿cómo?", "¿cuándo?", "¿cuál?", "¿quién?"],
+            correcta: 2,
+          },
+          // ── Bloque 6 (items 51-60): Tipo 3,2,2,5,3,3,5,3,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "como",
+            opciones: ["¿cómo?", "¿cuánto?", "¿cuál?", "¿cómo estás?"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿de qué?",
+            opcionesGifs: ["que", "deque", "quien"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "¿cuándo?",
+            opcionesGifs: ["cual", "cuando", "como"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "donde",
+            respuestaCorrecta: "¿dónde?",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nombre",
+            opciones: ["sordo", "oyente", "apellido", "nombre"],
+            correcta: 3,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "dni",
+            opciones: ["oyente", "DNI", "nombre", "sordo"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "presentandonos",
+            respuestaCorrecta: "presentándonos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cuando",
+            opciones: ["¿qué?", "¿cuánto?", "¿cómo estás?", "¿cuándo?"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "paraque",
+            respuestaCorrecta: "¿para qué?",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "oyente",
+            respuestaCorrecta: "oyente",
           },
         ],
       },
