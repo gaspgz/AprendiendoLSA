@@ -417,7 +417,7 @@ const NIVELES = [
             opciones: ["F", "B", "J", "H"],
             correcta: 2,
           },
-          // Bloque 4: 2,4,4,3,4
+          // Bloque 4: 2,4,4,3,4 ahi
           {
             tipo: "elegir_sena",
             letra: "J",
