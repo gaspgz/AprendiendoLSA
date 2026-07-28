@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
-  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,15 +16,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-// Arriba del archivo — agregá este import
-import { StatusBar } from "react-native";
 
-// En el RENDER del mapa principal, antes del <SafeAreaView> existente, agregá:
-<StatusBar
-  backgroundColor="#C8D3F5"
-  barStyle="dark-content"
-  translucent={false}
-/>;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const GIFS = {
@@ -417,7 +409,7 @@ const NIVELES = [
             opciones: ["F", "B", "J", "H"],
             correcta: 2,
           },
-          // Bloque 4: 2,4,4,3,4 ahi
+          // Bloque 4: 2,4,4,3,4
           {
             tipo: "elegir_sena",
             letra: "J",
@@ -1255,7 +1247,11 @@ const NIVELES = [
         xp: 50,
         items: [
           // ── Tipo 1: enseñanza (items 1-5) ──
-          { tipo: "ensenanza_palabra", gifPalabra: "apellido", nombre: "apellido" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "apellido",
+            nombre: "apellido",
+          },
           { tipo: "ensenanza_palabra", gifPalabra: "dni", nombre: "DNI" },
           { tipo: "ensenanza_palabra", gifPalabra: "nombre", nombre: "nombre" },
           { tipo: "ensenanza_palabra", gifPalabra: "oyente", nombre: "oyente" },
@@ -1283,7 +1279,11 @@ const NIVELES = [
             opcionesGifs: ["presentandonos", "nombre", "oyente"],
             correcta: 1,
           },
-          { tipo: "escritura_libre", gifPalabra: "dni", respuestaCorrecta: "DNI" },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "dni",
+            respuestaCorrecta: "DNI",
+          },
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "presentandonos",
@@ -1365,7 +1365,11 @@ const NIVELES = [
           },
           { tipo: "ensenanza_palabra", gifPalabra: "como", nombre: "¿cómo?" },
           { tipo: "ensenanza_palabra", gifPalabra: "cual", nombre: "¿cuál?" },
-          { tipo: "ensenanza_palabra", gifPalabra: "cuando", nombre: "¿cuándo?" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "cuando",
+            nombre: "¿cuándo?",
+          },
           // ── Bloque 2 (items 6-10): Tipo 2,3,2,2,5 ──
           {
             tipo: "elegir_sena_palabra",
@@ -1459,11 +1463,16 @@ const NIVELES = [
       {
         id: 3, // SECCIÓN 3, nivel 2
         titulo: "Cuánto, dónde y por qué",
-        descripcion: "¿cuánto?, ¿cuál es tu edad?, ¿dónde?, ¿para qué?, ¿por qué?.",
+        descripcion:
+          "¿cuánto?, ¿cuál es tu edad?, ¿dónde?, ¿para qué?, ¿por qué?.",
         xp: 50,
         items: [
           // ── Tipo 1: enseñanza (items 1-5) ──
-          { tipo: "ensenanza_palabra", gifPalabra: "cuanto", nombre: "¿cuánto?" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "cuanto",
+            nombre: "¿cuánto?",
+          },
           {
             tipo: "ensenanza_palabra",
             gifPalabra: "cualestuedad",
@@ -1531,7 +1540,12 @@ const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "porque",
-            opciones: ["¿cómo te sentís?", "¿por qué?", "¿cuánto?", "¿para qué?"],
+            opciones: [
+              "¿cómo te sentís?",
+              "¿por qué?",
+              "¿cuánto?",
+              "¿para qué?",
+            ],
             correcta: 1,
           },
           {
@@ -1589,7 +1603,11 @@ const NIVELES = [
             gifPalabra: "comotellamas",
             nombre: "¿cómo te llamas?",
           },
-          { tipo: "ensenanza_palabra", gifPalabra: "deque", nombre: "¿de qué?" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "deque",
+            nombre: "¿de qué?",
+          },
           // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
           {
             tipo: "que_palabra_opciones",
@@ -1732,7 +1750,11 @@ const NIVELES = [
             gifPalabra: "cuanto",
             respuestaCorrecta: "¿cuánto?",
           },
-          { tipo: "escritura_libre", gifPalabra: "dni", respuestaCorrecta: "DNI" },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "dni",
+            respuestaCorrecta: "DNI",
+          },
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "comotellamas",
@@ -1910,7 +1932,12 @@ const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "porque",
-            opciones: ["¿cómo te sentís?", "¿por qué?", "¿cuánto?", "¿para qué?"],
+            opciones: [
+              "¿cómo te sentís?",
+              "¿por qué?",
+              "¿cuánto?",
+              "¿para qué?",
+            ],
             correcta: 1,
           },
           {
@@ -2556,7 +2583,7 @@ const ItemEnsenanza = ({
         <Image
           source={GIFS[item.letra]}
           style={styles.gifGrande}
-          resizeMode="contain"
+          contentFit="contain"
         />
       </View>
     </ScrollView>
@@ -2644,7 +2671,7 @@ const ItemElegirSena = ({
                     <Image
                       source={GIFS[letra]}
                       style={styles.gifOpcion}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                   </View>
                   <View
@@ -2767,7 +2794,7 @@ const ItemQueLEtra = ({
           <Image
             source={GIFS[item.gifLetra]}
             style={styles.gifGrande}
-            resizeMode="contain"
+            contentFit="contain"
           />
         </View>
         <View style={styles.opcionesWrap}>
@@ -2928,7 +2955,7 @@ const ItemQuePalabra = ({
                 <Image
                   source={GIFS[letra]}
                   style={{ width: gifW, height: gifW * 1.3 }}
-                  resizeMode="cover"
+                  contentFit="cover"
                 />
               </View>
               <TouchableOpacity
@@ -3049,7 +3076,7 @@ const ItemEnsenanzaPalabra = ({
         <Image
           source={GIFS_PALABRAS[item.gifPalabra]}
           style={styles.gifGrande}
-          resizeMode="contain"
+          contentFit="contain"
         />
       </View>
     </ScrollView>
@@ -3137,7 +3164,7 @@ const ItemElegirSenaPalabra = ({
                     <Image
                       source={GIFS_PALABRAS[clave]}
                       style={styles.gifOpcion}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                   </View>
                   <View
@@ -3261,7 +3288,7 @@ const ItemQuePalabraOpciones = ({
           <Image
             source={GIFS_PALABRAS[item.gifPalabra]}
             style={styles.gifGrande}
-            resizeMode="contain"
+            contentFit="contain"
           />
         </View>
         <View style={styles.opcionesWrap}>
@@ -3384,7 +3411,7 @@ const ItemEscrituraLibre = ({
           <Image
             source={GIFS_PALABRAS[item.gifPalabra]}
             style={styles.gifGrande}
-            resizeMode="contain"
+            contentFit="contain"
           />
         </View>
         <Text style={styles.escrituraLabel}>Escribí la palabra aquí</Text>
@@ -3427,10 +3454,7 @@ const ItemEscrituraLibre = ({
       <View style={styles.ejercicioBtnWrap}>
         {!confirmado ? (
           <TouchableOpacity
-            style={[
-              styles.btnPrincipal,
-              { opacity: texto.trim() ? 1 : 0.45 },
-            ]}
+            style={[styles.btnPrincipal, { opacity: texto.trim() ? 1 : 0.45 }]}
             onPress={confirmar}
           >
             <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
