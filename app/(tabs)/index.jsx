@@ -1,8 +1,10 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   KeyboardAvoidingView,
   Modal,
@@ -73,6 +75,32 @@ const GIFS_PALABRAS = {
   quedice: require("../../assets/gifs/presentaciones/quedice.gif"),
   quien: require("../../assets/gifs/presentaciones/quien.gif"),
   sordo: require("../../assets/gifs/presentaciones/sordo.gif"),
+
+  // ── Nivel 3 · Interacciones cotidianas ──
+  // (interacciones/quien.gif es la misma seña que presentaciones/quien.gif)
+  saludos: require("../../assets/gifs/interacciones/saludos.gif"),
+  hola: require("../../assets/gifs/interacciones/hola.gif"),
+  chau: require("../../assets/gifs/interacciones/chau.gif"),
+  gracias: require("../../assets/gifs/interacciones/gracias.gif"),
+  bienvenida: require("../../assets/gifs/interacciones/bienvenida.gif"),
+  permiso: require("../../assets/gifs/interacciones/permiso.gif"),
+  perdon: require("../../assets/gifs/interacciones/perdon.gif"),
+  bien: require("../../assets/gifs/interacciones/bien.gif"),
+  mal: require("../../assets/gifs/interacciones/mal.gif"),
+  basta: require("../../assets/gifs/interacciones/basta.gif"),
+  porfavor: require("../../assets/gifs/interacciones/porfavor.gif"),
+  no: require("../../assets/gifs/interacciones/no.gif"),
+  comunicar: require("../../assets/gifs/interacciones/comunicar.gif"),
+  si: require("../../assets/gifs/interacciones/si.gif"),
+  conversar: require("../../assets/gifs/interacciones/conversar.gif"),
+  denada: require("../../assets/gifs/interacciones/denada.gif"),
+  hablarsenas: require("../../assets/gifs/interacciones/hablarsenas.gif"),
+  llamar: require("../../assets/gifs/interacciones/llamar.gif"),
+  hablaroral: require("../../assets/gifs/interacciones/hablaroral.gif"),
+  buendia: require("../../assets/gifs/interacciones/buendia.gif"),
+  buenasnoches: require("../../assets/gifs/interacciones/buenasnoches.gif"),
+  buenastardes: require("../../assets/gifs/interacciones/buenastardes.gif"),
+  porejemplo: require("../../assets/gifs/interacciones/porejemplo.gif"),
 };
 
 // Normaliza texto para comparar respuestas libres: minúsculas, sin tildes ni signos.
@@ -1883,6 +1911,13 @@ const NIVELES = [
             opciones: ["¿cómo estás?", "¿dónde?", "¿quién?", "¿cuál?"],
             correcta: 1,
           },
+          // ── Motivación: van 30 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "check",
+            titulo: "¡seguí así!",
+            subtitulo: "Ya llevás 30 ejercicios de esta sección",
+          },
           // ── Bloque 4 (items 31-40): Tipo 5,3,5,3,2,2,5,3,3,5 ──
           {
             tipo: "escritura_libre",
@@ -1944,6 +1979,13 @@ const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "apellido",
             respuestaCorrecta: "apellido",
+          },
+          // ── Motivación: van 40 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "estrella",
+            titulo: "¡vamos por más!",
+            subtitulo: "40 ejercicios completados, ya falta poco",
           },
           // ── Bloque 5 (items 41-50): Tipo 5,2,3,2,5,3,2,5,2,3 ──
           {
@@ -2060,16 +2102,971 @@ const NIVELES = [
             gifPalabra: "oyente",
             respuestaCorrecta: "oyente",
           },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo: "Ya sabés lo básico para comunicarte por LSA",
+            textoBoton: "¡Terminar!",
+          },
         ],
       },
     ],
   },
   {
-    id: 3,
+    id: 3, // NIVEL 3
     nombre: "Interacciones cotidianas",
-    descripcion: "Aprendé las interacciones cotidianas.",
-    totalXP: 150,
-    lecciones: [], // poner lecciones aca dentro
+    descripcion: "Saludos, cortesía y frases del día a día.",
+    totalXP: 300,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 3
+        titulo: "Saludos",
+        descripcion: "saludos, hola, chau, gracias y bienvenida.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "saludos",
+            nombre: "saludos",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "hola", nombre: "hola" },
+          { tipo: "ensenanza_palabra", gifPalabra: "chau", nombre: "chau" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "gracias",
+            nombre: "gracias",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "bienvenida",
+            nombre: "bienvenida",
+          },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,5,2,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hola",
+            opciones: ["chau", "gracias", "hola", "saludo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gracias",
+            opcionesGifs: ["hola", "gracias", "chau"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bienvenida",
+            respuestaCorrecta: "bienvenida",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "chau",
+            opcionesGifs: ["hola", "saludos", "chau"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "saludos",
+            opcionesGifs: ["saludos", "bienvenida", "hola"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 2,3,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hola",
+            opcionesGifs: ["chau", "hola", "gracias"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "saludos",
+            opciones: ["hola", "saludos", "oyente", "gracias"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "chau",
+            respuestaCorrecta: "chau",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bienvenida",
+            opciones: ["saludos", "bienvenida", "presentándonos", "nombre"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gracias",
+            respuestaCorrecta: "gracias",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "saludos",
+            respuestaCorrecta: "saludos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gracias",
+            opciones: ["gracias", "de nada", "hola", "chau"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hola",
+            respuestaCorrecta: "hola",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "chau",
+            opciones: ["hola", "bienvenida", "chau", "bien"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bienvenida",
+            opcionesGifs: ["gracias", "chau", "bienvenida"],
+            correcta: 2,
+          },
+        ],
+      },
+      {
+        id: 2, // SECCIÓN 2, nivel 3
+        titulo: "Cortesía",
+        descripcion: "permiso, perdón, bien, mal, basta y por favor.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "permiso",
+            nombre: "permiso",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "perdon", nombre: "perdón" },
+          { tipo: "ensenanza_palabra", gifPalabra: "bien", nombre: "bien" },
+          { tipo: "ensenanza_palabra", gifPalabra: "mal", nombre: "mal" },
+          { tipo: "ensenanza_palabra", gifPalabra: "basta", nombre: "basta" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "porfavor",
+            nombre: "por favor",
+          },
+          // ── Bloque 2 (items 7-12): Tipo 3,2,5,3,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "perdon",
+            opciones: ["de nada", "por favor", "gracias", "perdón"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "basta",
+            opcionesGifs: ["basta", "mal", "permiso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mal",
+            respuestaCorrecta: "mal",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porfavor",
+            opciones: ["gracias", "permiso", "por favor", "perdón"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "permiso",
+            respuestaCorrecta: "permiso",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bien",
+            opcionesGifs: ["mal", "bien", "basta"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 13-18): Tipo 5,3,5,3,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "perdon",
+            respuestaCorrecta: "perdón",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "basta",
+            opciones: ["frenar", "basta", "para", "espera"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porfavor",
+            respuestaCorrecta: "por favor",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "permiso",
+            opciones: ["bienvenido", "por favor", "permiso", "perdón"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mal",
+            opcionesGifs: ["bien", "basta", "mal"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bien",
+            opciones: ["bueno", "mal", "bien", "malo"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 19-24): Tipo 3,5,2,2,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mal",
+            opciones: ["mal", "bien", "malo", "bueno"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "basta",
+            respuestaCorrecta: "basta",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "perdón",
+            opcionesGifs: ["perdon", "permiso", "porfavor"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "permiso",
+            opcionesGifs: ["porfavor", "permiso", "perdon"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bien",
+            respuestaCorrecta: "bien",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "por favor",
+            opcionesGifs: ["perdon", "gracias", "porfavor"],
+            correcta: 2,
+          },
+        ],
+      },
+      {
+        id: 3, // SECCIÓN 3, nivel 3
+        titulo: "Sí, no y comunicación",
+        descripcion: "no, por ejemplo, comunicar, sí, conversar y de nada.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "no", nombre: "no" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "porejemplo",
+            nombre: "por ejemplo",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "comunicar",
+            nombre: "comunicar",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "si", nombre: "sí" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "conversar",
+            nombre: "conversar",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "denada",
+            nombre: "de nada",
+          },
+          // ── Bloque 2 (items 7-12): Tipo 2,2,3,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "comunicar",
+            opcionesGifs: ["conversar", "comunicar", "denada"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "conversar",
+            opcionesGifs: ["conversar", "comunicar", "no"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "no",
+            opciones: ["basta", "por favor", "sí", "no"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porejemplo",
+            respuestaCorrecta: "por ejemplo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "denada",
+            opciones: ["por favor", "gracias", "de nada", "permiso"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sí",
+            opcionesGifs: ["no", "si", "basta"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 13-18): Tipo 5,2,2,3,5,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "denada",
+            respuestaCorrecta: "de nada",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "por ejemplo",
+            opcionesGifs: ["porejemplo", "comunicar", "conversar"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "no",
+            opcionesGifs: ["si", "basta", "no"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comunicar",
+            opciones: ["acceder", "hablar", "comunicar", "charlar"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "conversar",
+            respuestaCorrecta: "conversar",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "si",
+            opciones: ["no", "sí", "basta", "comunicar"],
+            correcta: 1,
+          },
+          // ── Bloque 4 (items 19-24): Tipo 3,5,2,3,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "conversar",
+            opciones: ["expresar", "comunicar", "hablar", "conversar"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "no",
+            respuestaCorrecta: "no",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "de nada",
+            opcionesGifs: ["gracias", "denada", "porfavor"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porejemplo",
+            opciones: ["por ejemplo", "para", "quién", "por favor"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "si",
+            respuestaCorrecta: "sí",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comunicar",
+            respuestaCorrecta: "comunicar",
+          },
+        ],
+      },
+      {
+        id: 4, // SECCIÓN 4, nivel 3
+        titulo: "Hablar y saludar",
+        descripcion: "hablar señas, llamar, hablar oral y saludos del día.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "hablarsenas",
+            nombre: "hablar señas",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "llamar", nombre: "llamar" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "hablaroral",
+            nombre: "hablar oral",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "buendia",
+            nombre: "buen día",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "buenasnoches",
+            nombre: "buenas noches",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "buenastardes",
+            nombre: "buenas tardes",
+          },
+          // ── Bloque 2 (items 7-12): Tipo 2,3,2,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hablar oral",
+            opcionesGifs: ["hablarsenas", "hablaroral", "llamar"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "llamar",
+            opciones: ["comunicar", "hablar", "llamar", "expresar"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buenas noches",
+            opcionesGifs: ["buendia", "buenastardes", "buenasnoches"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hablarsenas",
+            respuestaCorrecta: "hablar señas",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buenastardes",
+            opciones: ["buen día", "buenas noches", "buenas tardes", "buenas"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buendia",
+            respuestaCorrecta: "buen día",
+          },
+          // ── Bloque 3 (items 13-18): Tipo 5,2,3,3,2,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buenasnoches",
+            respuestaCorrecta: "buenas noches",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buen día",
+            opcionesGifs: ["buendia", "buenasnoches", "buenastardes"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hablarsenas",
+            opciones: ["hablar señas", "comunicar", "hablar", "charlar"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hablaroral",
+            opciones: ["hablar", "expresar", "hablar oral", "hablar señas"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "llamar",
+            opcionesGifs: ["comunicar", "conversar", "llamar"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buenastardes",
+            respuestaCorrecta: "buenas tardes",
+          },
+          // ── Bloque 4 (items 19-24): Tipo 2,2,3,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hablar señas",
+            opcionesGifs: ["hablarsenas", "hablaroral", "comunicar"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buenas tardes",
+            opcionesGifs: ["buenasnoches", "buenastardes", "buendia"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buenasnoches",
+            opciones: ["buenas", "buenas tardes", "buenas noches", "buen día"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "llamar",
+            respuestaCorrecta: "llamar",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buendia",
+            opciones: ["buen día", "buenas", "buenas noches", "buenas tardes"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hablaroral",
+            respuestaCorrecta: "hablar oral",
+          },
+        ],
+      },
+      {
+        id: 5, // SECCIÓN 5, nivel 3
+        titulo: "Repaso del nivel",
+        descripcion: "Practicá las 23 señas del nivel.",
+        xp: 100,
+        items: [
+          // ── Bloque 1 (items 1-10): Tipo 2,3,2,5,3,2,5,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hola",
+            opcionesGifs: ["chau", "hola", "saludos"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bien",
+            opciones: ["bueno", "mal", "bien", "malo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "por ejemplo",
+            opcionesGifs: ["comunicar", "conversar", "porejemplo"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "comunicar",
+            respuestaCorrecta: "comunicar",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "no",
+            opciones: ["basta", "por favor", "sí", "no"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "basta",
+            opcionesGifs: ["basta", "permiso", "mal"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porfavor",
+            respuestaCorrecta: "por favor",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "llamar",
+            respuestaCorrecta: "llamar",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buenastardes",
+            opciones: ["buen día", "buenas noches", "buenas tardes", "buenas"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gracias",
+            opcionesGifs: ["denada", "gracias", "porfavor"],
+            correcta: 1,
+          },
+          // ── Bloque 2 (items 11-20): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "perdon",
+            opciones: ["de nada", "por favor", "gracias", "perdón"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "permiso",
+            opcionesGifs: ["permiso", "perdon", "porfavor"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bien",
+            respuestaCorrecta: "bien",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "saludos",
+            opcionesGifs: ["hola", "saludos", "bienvenida"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "chau",
+            opcionesGifs: ["chau", "hola", "saludos"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "comunicar",
+            opciones: ["acceder", "hablar", "comunicar", "charlar"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bienvenida",
+            respuestaCorrecta: "bienvenida",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sí",
+            opcionesGifs: ["no", "basta", "si"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buenastardes",
+            respuestaCorrecta: "buenas tardes",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "denada",
+            opciones: ["por favor", "gracias", "de nada", "permiso"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 21-30): Tipo 2,3,2,2,5,3,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bienvenida",
+            opcionesGifs: ["bienvenida", "saludos", "gracias"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gracias",
+            opciones: ["gracias", "de nada", "hola", "chau"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mal",
+            opcionesGifs: ["bien", "mal", "basta"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "por favor",
+            opcionesGifs: ["gracias", "perdon", "porfavor"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "chau",
+            respuestaCorrecta: "chau",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "llamar",
+            opciones: ["comunicar", "hablar", "llamar", "expresar"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buenas tardes",
+            opcionesGifs: ["buenastardes", "buendia", "buenasnoches"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "permiso",
+            respuestaCorrecta: "permiso",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "perdon",
+            respuestaCorrecta: "perdón",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "conversar",
+            opciones: ["expresar", "comunicar", "hablar", "conversar"],
+            correcta: 3,
+          },
+          // ── Motivación: van 30 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "check",
+            titulo: "¡seguí así!",
+            subtitulo: "Ya llevás 30 ejercicios de esta sección",
+          },
+          // ── Bloque 4 (items 31-40): Tipo 5,3,5,3,2,2,5,3,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buenasnoches",
+            respuestaCorrecta: "buenas noches",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hablaroral",
+            opciones: ["hablar", "expresar", "hablar oral", "hablar señas"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "si",
+            respuestaCorrecta: "sí",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "basta",
+            opciones: ["frenar", "basta", "para", "espera"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hablar oral",
+            opcionesGifs: ["hablaroral", "hablarsenas", "llamar"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buenas noches",
+            opcionesGifs: ["buendia", "buenasnoches", "buenastardes"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "porejemplo",
+            respuestaCorrecta: "por ejemplo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hablarsenas",
+            opciones: ["hablar señas", "comunicar", "hablar", "charlar"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "permiso",
+            opciones: ["bienvenido", "por favor", "permiso", "perdón"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mal",
+            respuestaCorrecta: "mal",
+          },
+          // ── Motivación: van 40 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "estrella",
+            titulo: "¡vamos por más!",
+            subtitulo: "40 ejercicios completados, ya falta poco",
+          },
+          // ── Bloque 5 (items 41-50): Tipo 5,2,3,2,5,3,2,5,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "buendia",
+            respuestaCorrecta: "buen día",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "llamar",
+            opcionesGifs: ["conversar", "llamar", "comunicar"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mal",
+            opciones: ["mal", "bien", "malo", "bueno"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "buen día",
+            opcionesGifs: ["buenastardes", "buenasnoches", "buendia"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "saludos",
+            respuestaCorrecta: "saludos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buenasnoches",
+            opciones: ["buenas", "buenas tardes", "buenas noches", "buen día"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "no",
+            opcionesGifs: ["no", "si", "basta"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "denada",
+            respuestaCorrecta: "de nada",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hablar señas",
+            opcionesGifs: ["comunicar", "hablaroral", "hablarsenas"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porejemplo",
+            opciones: ["por ejemplo", "para", "quién", "por favor"],
+            correcta: 0,
+          },
+          // ── Bloque 6 (items 51-69): Tipo 3,2,2,5,3,3,5,3,5,5,2,2,2,3,3,3,5,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "porfavor",
+            opciones: ["gracias", "permiso", "por favor", "perdón"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "de nada",
+            opcionesGifs: ["denada", "gracias", "porfavor"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bien",
+            opcionesGifs: ["mal", "bien", "basta"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "basta",
+            respuestaCorrecta: "basta",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buendia",
+            opciones: ["buen día", "buenas", "buenas noches", "buenas tardes"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bienvenida",
+            opciones: ["saludos", "bienvenida", "presentándonos", "nombre"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "no",
+            respuestaCorrecta: "no",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "si",
+            opciones: ["no", "sí", "basta", "comunicar"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hola",
+            respuestaCorrecta: "hola",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gracias",
+            respuestaCorrecta: "gracias",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "perdón",
+            opcionesGifs: ["permiso", "porfavor", "perdon"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "comunicar",
+            opcionesGifs: ["comunicar", "conversar", "llamar"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "conversar",
+            opcionesGifs: ["comunicar", "llamar", "conversar"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "saludos",
+            opciones: ["hola", "saludos", "oyente", "gracias"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hola",
+            opciones: ["chau", "gracias", "hola", "saludo"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "chau",
+            opciones: ["hola", "bienvenida", "chau", "bien"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "conversar",
+            respuestaCorrecta: "conversar",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hablarsenas",
+            respuestaCorrecta: "hablar señas",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hablaroral",
+            respuestaCorrecta: "hablar oral",
+          },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo:
+              "Ya podés manejar las interacciones del día a día en LSA",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
   },
   {
     id: 4,
@@ -3051,6 +4048,20 @@ const ItemQuePalabra = ({
   );
 };
 
+// GIF de una seña de vocabulario. Si el archivo todavía no está en assets
+// avisa en pantalla en vez de mostrar un recuadro vacío.
+const SenaGif = ({ clave, style }) => {
+  const source = GIFS_PALABRAS[clave];
+  if (!source)
+    return (
+      <View style={[style, styles.gifFaltante]}>
+        <Text style={styles.gifFaltanteTxt}>GIF pendiente</Text>
+        <Text style={styles.gifFaltanteSub}>{clave}</Text>
+      </View>
+    );
+  return <Image source={source} style={style} contentFit="contain" />;
+};
+
 // ── Tipo 1 (palabras): enseñanza de vocabulario ───────────────────────
 const ItemEnsenanzaPalabra = ({
   item,
@@ -3073,11 +4084,7 @@ const ItemEnsenanzaPalabra = ({
         <Text style={styles.itemCardSub}>Mirá bien la seña</Text>
       </View>
       <View style={styles.gifGrandeWrap}>
-        <Image
-          source={GIFS_PALABRAS[item.gifPalabra]}
-          style={styles.gifGrande}
-          contentFit="contain"
-        />
+        <SenaGif clave={item.gifPalabra} style={styles.gifGrande} />
       </View>
     </ScrollView>
     <View style={styles.ejercicioBtnWrap}>
@@ -3161,11 +4168,7 @@ const ItemElegirSenaPalabra = ({
                   activeOpacity={confirmado ? 1 : 0.75}
                 >
                   <View style={styles.gifOpcionImgWrap}>
-                    <Image
-                      source={GIFS_PALABRAS[clave]}
-                      style={styles.gifOpcion}
-                      contentFit="contain"
-                    />
+                    <SenaGif clave={clave} style={styles.gifOpcion} />
                   </View>
                   <View
                     style={[
@@ -3285,11 +4288,7 @@ const ItemQuePalabraOpciones = ({
           <Text style={styles.itemCardSub}>¿Qué palabra es esta?</Text>
         </View>
         <View style={styles.gifGrandeWrap}>
-          <Image
-            source={GIFS_PALABRAS[item.gifPalabra]}
-            style={styles.gifGrande}
-            contentFit="contain"
-          />
+          <SenaGif clave={item.gifPalabra} style={styles.gifGrande} />
         </View>
         <View style={styles.opcionesWrap}>
           {item.opciones.map((op, i) => (
@@ -3408,11 +4407,7 @@ const ItemEscrituraLibre = ({
           <Text style={styles.itemCardSub}>¿Cuál es esta palabra?</Text>
         </View>
         <View style={styles.gifGrandeWrap}>
-          <Image
-            source={GIFS_PALABRAS[item.gifPalabra]}
-            style={styles.gifGrande}
-            contentFit="contain"
-          />
+          <SenaGif clave={item.gifPalabra} style={styles.gifGrande} />
         </View>
         <Text style={styles.escrituraLabel}>Escribí la palabra aquí</Text>
         <TextInput
@@ -3482,6 +4477,231 @@ const ItemEscrituraLibre = ({
   );
 };
 
+// ── Motivación: checkpoint entre ejercicios (sin pregunta) ────────────
+const MOTIVACION_ICONO = {
+  check: "checkmark",
+  estrella: "star",
+  corazon: "heart",
+};
+
+// Rayitas alrededor del círculo (3 por lado), posicionadas dentro del wrap
+const MOTIVACION_RAYOS = [
+  { top: 26, left: 20, rotate: "-45deg" },
+  { top: 62, left: 10, rotate: "0deg" },
+  { top: 98, left: 20, rotate: "45deg" },
+  { top: 26, right: 20, rotate: "45deg" },
+  { top: 62, right: 10, rotate: "0deg" },
+  { top: 98, right: 20, rotate: "-45deg" },
+];
+
+// Chispita decorativa: dos barras redondeadas cruzadas + titileo en loop
+const ChispaMotivacion = ({ color, size, delay = 0 }) => {
+  const v = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(v, {
+          toValue: 1,
+          duration: 900,
+          useNativeDriver: true,
+        }),
+        Animated.timing(v, {
+          toValue: 0,
+          duration: 900,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    const t = setTimeout(() => loop.start(), delay);
+    return () => {
+      clearTimeout(t);
+      loop.stop();
+    };
+  }, [delay, v]);
+
+  const grosor = Math.max(3, Math.round(size * 0.28));
+  return (
+    <Animated.View
+      style={{
+        width: size,
+        height: size,
+        opacity: v.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }),
+        transform: [
+          {
+            scale: v.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0.8, 1.15],
+            }),
+          },
+        ],
+      }}
+    >
+      <View
+        style={{
+          position: "absolute",
+          left: (size - grosor) / 2,
+          top: 0,
+          width: grosor,
+          height: size,
+          borderRadius: grosor / 2,
+          backgroundColor: color,
+        }}
+      />
+      <View
+        style={{
+          position: "absolute",
+          top: (size - grosor) / 2,
+          left: 0,
+          width: size,
+          height: grosor,
+          borderRadius: grosor / 2,
+          backgroundColor: color,
+        }}
+      />
+    </Animated.View>
+  );
+};
+
+const ItemMotivacion = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onContinuar,
+  onSalir,
+}) => {
+  const pop = useRef(new Animated.Value(0)).current; // círculo con el ícono
+  const rayos = useRef(new Animated.Value(0)).current; // rayitas
+  const texto = useRef(new Animated.Value(0)).current; // título + subtítulo
+  const boton = useRef(new Animated.Value(0)).current; // botón continuar
+
+  useEffect(() => {
+    const anim = Animated.sequence([
+      Animated.spring(pop, {
+        toValue: 1,
+        friction: 4,
+        tension: 80,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(rayos, {
+          toValue: 1,
+          duration: 260,
+          useNativeDriver: true,
+        }),
+        Animated.timing(texto, {
+          toValue: 1,
+          duration: 320,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.timing(boton, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]);
+    anim.start();
+    return () => anim.stop();
+  }, [pop, rayos, texto, boton]);
+
+  const icono = MOTIVACION_ICONO[item.variante] || "checkmark";
+  const tituloLargo = (item.titulo || "").length > 16;
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader
+        idx={idx}
+        total={total}
+        vidasGlobales={vidasGlobales}
+        onSalir={onSalir}
+      />
+      <View style={styles.motivacionBody}>
+        <View style={styles.motivacionCard}>
+          <View style={styles.motivacionIconoWrap}>
+            {MOTIVACION_RAYOS.map((r, i) => (
+              <Animated.View
+                key={i}
+                style={[
+                  styles.motivacionRayo,
+                  { top: r.top, left: r.left, right: r.right },
+                  {
+                    opacity: rayos,
+                    transform: [{ rotate: r.rotate }, { scale: rayos }],
+                  },
+                ]}
+              />
+            ))}
+            <Animated.View
+              style={[
+                styles.motivacionCirculo,
+                { transform: [{ scale: pop }] },
+              ]}
+            >
+              <Ionicons name={icono} size={54} color="#fff" />
+            </Animated.View>
+          </View>
+
+          <Animated.View
+            style={{
+              opacity: texto,
+              transform: [
+                {
+                  translateY: texto.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [16, 0],
+                  }),
+                },
+              ],
+            }}
+          >
+            <Text
+              style={[
+                styles.motivacionTitulo,
+                tituloLargo && styles.motivacionTituloChico,
+              ]}
+            >
+              {item.titulo}
+            </Text>
+            {!!item.subtitulo && (
+              <Text style={styles.motivacionSub}>{item.subtitulo}</Text>
+            )}
+          </Animated.View>
+
+          <View style={styles.motivacionDeco}>
+            <ChispaMotivacion color="#7FD1B9" size={20} delay={0} />
+            <View style={styles.motivacionPunto} />
+            <View style={styles.motivacionAnillo} />
+            <ChispaMotivacion color="#A99BF7" size={14} delay={450} />
+          </View>
+        </View>
+      </View>
+      <View style={styles.ejercicioBtnWrap}>
+        <Animated.View
+          style={{
+            opacity: boton,
+            transform: [
+              {
+                translateY: boton.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [12, 0],
+                }),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity style={styles.btnPrincipal} onPress={onContinuar}>
+            <Text style={styles.btnPrincipalTxt}>
+              {item.textoBoton || "Continuar"}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
+    </View>
+  );
+};
+
 const PantallaEjercicioNueva = ({
   leccion,
   vidasGlobales,
@@ -3533,6 +4753,10 @@ const PantallaEjercicioNueva = ({
     return <ItemQuePalabra key={idx} item={item} {...common} />;
   if (item.tipo === "escritura_libre")
     return <ItemEscrituraLibre key={idx} item={item} {...common} />;
+  if (item.tipo === "motivacion")
+    return (
+      <ItemMotivacion key={idx} item={item} {...common} onContinuar={avanzar} />
+    );
   return null;
 };
 
@@ -4695,6 +5919,89 @@ const styles = StyleSheet.create({
   escrituraInputErr: {
     borderColor: "#C62828",
     backgroundColor: "#FFCDD2",
+  },
+
+  gifFaltante: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EEF1FB",
+    borderWidth: 1.5,
+    borderColor: "#C8D3F5",
+    borderStyle: "dashed",
+    borderRadius: 16,
+  },
+  gifFaltanteTxt: { fontSize: 15, fontWeight: "700", color: "#3D4FBB" },
+  gifFaltanteSub: { fontSize: 12, color: "#9CA3AF", marginTop: 4 },
+
+  // ── Motivación (checkpoints) ───────────────────────────────────────
+  motivacionBody: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  motivacionCard: {
+    backgroundColor: "#F4F2FD",
+    borderRadius: 28,
+    paddingVertical: 34,
+    paddingHorizontal: 24,
+    alignItems: "center",
+  },
+  motivacionIconoWrap: {
+    width: 220,
+    height: 130,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+  motivacionCirculo: {
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    backgroundColor: "#8C7CF0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  motivacionRayo: {
+    position: "absolute",
+    width: 18,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#A99BF7",
+  },
+  motivacionTitulo: {
+    fontSize: 40,
+    fontWeight: "900",
+    color: "#3D4FBB",
+    textAlign: "center",
+    letterSpacing: -0.5,
+  },
+  motivacionTituloChico: { fontSize: 30 },
+  motivacionSub: {
+    fontSize: 15,
+    color: "#6B7280",
+    textAlign: "center",
+    marginTop: 10,
+    lineHeight: 21,
+  },
+  motivacionDeco: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
+    marginTop: 22,
+  },
+  motivacionPunto: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#A99BF7",
+  },
+  motivacionAnillo: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 4,
+    borderColor: "#7FD1B9",
   },
 
   // XP badge
