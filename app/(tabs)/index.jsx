@@ -101,6 +101,30 @@ const GIFS_PALABRAS = {
   buenasnoches: require("../../assets/gifs/interacciones/buenasnoches.gif"),
   buenastardes: require("../../assets/gifs/interacciones/buenastardes.gif"),
   porejemplo: require("../../assets/gifs/interacciones/porejemplo.gif"),
+
+  // ── Nivel 4 · Sentimientos ──
+  sentimientos: require("../../assets/gifs/sentimientos/sentimientos.gif"),
+  aburrido: require("../../assets/gifs/sentimientos/aburrido.gif"),
+  alegre: require("../../assets/gifs/sentimientos/alegre.gif"),
+  amar: require("../../assets/gifs/sentimientos/amar.gif"),
+  asustado: require("../../assets/gifs/sentimientos/asustado.gif"),
+  cansado: require("../../assets/gifs/sentimientos/cansado.gif"),
+  caprichoso: require("../../assets/gifs/sentimientos/caprichoso.gif"),
+  contento: require("../../assets/gifs/sentimientos/contento.gif"),
+  culpa: require("../../assets/gifs/sentimientos/culpa.gif"),
+  deprimido: require("../../assets/gifs/sentimientos/deprimido.gif"),
+  enojado: require("../../assets/gifs/sentimientos/enojado.gif"),
+  feliz: require("../../assets/gifs/sentimientos/feliz.gif"),
+  gracioso: require("../../assets/gifs/sentimientos/gracioso.gif"),
+  llorar: require("../../assets/gifs/sentimientos/llorar.gif"),
+  miedoso: require("../../assets/gifs/sentimientos/miedoso.gif"),
+  nervioso: require("../../assets/gifs/sentimientos/nervioso.gif"),
+  orgulloso: require("../../assets/gifs/sentimientos/orgulloso.gif"),
+  preocupado: require("../../assets/gifs/sentimientos/preocupado.gif"),
+  sorprendido: require("../../assets/gifs/sentimientos/sorprendido.gif"),
+  timido: require("../../assets/gifs/sentimientos/timido.gif"),
+  tranquilo: require("../../assets/gifs/sentimientos/tranquilo.gif"),
+  triste: require("../../assets/gifs/sentimientos/triste.gif"),
 };
 
 // Normaliza texto para comparar respuestas libres: minúsculas, sin tildes ni signos.
@@ -3070,10 +3094,939 @@ const NIVELES = [
   },
   {
     id: 4,
-    nombre: "Familia",
-    descripcion: "Mamá, papá, hermano, hermana y más vínculos.",
-    totalXP: 150,
-    lecciones: [], // poner lecciones aca dentro
+    nombre: "Sentimientos",
+    descripcion: "Cómo te sentís y cómo se sienten los demás.",
+    totalXP: 300,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 4
+        titulo: "Primeros sentimientos",
+        descripcion: "sentimientos, aburrido, alegre, amar y asustado.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "sentimientos",
+            nombre: "sentimientos",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "aburrido",
+            nombre: "aburrido",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "alegre", nombre: "alegre" },
+          { tipo: "ensenanza_palabra", gifPalabra: "amar", nombre: "amar" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "asustado",
+            nombre: "asustado",
+          },
+          // ── Bloque 2 (items 6-10): Tipo 2,2,3,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "amar",
+            opcionesGifs: ["alegre", "amar", "asustado"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sentimientos",
+            opcionesGifs: ["aburrido", "asustado", "sentimientos"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "aburrido",
+            opciones: ["alegre", "aburrido", "feliz", "amar"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "asustado",
+            respuestaCorrecta: "asustado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "alegre",
+            opciones: ["alegre", "sentimientos", "amar", "feliz"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "aburrido",
+            respuestaCorrecta: "aburrido",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "amar",
+            opciones: ["frenar", "basta", "amar", "espera"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sentimientos",
+            respuestaCorrecta: "sentimientos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "asustado",
+            opciones: ["triste", "contento", "feliz", "asustado"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "alegre",
+            opcionesGifs: ["alegre", "aburrido", "amar"],
+            correcta: 0,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sentimientos",
+            opciones: ["sentimientos", "alegre", "asustado", "aburrido"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "aburrido",
+            opcionesGifs: ["amar", "aburrido", "alegre"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "amar",
+            respuestaCorrecta: "amar",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "alegre",
+            respuestaCorrecta: "alegre",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "asustado",
+            opcionesGifs: ["sentimientos", "aburrido", "asustado"],
+            correcta: 2,
+          },
+        ],
+      },
+      {
+        id: 2, // SECCIÓN 2, nivel 4
+        titulo: "Ánimo y cansancio",
+        descripcion: "cansado, caprichoso, contento, culpa y deprimido.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "cansado",
+            nombre: "cansado",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "caprichoso",
+            nombre: "caprichoso",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "contento",
+            nombre: "contento",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "culpa", nombre: "culpa" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "deprimido",
+            nombre: "deprimido",
+          },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cansado",
+            opciones: ["caprichoso", "contento", "cansado", "preocupado"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "culpa",
+            opcionesGifs: ["culpa", "caprichoso", "deprimido"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "contento",
+            opcionesGifs: ["cansado", "contento", "alegre"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "caprichoso",
+            respuestaCorrecta: "caprichoso",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deprimido",
+            opciones: ["triste", "deprimido", "preocupado", "alegre"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "culpa",
+            respuestaCorrecta: "culpa",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "contento",
+            opciones: ["culpa", "deprimido", "feliz", "contento"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cansado",
+            respuestaCorrecta: "cansado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "caprichoso",
+            opciones: ["triste", "culpa", "contento", "caprichoso"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "deprimido",
+            opcionesGifs: ["cansado", "deprimido", "culpa"],
+            correcta: 1,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,2,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "culpa",
+            opciones: ["culpa", "caprichoso", "triste", "deprimido"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "cansado",
+            opcionesGifs: ["caprichoso", "deprimido", "cansado"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "contento",
+            respuestaCorrecta: "contento",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "caprichoso",
+            opcionesGifs: ["caprichoso", "culpa", "aburrido"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "deprimido",
+            respuestaCorrecta: "deprimido",
+          },
+        ],
+      },
+      {
+        id: 3, // SECCIÓN 3, nivel 4
+        titulo: "Emociones fuertes",
+        descripcion: "enojado, feliz, gracioso, llorar, miedoso y nervioso.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "enojado",
+            nombre: "enojado",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "feliz", nombre: "feliz" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "gracioso",
+            nombre: "gracioso",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "llorar", nombre: "llorar" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "miedoso",
+            nombre: "miedoso",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "nervioso",
+            nombre: "nervioso",
+          },
+          // ── Bloque 2 (items 7-13): Tipo 2,3,2,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gracioso",
+            opcionesGifs: ["gracioso", "feliz", "miedoso"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "enojado",
+            opciones: ["nervioso", "enojado", "triste", "preocupado"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "miedoso",
+            opcionesGifs: ["nervioso", "miedoso", "llorar"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "llorar",
+            opcionesGifs: ["miedoso", "enojado", "llorar"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nervioso",
+            respuestaCorrecta: "nervioso",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "feliz",
+            respuestaCorrecta: "feliz",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nervioso",
+            opciones: ["triste", "nervioso", "preocupado", "alegre"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 14-19): Tipo 3,2,5,2,3,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "llorar",
+            opciones: ["miedoso", "deprimido", "nervioso", "llorar"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "enojado",
+            opcionesGifs: ["feliz", "enojado", "gracioso"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "miedoso",
+            respuestaCorrecta: "miedoso",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nervioso",
+            opcionesGifs: ["nervioso", "miedoso", "enojado"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gracioso",
+            opciones: ["miedoso", "gracioso", "nervioso", "feliz"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "feliz",
+            opcionesGifs: ["contento", "alegre", "feliz"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 20-25): Tipo 3,5,3,3,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "feliz",
+            opciones: ["feliz", "gracioso", "contento", "alegre"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "enojado",
+            respuestaCorrecta: "enojado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "miedoso",
+            opciones: ["preocupado", "nervioso", "miedoso", "gracioso"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deprimido",
+            opciones: ["deprimido", "triste", "llorar", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gracioso",
+            respuestaCorrecta: "gracioso",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "llorar",
+            respuestaCorrecta: "llorar",
+          },
+        ],
+      },
+      {
+        id: 4, // SECCIÓN 4, nivel 4
+        titulo: "Carácter y calma",
+        descripcion:
+          "orgulloso, preocupado, sorprendido, tímido, tranquilo y triste.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "orgulloso",
+            nombre: "orgulloso",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "preocupado",
+            nombre: "preocupado",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "sorprendido",
+            nombre: "sorprendido",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "timido", nombre: "tímido" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "tranquilo",
+            nombre: "tranquilo",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "triste", nombre: "triste" },
+          // ── Bloque 2 (items 7-12): Tipo 3,2,5,2,3,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tranquilo",
+            opciones: ["relajado", "alegre", "feliz", "tranquilo"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sorprendido",
+            opcionesGifs: ["sorprendido", "preocupado", "timido"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "triste",
+            respuestaCorrecta: "triste",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "orgulloso",
+            opcionesGifs: ["triste", "orgulloso", "tranquilo"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "preocupado",
+            opciones: ["deprimido", "nervioso", "preocupado", "triste"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tímido",
+            opcionesGifs: ["tranquilo", "preocupado", "timido"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 13-18): Tipo 2,3,5,2,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "triste",
+            opcionesGifs: ["triste", "deprimido", "llorar"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "orgulloso",
+            opciones: ["orgulloso", "caprichoso", "culpa", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sorprendido",
+            respuestaCorrecta: "sorprendido",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "preocupado",
+            opcionesGifs: ["nervioso", "preocupado", "triste"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tranquilo",
+            respuestaCorrecta: "tranquilo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "timido",
+            opciones: ["tímido", "vergonzoso", "preocupado", "triste"],
+            correcta: 0,
+          },
+          // ── Bloque 4 (items 19-24): Tipo 3,5,3,2,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sorprendido",
+            opciones: ["deprimido", "tímido", "alegre", "sorprendido"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "orgulloso",
+            respuestaCorrecta: "orgulloso",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "triste",
+            opciones: ["triste", "deprimido", "llorar", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tranquilo",
+            opcionesGifs: ["sorprendido", "tranquilo", "preocupado"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "timido",
+            respuestaCorrecta: "tímido",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "preocupado",
+            respuestaCorrecta: "preocupado",
+          },
+        ],
+      },
+      {
+        id: 5, // SECCIÓN 5, nivel 4
+        titulo: "Repaso del nivel",
+        descripcion: "Todos los sentimientos del nivel, mezclados.",
+        xp: 100,
+        items: [
+          // ── Bloque 1 (items 1-10): Tipo 2,3,2,5,3,2,5,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gracioso",
+            opcionesGifs: ["feliz", "gracioso", "contento"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "asustado",
+            opciones: ["triste", "contento", "feliz", "asustado"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "caprichoso",
+            opcionesGifs: ["caprichoso", "culpa", "cansado"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "amar",
+            respuestaCorrecta: "amar",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "timido",
+            opciones: ["tímido", "vergonzoso", "preocupado", "triste"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sentimientos",
+            opcionesGifs: ["amar", "sentimientos", "asustado"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "orgulloso",
+            respuestaCorrecta: "orgulloso",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tranquilo",
+            respuestaCorrecta: "tranquilo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nervioso",
+            opciones: ["triste", "nervioso", "preocupado", "alegre"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "llorar",
+            opcionesGifs: ["llorar", "triste", "miedoso"],
+            correcta: 0,
+          },
+          // ── Bloque 2 (items 11-20): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "alegre",
+            opciones: ["alegre", "sentimientos", "amar", "feliz"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "enojado",
+            opcionesGifs: ["nervioso", "enojado", "miedoso"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "preocupado",
+            respuestaCorrecta: "preocupado",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "miedoso",
+            opcionesGifs: ["miedoso", "asustado", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "amar",
+            opcionesGifs: ["alegre", "contento", "amar"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cansado",
+            opciones: ["caprichoso", "contento", "cansado", "preocupado"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "caprichoso",
+            respuestaCorrecta: "caprichoso",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "culpa",
+            opcionesGifs: ["deprimido", "culpa", "triste"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "aburrido",
+            respuestaCorrecta: "aburrido",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gracioso",
+            opciones: ["miedoso", "gracioso", "nervioso", "feliz"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 21-30): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "llorar",
+            opciones: ["miedoso", "deprimido", "nervioso", "llorar"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "orgulloso",
+            opcionesGifs: ["tranquilo", "orgulloso", "feliz"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sentimientos",
+            respuestaCorrecta: "sentimientos",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tímido",
+            opcionesGifs: ["timido", "tranquilo", "preocupado"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "contento",
+            opcionesGifs: ["alegre", "feliz", "contento"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deprimido",
+            opciones: ["triste", "deprimido", "preocupado", "alegre"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gracioso",
+            respuestaCorrecta: "gracioso",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nervioso",
+            opcionesGifs: ["nervioso", "preocupado", "miedoso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "asustado",
+            respuestaCorrecta: "asustado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sorprendido",
+            opciones: ["deprimido", "tímido", "alegre", "sorprendido"],
+            correcta: 3,
+          },
+          // ── Bloque 4 (items 31-40): Tipo 2,3,2,2,5,3,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "triste",
+            opcionesGifs: ["llorar", "deprimido", "triste"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sentimientos",
+            opciones: ["sentimientos", "alegre", "asustado", "aburrido"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "feliz",
+            opcionesGifs: ["feliz", "contento", "gracioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "deprimido",
+            opcionesGifs: ["cansado", "deprimido", "culpa"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "alegre",
+            respuestaCorrecta: "alegre",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tranquilo",
+            opciones: ["relajado", "alegre", "feliz", "tranquilo"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "asustado",
+            opcionesGifs: ["miedoso", "sorprendido", "asustado"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cansado",
+            respuestaCorrecta: "cansado",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "culpa",
+            respuestaCorrecta: "culpa",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "triste",
+            opciones: ["triste", "deprimido", "llorar", "nervioso"],
+            correcta: 0,
+          },
+          // ── Motivación: tras los primeros 40 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "check",
+            titulo: "¡seguí así!",
+            subtitulo: "Ya llevás 40 ejercicios de esta sección",
+          },
+          // ── Bloque 5 (items 41-50): Tipo 5,3,5,3,2,2,5,3,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "timido",
+            respuestaCorrecta: "tímido",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "orgulloso",
+            opciones: ["orgulloso", "caprichoso", "culpa", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "contento",
+            respuestaCorrecta: "contento",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "miedoso",
+            opciones: ["preocupado", "nervioso", "miedoso", "gracioso"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tranquilo",
+            opcionesGifs: ["cansado", "tranquilo", "aburrido"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sorprendido",
+            opcionesGifs: ["sorprendido", "asustado", "miedoso"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "enojado",
+            respuestaCorrecta: "enojado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "feliz",
+            opciones: ["feliz", "gracioso", "contento", "alegre"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "enojado",
+            opciones: ["nervioso", "enojado", "triste", "preocupado"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "llorar",
+            respuestaCorrecta: "llorar",
+          },
+          // ── Motivación: tras 50 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "estrella",
+            titulo: "¡vamos por más!",
+            subtitulo: "50 ejercicios completados, ya falta poco",
+          },
+          // ── Bloque 6 (items 51-60): Tipo 5,2,3,2,5,3,2,5,3,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nervioso",
+            respuestaCorrecta: "nervioso",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "cansado",
+            opcionesGifs: ["aburrido", "cansado", "deprimido"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "aburrido",
+            opciones: ["alegre", "aburrido", "feliz", "amar"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "aburrido",
+            opcionesGifs: ["aburrido", "cansado", "tranquilo"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "deprimido",
+            respuestaCorrecta: "deprimido",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "preocupado",
+            opciones: ["deprimido", "nervioso", "preocupado", "triste"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "alegre",
+            opcionesGifs: ["contento", "feliz", "alegre"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "feliz",
+            respuestaCorrecta: "feliz",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "culpa",
+            opciones: ["culpa", "caprichoso", "triste", "deprimido"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "caprichoso",
+            opciones: ["triste", "culpa", "contento", "caprichoso"],
+            correcta: 3,
+          },
+          // ── Bloque 7 (items 61-67): Tipo 3,2,5,3,3,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "contento",
+            opciones: ["culpa", "deprimido", "feliz", "contento"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "preocupado",
+            opcionesGifs: ["preocupado", "nervioso", "triste"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "triste",
+            respuestaCorrecta: "triste",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "deprimido",
+            opciones: ["deprimido", "triste", "llorar", "nervioso"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "amar",
+            opciones: ["frenar", "basta", "amar", "espera"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "miedoso",
+            respuestaCorrecta: "miedoso",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sorprendido",
+            respuestaCorrecta: "sorprendido",
+          },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo: "Estás avanzando muchísimo",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
   },
   {
     id: 5,
