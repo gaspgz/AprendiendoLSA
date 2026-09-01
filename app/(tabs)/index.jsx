@@ -125,6 +125,51 @@ const GIFS_PALABRAS = {
   timido: require("../../assets/gifs/sentimientos/timido.gif"),
   tranquilo: require("../../assets/gifs/sentimientos/tranquilo.gif"),
   triste: require("../../assets/gifs/sentimientos/triste.gif"),
+
+  // ── Nivel 5 · Números ──
+  // Las claves llevan prefijo n para no chocar con los índices numéricos de JS.
+  numeros: require("../../assets/gifs/numeros/numeros.gif"),
+  n0: require("../../assets/gifs/numeros/0.gif"),
+  n1: require("../../assets/gifs/numeros/1.gif"),
+  n2: require("../../assets/gifs/numeros/2.gif"),
+  n3: require("../../assets/gifs/numeros/3.gif"),
+  n4: require("../../assets/gifs/numeros/4.gif"),
+  n5: require("../../assets/gifs/numeros/5.gif"),
+  n6: require("../../assets/gifs/numeros/6.gif"),
+  n7: require("../../assets/gifs/numeros/7.gif"),
+  n8: require("../../assets/gifs/numeros/8.gif"),
+  n9: require("../../assets/gifs/numeros/9.gif"),
+  n10: require("../../assets/gifs/numeros/10.gif"),
+  n11: require("../../assets/gifs/numeros/11.gif"),
+  n12: require("../../assets/gifs/numeros/12.gif"),
+  n13: require("../../assets/gifs/numeros/13.gif"),
+  n14: require("../../assets/gifs/numeros/14.gif"),
+  n15: require("../../assets/gifs/numeros/15.gif"),
+  n16: require("../../assets/gifs/numeros/16.gif"),
+  n17: require("../../assets/gifs/numeros/17.gif"),
+  n18: require("../../assets/gifs/numeros/18.gif"),
+  n19: require("../../assets/gifs/numeros/19.gif"),
+  n20: require("../../assets/gifs/numeros/20.gif"),
+  n30: require("../../assets/gifs/numeros/30.gif"),
+  n40: require("../../assets/gifs/numeros/40.gif"),
+  n50: require("../../assets/gifs/numeros/50.gif"),
+  n60: require("../../assets/gifs/numeros/60.gif"),
+  n70: require("../../assets/gifs/numeros/70.gif"),
+  n80: require("../../assets/gifs/numeros/80.gif"),
+  n90: require("../../assets/gifs/numeros/90.gif"),
+  n100: require("../../assets/gifs/numeros/100.gif"),
+  n1000: require("../../assets/gifs/numeros/1000.gif"),
+};
+
+// Un número se puede escribir con dígitos o con letras: las dos valen.
+const NUMEROS_EN_LETRAS = {
+  0: "cero", 1: "uno", 2: "dos", 3: "tres", 4: "cuatro",
+  5: "cinco", 6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
+  10: "diez", 11: "once", 12: "doce", 13: "trece", 14: "catorce",
+  15: "quince", 16: "dieciséis", 17: "diecisiete", 18: "dieciocho",
+  19: "diecinueve", 20: "veinte", 30: "treinta", 40: "cuarenta",
+  50: "cincuenta", 60: "sesenta", 70: "setenta", 80: "ochenta",
+  90: "noventa", 100: "cien", 1000: "mil",
 };
 
 // Normaliza texto para comparar respuestas libres: minúsculas, sin tildes ni signos.
@@ -4030,10 +4075,1370 @@ const NIVELES = [
   },
   {
     id: 5,
-    nombre: "Colores",
-    descripcion: "Todos los colores básicos en señas.",
-    totalXP: 150,
-    lecciones: [], // poner lecciones aca dentro
+    nombre: "Números",
+    descripcion: "Del 0 al 1000, con la seña de cada número.",
+    totalXP: 400,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 5
+        titulo: "Del 0 al 3",
+        descripcion: "números, 0, 1, 2 y 3.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "numeros",
+            nombre: "números",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "n0", nombre: "0" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n1", nombre: "1" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n2", nombre: "2" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n3", nombre: "3" },
+          // ── Bloque 2 (items 6-10): Tipo 2,2,3,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "1",
+            opcionesGifs: ["n2", "n1", "n3"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "3",
+            opcionesGifs: ["n3", "n0", "n2"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "numeros",
+            opciones: ["números", "3", "2", "0"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n2",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "2",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n0",
+            enunciado: "¿Qué número es este?",
+            opciones: ["3", "0", "1", "4"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n1",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "1",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n3",
+            enunciado: "¿Qué número es este?",
+            opciones: ["3", "4", "1", "2"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "numeros",
+            respuestaCorrecta: "números",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n2",
+            enunciado: "¿Qué número es este?",
+            opciones: ["4", "3", "2", "1"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "0",
+            opcionesGifs: ["n1", "n3", "n0"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n1",
+            enunciado: "¿Qué número es este?",
+            opciones: ["3", "2", "1", "números"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "2",
+            opcionesGifs: ["n2", "n3", "n1"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n0",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "0",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n3",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "3",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "números",
+            opcionesGifs: ["n0", "numeros", "n2"],
+            correcta: 1,
+          },
+        ],
+      },
+      {
+        id: 2, // SECCIÓN 2, nivel 5
+        titulo: "Del 4 al 8",
+        descripcion: "4, 5, 6, 7 y 8.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "n4", nombre: "4" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n5", nombre: "5" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n6", nombre: "6" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n7", nombre: "7" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n8", nombre: "8" },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n5",
+            enunciado: "¿Qué número es este?",
+            opciones: ["4", "6", "5", "8"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "7",
+            opcionesGifs: ["n6", "n7", "n8"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "4",
+            opcionesGifs: ["n4", "n5", "n6"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n8",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "8",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n6",
+            enunciado: "¿Qué número es este?",
+            opciones: ["6", "7", "5", "8"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n7",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "7",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n4",
+            enunciado: "¿Qué número es este?",
+            opciones: ["6", "2", "3", "4"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n5",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "5",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n8",
+            enunciado: "¿Qué número es este?",
+            opciones: ["7", "8", "5", "9"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "6",
+            opcionesGifs: ["n5", "n8", "n6"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n7",
+            enunciado: "¿Qué número es este?",
+            opciones: ["9", "5", "7", "6"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "5",
+            opcionesGifs: ["n5", "n4", "n7"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n4",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "4",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n6",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "6",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "8",
+            opcionesGifs: ["n7", "n4", "n8"],
+            correcta: 2,
+          },
+        ],
+      },
+      {
+        id: 3, // SECCIÓN 3, nivel 5
+        titulo: "Del 9 al 13",
+        descripcion: "9, 10, 11, 12 y 13.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "n9", nombre: "9" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n10", nombre: "10" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n11", nombre: "11" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n12", nombre: "12" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n13", nombre: "13" },
+          // ── Bloque 2 (items 6-10): Tipo 2,3,2,2,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "12",
+            opcionesGifs: ["n12", "n13", "n11"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n9",
+            enunciado: "¿Qué número es este?",
+            opciones: ["7", "8", "9", "6"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "11",
+            opcionesGifs: ["n10", "n11", "n13"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "13",
+            opcionesGifs: ["n11", "n12", "n13"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n10",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "10",
+          },
+          // ── Bloque 3 (items 11-15): Tipo 3,2,5,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n10",
+            enunciado: "¿Qué número es este?",
+            opciones: ["11", "6", "8", "10"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "9",
+            opcionesGifs: ["n9", "n10", "n12"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n13",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "13",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n11",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "11",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n12",
+            enunciado: "¿Qué número es este?",
+            opciones: ["15", "13", "12", "11"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,5,3,2,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n13",
+            enunciado: "¿Qué número es este?",
+            opciones: ["12", "13", "10", "11"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n9",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "9",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n11",
+            enunciado: "¿Qué número es este?",
+            opciones: ["11", "13", "12", "10"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "10",
+            opcionesGifs: ["n13", "n10", "n9"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n12",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "12",
+          },
+        ],
+      },
+      {
+        id: 4, // SECCIÓN 4, nivel 5
+        titulo: "Del 14 al 18",
+        descripcion: "14, 15, 16, 17 y 18.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "n14", nombre: "14" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n15", nombre: "15" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n16", nombre: "16" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n17", nombre: "17" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n18", nombre: "18" },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,5,2,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n16",
+            enunciado: "¿Qué número es este?",
+            opciones: ["16", "18", "17", "14"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "18",
+            opcionesGifs: ["n16", "n18", "n17"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n15",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "15",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "14",
+            opcionesGifs: ["n14", "n15", "n16"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n17",
+            enunciado: "¿Qué número es este?",
+            opciones: ["18", "15", "17", "16"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 2,3,5,2,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "16",
+            opcionesGifs: ["n17", "n16", "n14"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n14",
+            enunciado: "¿Qué número es este?",
+            opciones: ["16", "18", "12", "14"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n18",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "18",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "17",
+            opcionesGifs: ["n15", "n18", "n17"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n15",
+            enunciado: "¿Qué número es este?",
+            opciones: ["17", "16", "15", "18"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,5,2,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n18",
+            enunciado: "¿Qué número es este?",
+            opciones: ["14", "16", "18", "15"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n14",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "14",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "15",
+            opcionesGifs: ["n15", "n17", "n16"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n16",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "16",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n17",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "17",
+          },
+        ],
+      },
+      {
+        id: 5, // SECCIÓN 5, nivel 5
+        titulo: "19, 20 y las decenas",
+        descripcion: "19, 20, 30, 40 y 50.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "n19", nombre: "19" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n20", nombre: "20" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n30", nombre: "30" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n40", nombre: "40" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n50", nombre: "50" },
+          // ── Bloque 2 (items 6-10): Tipo 2,2,3,5,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "40",
+            opcionesGifs: ["n40", "n30", "n50"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "19",
+            opcionesGifs: ["n20", "n19", "n30"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n50",
+            enunciado: "¿Qué número es este?",
+            opciones: ["40", "20", "30", "50"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n20",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "20",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "30",
+            opcionesGifs: ["n50", "n40", "n30"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,2,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n19",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "19",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n40",
+            enunciado: "¿Qué número es este?",
+            opciones: ["20", "40", "50", "30"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "20",
+            opcionesGifs: ["n20", "n19", "n50"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n30",
+            enunciado: "¿Qué número es este?",
+            opciones: ["50", "20", "30", "40"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n50",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "50",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 5,2,5,3,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n30",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "30",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "50",
+            opcionesGifs: ["n40", "n50", "n20"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n40",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "40",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n20",
+            enunciado: "¿Qué número es este?",
+            opciones: ["30", "40", "20", "50"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n19",
+            enunciado: "¿Qué número es este?",
+            opciones: ["19", "30", "20", "40"],
+            correcta: 0,
+          },
+        ],
+      },
+      {
+        id: 6, // SECCIÓN 6, nivel 5
+        titulo: "De 60 a 1000",
+        descripcion: "60, 70, 80, 90, 100 y 1000.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "n60", nombre: "60" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n70", nombre: "70" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n80", nombre: "80" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n90", nombre: "90" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n100", nombre: "100" },
+          { tipo: "ensenanza_palabra", gifPalabra: "n1000", nombre: "1000" },
+          // ── Bloque 2 (items 7-12): Tipo 2,3,2,5,3,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "100",
+            opcionesGifs: ["n100", "n1000", "n90"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n60",
+            enunciado: "¿Qué número es este?",
+            opciones: ["80", "60", "100", "70"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "80",
+            opcionesGifs: ["n70", "n80", "n90"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n70",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "70",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n1000",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "1100", "100", "10000"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n90",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "90",
+          },
+          // ── Bloque 3 (items 13-18): Tipo 5,3,2,3,5,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n1000",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "1000",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n70",
+            enunciado: "¿Qué número es este?",
+            opciones: ["100", "90", "70", "60"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "60",
+            opcionesGifs: ["n60", "n80", "n70"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n80",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "100", "80", "90"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n100",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "100",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "90",
+            opcionesGifs: ["n100", "n60", "n90"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 19-24): Tipo 5,2,3,2,5,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n60",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "60",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "1000",
+            opcionesGifs: ["n1000", "n100", "n90"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n90",
+            enunciado: "¿Qué número es este?",
+            opciones: ["60", "1000", "100", "90"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "70",
+            opcionesGifs: ["n80", "n70", "n60"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n80",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "80",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n100",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "80", "90", "100"],
+            correcta: 3,
+          },
+        ],
+      },
+      {
+        id: 7, // SECCIÓN 7, nivel 5
+        titulo: "Repaso del nivel",
+        descripcion: "Todos los números del nivel, mezclados.",
+        xp: 100,
+        items: [
+          // ── Bloque 1 (items 1-10): Tipo 2,3,2,5,3,2,5,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "2",
+            opcionesGifs: ["n2", "n1", "n3"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n16",
+            enunciado: "¿Qué número es este?",
+            opciones: ["16", "18", "17", "14"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "18",
+            opcionesGifs: ["n16", "n18", "n17"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n7",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "7",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n14",
+            enunciado: "¿Qué número es este?",
+            opciones: ["16", "18", "12", "14"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "5",
+            opcionesGifs: ["n5", "n4", "n6"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n0",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "0",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n17",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "17",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n12",
+            enunciado: "¿Qué número es este?",
+            opciones: ["15", "13", "12", "11"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "1",
+            opcionesGifs: ["n3", "n1", "n0"],
+            correcta: 1,
+          },
+          // ── Bloque 2 (items 11-20): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n9",
+            enunciado: "¿Qué número es este?",
+            opciones: ["7", "8", "9", "6"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "13",
+            opcionesGifs: ["n13", "n12", "n11"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n6",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "6",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "80",
+            opcionesGifs: ["n80", "n90", "n70"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "20",
+            opcionesGifs: ["n30", "n20", "n40"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n15",
+            enunciado: "¿Qué número es este?",
+            opciones: ["17", "16", "15", "18"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n8",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "8",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "números",
+            opcionesGifs: ["n0", "numeros", "n2"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n9",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "9",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n70",
+            enunciado: "¿Qué número es este?",
+            opciones: ["100", "90", "70", "60"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 21-30): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n1000",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "1100", "100", "10000"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "11",
+            opcionesGifs: ["n11", "n10", "n12"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n4",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "4",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "60",
+            opcionesGifs: ["n70", "n60", "n80"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "14",
+            opcionesGifs: ["n14", "n16", "n15"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n3",
+            enunciado: "¿Qué número es este?",
+            opciones: ["3", "4", "1", "2"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n5",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "5",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "70",
+            opcionesGifs: ["n60", "n80", "n70"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "1000",
+            opcionesGifs: ["n100", "n1000", "n90"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n11",
+            enunciado: "¿Qué número es este?",
+            opciones: ["11", "13", "12", "10"],
+            correcta: 0,
+          },
+          // ── Bloque 4 (items 31-40): Tipo 2,3,2,2,5,3,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "10",
+            opcionesGifs: ["n10", "n11", "n13"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n4",
+            enunciado: "¿Qué número es este?",
+            opciones: ["6", "2", "3", "4"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "30",
+            opcionesGifs: ["n40", "n30", "n50"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "16",
+            opcionesGifs: ["n17", "n16", "n14"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n3",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "3",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n60",
+            enunciado: "¿Qué número es este?",
+            opciones: ["80", "60", "100", "70"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "7",
+            opcionesGifs: ["n7", "n8", "n6"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "numeros",
+            respuestaCorrecta: "números",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n2",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "2",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n30",
+            enunciado: "¿Qué número es este?",
+            opciones: ["50", "20", "30", "40"],
+            correcta: 2,
+          },
+          // ── Motivación: tras los primeros 40 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "check",
+            titulo: "¡seguí así!",
+            subtitulo: "Ya llevás 40 ejercicios de esta sección",
+          },
+          // ── Bloque 5 (items 41-50): Tipo 5,3,5,3,2,2,5,3,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n10",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "10",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n19",
+            enunciado: "¿Qué número es este?",
+            opciones: ["19", "30", "20", "40"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n16",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "16",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n90",
+            enunciado: "¿Qué número es este?",
+            opciones: ["60", "1000", "100", "90"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "12",
+            opcionesGifs: ["n12", "n13", "n11"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "15",
+            opcionesGifs: ["n15", "n17", "n16"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n1",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "1",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n18",
+            enunciado: "¿Qué número es este?",
+            opciones: ["14", "16", "18", "15"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n80",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "100", "80", "90"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n11",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "11",
+          },
+          // ── Motivación: tras 50 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "estrella",
+            titulo: "¡vamos por más!",
+            subtitulo: "50 ejercicios completados, ya falta poco",
+          },
+          // ── Bloque 6 (items 51-60): Tipo 5,2,3,2,5,3,2,5,3,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n13",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "13",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "100",
+            opcionesGifs: ["n100", "n1000", "n90"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n5",
+            enunciado: "¿Qué número es este?",
+            opciones: ["4", "6", "5", "8"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "0",
+            opcionesGifs: ["n1", "n3", "n0"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n12",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "12",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n50",
+            enunciado: "¿Qué número es este?",
+            opciones: ["40", "20", "30", "50"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "40",
+            opcionesGifs: ["n40", "n30", "n50"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n18",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "18",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n40",
+            enunciado: "¿Qué número es este?",
+            opciones: ["20", "40", "50", "30"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n100",
+            enunciado: "¿Qué número es este?",
+            opciones: ["1000", "80", "90", "100"],
+            correcta: 3,
+          },
+          // ── Bloque 7 (items 61-70): Tipo 3,2,5,3,3,5,5,2,3,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n2",
+            enunciado: "¿Qué número es este?",
+            opciones: ["4", "3", "2", "1"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "3",
+            opcionesGifs: ["n3", "n0", "n2"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n15",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "15",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n20",
+            enunciado: "¿Qué número es este?",
+            opciones: ["30", "40", "20", "50"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n17",
+            enunciado: "¿Qué número es este?",
+            opciones: ["18", "15", "17", "16"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n1000",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "1000",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n100",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "100",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "4",
+            opcionesGifs: ["n4", "n5", "n6"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n0",
+            enunciado: "¿Qué número es este?",
+            opciones: ["3", "0", "1", "4"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n20",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "20",
+          },
+          // ── Bloque 8 (items 71-80): Tipo 5,2,3,2,5,3,2,5,5,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n40",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "40",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "90",
+            opcionesGifs: ["n100", "n60", "n90"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n8",
+            enunciado: "¿Qué número es este?",
+            opciones: ["7", "8", "5", "9"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "9",
+            opcionesGifs: ["n9", "n10", "n12"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n14",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "14",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n13",
+            enunciado: "¿Qué número es este?",
+            opciones: ["12", "13", "10", "11"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "19",
+            opcionesGifs: ["n20", "n19", "n30"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n30",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "30",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n19",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "19",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "6",
+            opcionesGifs: ["n5", "n8", "n6"],
+            correcta: 2,
+          },
+          // ── Bloque 9 (items 81-90): Tipo 2,3,5,2,5,5,3,2,5,5 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "8",
+            opcionesGifs: ["n7", "n4", "n8"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "numeros",
+            opciones: ["números", "3", "2", "0"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n60",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "60",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "17",
+            opcionesGifs: ["n15", "n18", "n17"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n90",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "90",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n70",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "70",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "n10",
+            enunciado: "¿Qué número es este?",
+            opciones: ["11", "6", "8", "10"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "50",
+            opcionesGifs: ["n40", "n50", "n20"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n80",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "80",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n50",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "50",
+          },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo: "Estás avanzando muchísimo",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -5238,7 +6643,9 @@ const ItemQuePalabraOpciones = ({
       <ScrollView contentContainerStyle={styles.ejercicioContent}>
         <View style={styles.itemCard}>
           <Text style={styles.itemCardTitulo}>Mirá bien la seña</Text>
-          <Text style={styles.itemCardSub}>¿Qué palabra es esta?</Text>
+          <Text style={styles.itemCardSub}>
+            {item.enunciado || "¿Qué palabra es esta?"}
+          </Text>
         </View>
         <View style={styles.gifGrandeWrap}>
           <SenaGif clave={item.gifPalabra} style={styles.gifGrande} />
@@ -5325,8 +6732,11 @@ const ItemEscrituraLibre = ({
 }) => {
   const [texto, setTexto] = useState("");
   const [confirmado, setConf] = useState(false);
+  // Un número vale escrito con dígitos o con letras: "7" y "siete" son correctas.
+  const enLetras = NUMEROS_EN_LETRAS[item.respuestaCorrecta];
   const esCorrecta =
-    normalizarTexto(texto) === normalizarTexto(item.respuestaCorrecta);
+    normalizarTexto(texto) === normalizarTexto(item.respuestaCorrecta) ||
+    (!!enLetras && normalizarTexto(texto) === normalizarTexto(enLetras));
 
   const confirmar = () => {
     if (!texto.trim()) return;
@@ -5357,12 +6767,16 @@ const ItemEscrituraLibre = ({
       >
         <View style={styles.itemCard}>
           <Text style={styles.itemCardTitulo}>Mirá bien la seña</Text>
-          <Text style={styles.itemCardSub}>¿Cuál es esta palabra?</Text>
+          <Text style={styles.itemCardSub}>
+            {item.enunciado || "¿Cuál es esta palabra?"}
+          </Text>
         </View>
         <View style={styles.gifGrandeWrap}>
           <SenaGif clave={item.gifPalabra} style={styles.gifGrande} />
         </View>
-        <Text style={styles.escrituraLabel}>Escribí la palabra aquí</Text>
+        <Text style={styles.escrituraLabel}>
+          {item.etiqueta || "Escribí la palabra aquí"}
+        </Text>
         <TextInput
           style={[
             styles.escrituraInput,
