@@ -12,8 +12,8 @@ export default function TabLayout() {
         screenOptions={{ headerShown: false }}
       >
         <Tabs.Screen name="index" options={{ title: "Home" }} />
-        <Tabs.Screen name="senas" options={{ title: "Señas" }} />
-        <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
+        <Tabs.Screen name="SenasScreen" options={{ title: "Señas" }} />
+        <Tabs.Screen name="ProfileScreen" options={{ title: "Perfil" }} />
       </Tabs>
     </View>
   );
