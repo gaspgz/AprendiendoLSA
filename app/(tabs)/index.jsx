@@ -18,6 +18,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { cerrarSesionRemota } from "../../services/api";
+import {
+  cerrarSesion,
+  obtenerSesion,
+  obtenerSesionId,
+} from "../../services/sesion";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -163,13 +169,36 @@ const GIFS_PALABRAS = {
 
 // Un número se puede escribir con dígitos o con letras: las dos valen.
 const NUMEROS_EN_LETRAS = {
-  0: "cero", 1: "uno", 2: "dos", 3: "tres", 4: "cuatro",
-  5: "cinco", 6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
-  10: "diez", 11: "once", 12: "doce", 13: "trece", 14: "catorce",
-  15: "quince", 16: "dieciséis", 17: "diecisiete", 18: "dieciocho",
-  19: "diecinueve", 20: "veinte", 30: "treinta", 40: "cuarenta",
-  50: "cincuenta", 60: "sesenta", 70: "setenta", 80: "ochenta",
-  90: "noventa", 100: "cien", 1000: "mil",
+  0: "cero",
+  1: "uno",
+  2: "dos",
+  3: "tres",
+  4: "cuatro",
+  5: "cinco",
+  6: "seis",
+  7: "siete",
+  8: "ocho",
+  9: "nueve",
+  10: "diez",
+  11: "once",
+  12: "doce",
+  13: "trece",
+  14: "catorce",
+  15: "quince",
+  16: "dieciséis",
+  17: "diecisiete",
+  18: "dieciocho",
+  19: "diecinueve",
+  20: "veinte",
+  30: "treinta",
+  40: "cuarenta",
+  50: "cincuenta",
+  60: "sesenta",
+  70: "setenta",
+  80: "ochenta",
+  90: "noventa",
+  100: "cien",
+  1000: "mil",
 };
 
 // Normaliza texto para comparar respuestas libres: minúsculas, sin tildes ni signos.
@@ -190,10 +219,8 @@ const normalizarTexto = (s) =>
     .trim();
 
 // ══════════════════════════════════════════════════════════════════════
-//  CONFIG API  — reemplazá la URL cuando tengas MockAPI listo
+//  CONFIG
 // ══════════════════════════════════════════════════════════════════════
-const MOCKAPI_BASE = "https://TU-URL.mockapi.io/api"; // TODO: reemplazar
-const USER_ID = "user_1"; // TODO: reemplazar con el id del usuario logueado
 const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
 
 // ══════════════════════════════════════════════════════════════════════
@@ -5512,7 +5539,7 @@ const getNivelEstado = (nivel, leccionesCompletadas) => {
 };
 
 // ══════════════════════════════════════════════════════════════════════
-//  PERSISTENCIA — AsyncStorage + MockAPI
+//  PERSISTENCIA — AsyncStorage, keyeado por id de usuario
 // ══════════════════════════════════════════════════════════════════════
 
 const KEYS = {
@@ -5520,14 +5547,15 @@ const KEYS = {
   vidas: (uid) => `vidas_${uid}`,
 };
 
-const DEFAULT_PROGRESO = { leccionesCompletadas: { 0: [0] } }; // nivel 1, lección 1 done por defecto
+const DEFAULT_PROGRESO = { leccionesCompletadas: {} }; // usuario nuevo: nada completado
 const DEFAULT_VIDAS = { vidas: 3, proximaRegen: null };
 
-const cargarDatos = async () => {
+const cargarDatos = async (uid) => {
+  if (!uid) return { progreso: DEFAULT_PROGRESO, vidas: DEFAULT_VIDAS };
   try {
     const [progresoRaw, vidasRaw] = await Promise.all([
-      AsyncStorage.getItem(KEYS.progreso(USER_ID)),
-      AsyncStorage.getItem(KEYS.vidas(USER_ID)),
+      AsyncStorage.getItem(KEYS.progreso(uid)),
+      AsyncStorage.getItem(KEYS.vidas(uid)),
     ]);
     const progreso = progresoRaw ? JSON.parse(progresoRaw) : DEFAULT_PROGRESO;
     const vidasRaw2 = vidasRaw ? JSON.parse(vidasRaw) : DEFAULT_VIDAS;
@@ -5538,14 +5566,13 @@ const cargarDatos = async () => {
   }
 };
 
-const guardarProgreso = async (progreso) => {
+const guardarProgreso = async (uid, progreso) => {
+  if (!uid) return;
   try {
-    await AsyncStorage.setItem(
-      KEYS.progreso(USER_ID),
-      JSON.stringify(progreso),
-    );
-    // TODO: sincronizar con MockAPI
-    // await fetch(`${MOCKAPI_BASE}/usuarios/${USER_ID}/progreso`, {
+    await AsyncStorage.setItem(KEYS.progreso(uid), JSON.stringify(progreso));
+    // TODO: sincronizar con la API del curso usando ENDPOINTS.progreso(uid)
+    // de services/api.js. Se enchufa en el paso siguiente:
+    // await fetch(ENDPOINTS.progreso(uid), {
     //   method: "PUT",
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify(progreso),
@@ -5555,15 +5582,12 @@ const guardarProgreso = async (progreso) => {
   }
 };
 
-const guardarVidas = async (vidas) => {
+const guardarVidas = async (uid, vidas) => {
+  if (!uid) return;
   try {
-    await AsyncStorage.setItem(KEYS.vidas(USER_ID), JSON.stringify(vidas));
-    // TODO: sincronizar con MockAPI
-    // await fetch(`${MOCKAPI_BASE}/usuarios/${USER_ID}/vidas`, {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(vidas),
-    // });
+    await AsyncStorage.setItem(KEYS.vidas(uid), JSON.stringify(vidas));
+    // TODO: sincronizar las vidas con la API del curso cuando exista el
+    // endpoint (services/api.js todavía no expone uno para vidas).
   } catch (e) {
     console.log("Error guardando vidas:", e);
   }
@@ -7354,9 +7378,22 @@ const MenuPerfil = ({ visible, onClose }) => {
             <View style={styles.menuDivider} />
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => {
+              onPress={async () => {
                 onClose();
-                router.replace("/login");
+                // 1) avisarle a la API que esta sesión se cierra. Si falla
+                //    (sin internet, endpoint caído), el logout local sigue igual.
+                try {
+                  const sesionId = await obtenerSesionId();
+                  await cerrarSesionRemota(sesionId);
+                } catch (e) {
+                  console.log("No se pudo cerrar la sesión remota:", e);
+                }
+                // 2) borrar usuario + sesion_id de AsyncStorage. OJO: no se
+                //    tocan progreso_<uid> ni vidas_<uid>, que son la caché por
+                //    usuario y tienen que sobrevivir al logout.
+                await cerrarSesion();
+                // 3) recién ahora, al login
+                router.replace("/LoginScreen");
               }}
             >
               <Text style={styles.menuItemIcono}>🚪</Text>
@@ -7380,9 +7417,8 @@ const MenuPerfil = ({ visible, onClose }) => {
 
 export default function HomeScreen() {
   // ── datos persistentes ──
-  const [progreso, setProgreso] = useState({
-    leccionesCompletadas: { 1: [1] },
-  });
+  const [userId, setUserId] = useState(null);
+  const [progreso, setProgreso] = useState({ leccionesCompletadas: {} });
   const [vidasData, setVidasData] = useState({ vidas: 3, proximaRegen: null });
   const [cargando, setCargando] = useState(true);
 
@@ -7402,22 +7438,49 @@ export default function HomeScreen() {
 
   // ── regeneración de vidas (timer) ──
   const regenTimerRef = useRef(null);
+  // El interval de regeneración se crea una sola vez, así que su closure
+  // congelaría el userId inicial (null). Por eso el id vive además en un ref,
+  // que siempre devuelve el valor actual.
+  const userIdRef = useRef(null);
 
+  // ── carga inicial: primero la sesión, después los datos de ESE usuario ──
   useEffect(() => {
-    cargarDatos().then(({ progreso: p, vidas: v }) => {
+    let cancelado = false;
+
+    (async () => {
+      const usuario = await obtenerSesion();
+
+      // Sin sesión guardada (o sesión sin id) → al login, sin cargar nada
+      if (!usuario || usuario.id == null) {
+        router.replace("/LoginScreen");
+        return;
+      }
+
+      const uid = String(usuario.id);
+      userIdRef.current = uid;
+      if (cancelado) return;
+      setUserId(uid);
+
+      const { progreso: p, vidas: v } = await cargarDatos(uid);
+      if (cancelado) return;
       setProgreso(p);
       setVidasData(v);
       setCargando(false);
-    });
+    })();
+
+    return () => {
+      cancelado = true;
+    };
   }, []);
 
   // chequear regeneración cada 30 segundos
   useEffect(() => {
     regenTimerRef.current = setInterval(() => {
+      const uid = userIdRef.current; // valor actual, no el del closure inicial
       setVidasData((prev) => {
         const actualizado = checkRegenVidas(prev);
         if (actualizado.vidas !== prev.vidas) {
-          guardarVidas(actualizado);
+          guardarVidas(uid, actualizado);
           return actualizado;
         }
         return prev;
@@ -7440,7 +7503,7 @@ export default function HomeScreen() {
           [nivelId]: [...actuales, leccionId],
         },
       };
-      guardarProgreso(nuevo);
+      guardarProgreso(userIdRef.current, nuevo);
       return nuevo;
     });
   }, []);
@@ -7448,7 +7511,7 @@ export default function HomeScreen() {
   const handlePerderVida = useCallback(() => {
     setVidasData((prev) => {
       const nuevo = perderUnaVida(prev);
-      guardarVidas(nuevo);
+      guardarVidas(userIdRef.current, nuevo);
       return nuevo;
     });
   }, []);
@@ -7515,7 +7578,7 @@ export default function HomeScreen() {
   const posiciones = NIVELES.map((_, i) => getPosition(i));
   const alturaMapa = getTotalHeight(NIVELES.length);
 
-  if (cargando) {
+  if (cargando || !userId) {
     return (
       <SafeAreaView
         style={[
