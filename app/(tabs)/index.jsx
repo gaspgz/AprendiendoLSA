@@ -18,7 +18,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { cerrarSesionRemota } from "../../services/api";
+import {
+  cerrarSesionRemota,
+  completarLeccion,
+  guardarProgreso as guardarProgresoAPI,
+  guardarVidas as guardarVidasAPI,
+  obtenerProgreso,
+  obtenerVidas,
+} from "../../services/api";
 import {
   cerrarSesion,
   obtenerSesion,
@@ -5550,47 +5557,80 @@ const KEYS = {
 const DEFAULT_PROGRESO = { leccionesCompletadas: {} }; // usuario nuevo: nada completado
 const DEFAULT_VIDAS = { vidas: 3, proximaRegen: null };
 
+// Lee de la API. Si falla (sin internet, 401...), usa la copia del celular.
 const cargarDatos = async (uid) => {
   if (!uid) return { progreso: DEFAULT_PROGRESO, vidas: DEFAULT_VIDAS };
-  try {
-    const [progresoRaw, vidasRaw] = await Promise.all([
-      AsyncStorage.getItem(KEYS.progreso(uid)),
-      AsyncStorage.getItem(KEYS.vidas(uid)),
-    ]);
-    const progreso = progresoRaw ? JSON.parse(progresoRaw) : DEFAULT_PROGRESO;
-    const vidasRaw2 = vidasRaw ? JSON.parse(vidasRaw) : DEFAULT_VIDAS;
-    const vidas = checkRegenVidas(vidasRaw2); // regenerar si pasaron horas
-    return { progreso, vidas };
-  } catch {
-    return { progreso: DEFAULT_PROGRESO, vidas: DEFAULT_VIDAS };
+
+  const [resProgreso, resVidas] = await Promise.all([
+    obtenerProgreso(uid),
+    obtenerVidas(uid),
+  ]);
+
+  let progreso = null;
+  let vidas = null;
+
+  if (resProgreso.ok) {
+    progreso = {
+      leccionesCompletadas: resProgreso.progreso?.leccionesCompletadas || {},
+    };
+    AsyncStorage.setItem(KEYS.progreso(uid), JSON.stringify(progreso)).catch(
+      () => {},
+    );
   }
+
+  if (resVidas.ok) {
+    vidas = {
+      vidas: resVidas.vidas?.vidas ?? 3,
+      proximaRegen: resVidas.vidas?.proximaRegen ?? null,
+    };
+    AsyncStorage.setItem(KEYS.vidas(uid), JSON.stringify(vidas)).catch(
+      () => {},
+    );
+  }
+
+  // Lo que no vino de la API se completa con lo guardado en el celular
+  if (!progreso || !vidas) {
+    try {
+      const [progresoRaw, vidasRaw] = await Promise.all([
+        AsyncStorage.getItem(KEYS.progreso(uid)),
+        AsyncStorage.getItem(KEYS.vidas(uid)),
+      ]);
+      if (!progreso) {
+        progreso = progresoRaw ? JSON.parse(progresoRaw) : DEFAULT_PROGRESO;
+      }
+      if (!vidas) {
+        vidas = vidasRaw ? JSON.parse(vidasRaw) : DEFAULT_VIDAS;
+      }
+    } catch {
+      progreso = progreso || DEFAULT_PROGRESO;
+      vidas = vidas || DEFAULT_VIDAS;
+    }
+  }
+
+  return { progreso, vidas: checkRegenVidas(vidas) };
 };
 
+// Guarda en el celular al toque y sincroniza con la API.
 const guardarProgreso = async (uid, progreso) => {
   if (!uid) return;
   try {
     await AsyncStorage.setItem(KEYS.progreso(uid), JSON.stringify(progreso));
-    // TODO: sincronizar con la API del curso usando ENDPOINTS.progreso(uid)
-    // de services/api.js. Se enchufa en el paso siguiente:
-    // await fetch(ENDPOINTS.progreso(uid), {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(progreso),
-    // });
   } catch (e) {
-    console.log("Error guardando progreso:", e);
+    console.log("Error guardando progreso local:", e);
   }
+  const res = await guardarProgresoAPI(uid, progreso.leccionesCompletadas);
+  if (!res.ok) console.log("No se pudo sincronizar el progreso:", res.error);
 };
 
 const guardarVidas = async (uid, vidas) => {
   if (!uid) return;
   try {
     await AsyncStorage.setItem(KEYS.vidas(uid), JSON.stringify(vidas));
-    // TODO: sincronizar las vidas con la API del curso cuando exista el
-    // endpoint (services/api.js todavía no expone uno para vidas).
   } catch (e) {
-    console.log("Error guardando vidas:", e);
+    console.log("Error guardando vidas local:", e);
   }
+  const res = await guardarVidasAPI(uid, vidas);
+  if (!res.ok) console.log("No se pudieron sincronizar las vidas:", res.error);
 };
 
 // ══════════════════════════════════════════════════════════════════════
@@ -7418,6 +7458,7 @@ const MenuPerfil = ({ visible, onClose }) => {
 export default function HomeScreen() {
   // ── datos persistentes ──
   const [userId, setUserId] = useState(null);
+  const [usuario, setUsuario] = useState(null);
   const [progreso, setProgreso] = useState({ leccionesCompletadas: {} });
   const [vidasData, setVidasData] = useState({ vidas: 3, proximaRegen: null });
   const [cargando, setCargando] = useState(true);
@@ -7428,7 +7469,7 @@ export default function HomeScreen() {
   const [modalSinVidas, setModalSinVidas] = useState(false);
   const [nivelSeleccionado, setNivelSeleccionado] = useState(null);
   const [estadoSeleccionado, setEstadoSeleccionado] = useState(null);
-  const racha = 7; // TODO: traer de API
+  const racha = usuario?.racha ?? 0;
 
   // ── estado del nivel abierto ──
   const [nivelAbierto, setNivelAbierto] = useState(null);
@@ -7460,6 +7501,7 @@ export default function HomeScreen() {
       userIdRef.current = uid;
       if (cancelado) return;
       setUserId(uid);
+      setUsuario(usuario);
 
       const { progreso: p, vidas: v } = await cargarDatos(uid);
       if (cancelado) return;
@@ -7492,7 +7534,7 @@ export default function HomeScreen() {
   // ── helpers de progreso ──
   const leccionesComp = progreso.leccionesCompletadas;
 
-  const marcarLeccionCompleta = useCallback((nivelId, leccionId) => {
+  const marcarLeccionCompleta = useCallback((nivelId, leccionId, xp) => {
     setProgreso((prev) => {
       const actuales = prev.leccionesCompletadas[nivelId] || [];
       if (actuales.includes(leccionId)) return prev;
@@ -7503,7 +7545,18 @@ export default function HomeScreen() {
           [nivelId]: [...actuales, leccionId],
         },
       };
-      guardarProgreso(userIdRef.current, nuevo);
+      const uid = userIdRef.current;
+      AsyncStorage.setItem(KEYS.progreso(uid), JSON.stringify(nuevo)).catch(
+        () => {},
+      );
+      // Este endpoint marca la lección Y suma el XP en una sola llamada
+      completarLeccion(uid, { nivel: nivelId, leccion: leccionId, xp }).then(
+        (res) => {
+          if (!res.ok) {
+            console.log("No se pudo completar la lección:", res.error);
+          }
+        },
+      );
       return nuevo;
     });
   }, []);
@@ -7553,6 +7606,7 @@ export default function HomeScreen() {
         marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id);
         setXpUltimaLeccion(xp);
         setModalResultado(true);
+        marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id, xp);
       }
       setLeccionActiva(null);
     },
