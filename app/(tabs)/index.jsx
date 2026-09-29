@@ -5483,8 +5483,11 @@ const NIVELES = [
 const checkRegenVidas = (vidasData) => {
   if (!vidasData || vidasData.vidas >= 3)
     return { vidas: 3, proximaRegen: null };
-  const { vidas, proximaRegen } = vidasData;
-  if (!proximaRegen) return vidasData;
+  const { vidas } = vidasData;
+  const proximaRegen = Number(vidasData.proximaRegen);
+  if (!proximaRegen || Number.isNaN(proximaRegen)) {
+    return { vidas, proximaRegen: null };
+  }
   const ahora = Date.now();
   let nuevasVidas = vidas;
   let nuevaRegen = proximaRegen;
@@ -5581,7 +5584,9 @@ const cargarDatos = async (uid) => {
   if (resVidas.ok) {
     vidas = {
       vidas: resVidas.vidas?.vidas ?? 3,
-      proximaRegen: resVidas.vidas?.proximaRegen ?? null,
+      proximaRegen: resVidas.vidas?.proximaRegen
+        ? Number(resVidas.vidas.proximaRegen)
+        : null,
     };
     AsyncStorage.setItem(KEYS.vidas(uid), JSON.stringify(vidas)).catch(
       () => {},
