@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -31,7 +31,6 @@ import {
   obtenerSesion,
   obtenerSesionId,
 } from "../../services/sesion";
-
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const GIFS = {
@@ -7490,35 +7489,45 @@ export default function HomeScreen() {
   const userIdRef = useRef(null);
 
   // ── carga inicial: primero la sesión, después los datos de ESE usuario ──
-  useEffect(() => {
-    let cancelado = false;
+  // ── ACA SACAMOS CARGA INICIAL POR QUE NOS DABA EL ERROR DEL PROGRESO ──
 
-    (async () => {
-      const usuario = await obtenerSesion();
+  // ── carga: cada vez que el mapa vuelve a estar en pantalla ──
+  // Las pestañas no se cierran al cambiar de una a otra, así que la sesión
+  // se revisa al volver del login o al cambiar de usuario.
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const usuario = await obtenerSesion();
 
-      // Sin sesión guardada (o sesión sin id) → al login, sin cargar nada
-      if (!usuario || usuario.id == null) {
-        router.replace("/LoginScreen");
-        return;
-      }
+        // Sin sesión → al login
+        if (!usuario || usuario.id == null) {
+          userIdRef.current = null;
+          setUserId(null);
+          setUsuario(null);
+          router.replace("/LoginScreen");
+          return;
+        }
 
-      const uid = String(usuario.id);
-      userIdRef.current = uid;
-      if (cancelado) return;
-      setUserId(uid);
-      setUsuario(usuario);
+        const uid = String(usuario.id);
+        setUsuario(usuario);
 
-      const { progreso: p, vidas: v } = await cargarDatos(uid);
-      if (cancelado) return;
-      setProgreso(p);
-      setVidasData(v);
-      setCargando(false);
-    })();
+        // Mismo usuario que ya está cargado → no hace falta pedir todo de nuevo
+        if (uid === userIdRef.current) return;
 
-    return () => {
-      cancelado = true;
-    };
-  }, []);
+        userIdRef.current = uid;
+        setCargando(true);
+        setUserId(uid);
+        setNivelAbierto(null);
+        setLeccionActiva(null);
+
+        const { progreso: p, vidas: v } = await cargarDatos(uid);
+        if (userIdRef.current !== uid) return; // cambió el usuario mientras cargaba
+        setProgreso(p);
+        setVidasData(v);
+        setCargando(false);
+      })();
+    }, []),
+  );
 
   // chequear regeneración cada 30 segundos
   useEffect(() => {
