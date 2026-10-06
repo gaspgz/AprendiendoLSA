@@ -233,7 +233,7 @@ const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
 // ══════════════════════════════════════════════════════════════════════
 //  DATOS
 // ══════════════════════════════════════════════════════════════════════
-const NIVELES = [
+export const NIVELES = [
   {
     id: 1, // NIVEL 1
     nombre: "Abecedario dactilológico",

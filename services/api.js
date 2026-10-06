@@ -68,6 +68,17 @@ const mensajeError = (status, data, porDefecto) => {
   return mensajes[status] || data?.error || porDefecto;
 };
 
+// ── Crear sesión en el servidor ──
+// Devuelve el id de la sesión creada, o null si falla. Si falla, el login
+// sigue igual: solo que esa sesión no se va a poder cerrar en la API.
+const crearSesion = async (usuarioId, email) => {
+  const { ok, data } = await apiFetch(ENDPOINTS.sesiones, {
+    method: "POST",
+    body: JSON.stringify({ usuario_id: String(usuarioId), email }),
+  });
+  return ok && data?.id ? data.id : null;
+};
+
 // ── Login ──
 export const loginUsuario = async (email, password) => {
   const { data, status } = await apiFetch(ENDPOINTS.login, {
@@ -81,7 +92,16 @@ export const loginUsuario = async (email, password) => {
     return { ok: false, error: data?.error || "No se pudo iniciar sesión." };
   }
 
-  return { ok: true, usuario: data.usuario, sesion_id: data.sesion_id };
+  const usuario = data.usuario;
+  let sesion_id = data.sesion_id ?? null;
+
+  // Si el login no creó una sesión en el servidor, la creamos acá.
+  // Hace falta para poder cerrarla después.
+  if (!sesion_id && usuario?.id != null) {
+    sesion_id = await crearSesion(usuario.id, usuario.email ?? email);
+  }
+
+  return { ok: true, usuario, sesion_id };
 };
 
 // ── Registro ──
@@ -135,16 +155,26 @@ export const actualizarUsuario = async (id, datos) => {
 };
 
 // ─── Cerrar sesión remota ─────────────────────────────────────────────
-// TODO: falta confirmar la ruta real de logout en la API del curso.
-// La versión anterior usaba ENDPOINTS.sesiones (herencia de MockAPI), que acá
-// nunca existió. Cuando se confirme: agregarla a ENDPOINTS, hacer la llamada
-// con apiFetch y pasar esta constante a true. Mientras tanto no se hace ningún
-// fetch y el logout es solo local (cerrarSesion en services/sesion.js).
-const RUTA_LOGOUT_CONFIRMADA = false;
-
+// Marca la sesión como inactiva en el servidor: PUT /sesiones/{id} con
+// { activa: false }. Si falla (sin internet, etc.), no bloquea el logout
+// del celular: el usuario igual sale de la app.
 export const cerrarSesionRemota = async (sesion_id) => {
-  // Guard temprano: sin ruta confirmada no llamamos a la API.
-  if (!RUTA_LOGOUT_CONFIRMADA || !sesion_id) return;
+  if (!sesion_id) return { ok: false, error: "No hay sesión para cerrar." };
+
+  const { ok, data } = await apiFetch(`${ENDPOINTS.sesiones}/${sesion_id}`, {
+    method: "PUT",
+    body: JSON.stringify({ activa: false }),
+  });
+
+  if (!ok) {
+    console.log("No se pudo cerrar la sesión en el servidor:", data?.error);
+    return {
+      ok: false,
+      error: data?.error || "No se pudo cerrar la sesión en el servidor.",
+    };
+  }
+
+  return { ok: true, sesion: data };
 };
 
 // ── Progreso ──

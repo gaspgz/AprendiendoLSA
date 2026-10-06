@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
+    ActivityIndicator,
     Alert,
     Image,
     Modal,
@@ -11,44 +13,83 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import {
+  actualizarUsuario,
+  cerrarSesionRemota,
+  obtenerProgreso,
+  obtenerUsuario,
+} from "../../services/api";
+import {
+  cerrarSesion,
+  guardarSesion,
+  obtenerSesion,
+  obtenerSesionId,
+} from "../../services/sesion";
+import { NIVELES } from "./index";
 
-// ─── Datos mock (reemplazar con MockAPI cuando esté lista) ────────────
-const USUARIO_MOCK = {
-  id: "1",
-  nombre: "María García",
-  email: "maria@gmail.com",
-  foto: null, // reemplazar con URL real o require() local
-  fechaRegistro: "Marzo 2025",
+// ─── Helpers de datos ────────────────────────────────────────────────
+const MESES = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
+
+// "2026-10-06T15:15:21+00:00" → "Octubre 2026". null si no hay fecha válida.
+const formatearMesAnio = (iso) => {
+  if (!iso) return null;
+  const fecha = new Date(iso);
+  if (isNaN(fecha.getTime())) return null;
+  return `${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`;
 };
 
-const STATS_MOCK = {
-  nivelesCompletados: 2,
-  totalNiveles: 5,
-  xpTotal: 340,
-  rachaDias: 7,
-  rachaMaxima: 12,
+// Un nivel está completo si TODAS sus lecciones están en leccionesCompletadas.
+// El JSON trae las claves como string ("1"): obj[1] y obj["1"] son lo mismo
+// en JS. Los ids de lección se comparan como string por si vienen así.
+const nivelCompleto = (nivel, leccionesCompletadas) => {
+  const hechas = (leccionesCompletadas[nivel.id] || []).map(String);
+  return (
+    nivel.lecciones.length > 0 &&
+    nivel.lecciones.every((leccion) => hechas.includes(String(leccion.id)))
+  );
 };
 
-const LOGROS_MOCK = [
+// Misma lista visual de siempre; `obtenido` sale de los datos reales
+const calcularLogros = ({
+  nivelesCompletados,
+  totalNiveles,
+  abecedarioCompleto,
+  rachaMaxima,
+}) => [
   {
     id: "1",
     icono: "🏆",
     nombre: "Primer nivel",
     descripcion: "Completaste tu primer nivel",
-    obtenido: true,
+    obtenido: nivelesCompletados >= 1,
   },
   {
     id: "2",
     icono: "🔥",
     nombre: "Racha de 7 días",
     descripcion: "7 días seguidos practicando",
-    obtenido: true,
+    obtenido: rachaMaxima >= 7,
   },
   {
     id: "3",
     icono: "⭐",
     nombre: "Perfeccionista",
     descripcion: "10 ejercicios perfectos seguidos",
+    // TODO: no hay datos de ejercicios perfectos seguidos para calcularlo.
+    // Queda bloqueado hasta que exista ese dato.
     obtenido: false,
   },
   {
@@ -56,21 +97,21 @@ const LOGROS_MOCK = [
     icono: "🤟",
     nombre: "Abecedario completo",
     descripcion: "Aprendiste todas las letras",
-    obtenido: false,
+    obtenido: abecedarioCompleto,
   },
   {
     id: "5",
     icono: "🎓",
     nombre: "Graduado",
     descripcion: "Completaste todos los niveles",
-    obtenido: false,
+    obtenido: totalNiveles > 0 && nivelesCompletados === totalNiveles,
   },
   {
     id: "6",
     icono: "💪",
     nombre: "Constante",
     descripcion: "30 días seguidos practicando",
-    obtenido: false,
+    obtenido: rachaMaxima >= 30,
   },
 ];
 
@@ -84,16 +125,24 @@ const StatCard = ({ icono, valor, label, color }) => (
 );
 
 // ─── Modal de edición ────────────────────────────────────────────────
-const ModalEditar = ({ visible, usuario, onGuardar, onCerrar }) => {
-  const [nombre, setNombre] = useState(usuario.nombre);
-  const [email, setEmail] = useState(usuario.email);
+const ModalEditar = ({ visible, usuario, guardando, onGuardar, onCerrar }) => {
+  const [nombre, setNombre] = useState(usuario.nombre || "");
+
+  // El valor inicial del useState queda congelado: cada vez que se abre,
+  // el input arranca con el nombre actual. Se ajusta durante el render
+  // (patrón recomendado por React) en vez de con un useEffect.
+  const [estabaVisible, setEstabaVisible] = useState(visible);
+  if (visible !== estabaVisible) {
+    setEstabaVisible(visible);
+    if (visible) setNombre(usuario.nombre || "");
+  }
 
   const handleGuardar = () => {
-    if (!nombre.trim() || !email.trim()) {
-      Alert.alert("Error", "Completá todos los campos.");
+    if (!nombre.trim()) {
+      Alert.alert("Error", "Completá tu nombre.");
       return;
     }
-    onGuardar({ ...usuario, nombre: nombre.trim(), email: email.trim() });
+    onGuardar(nombre.trim());
   };
 
   return (
@@ -122,16 +171,16 @@ const ModalEditar = ({ visible, usuario, onGuardar, onCerrar }) => {
             autoCapitalize="words"
           />
 
+          {/* El email no se puede editar: la API no lo acepta en el PUT */}
           <Text style={styles.inputLabel}>Email</Text>
           <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+            style={[styles.input, styles.inputSoloLectura]}
+            value={usuario.email}
+            editable={false}
             placeholder="tu@email.com"
             placeholderTextColor="#9CA3AF"
-            keyboardType="email-address"
-            autoCapitalize="none"
           />
+          <Text style={styles.inputAyuda}>El email no se puede cambiar.</Text>
 
           {/* Foto — por ahora solo aviso, cuando esté MockAPI se activa */}
           <View style={styles.fotoEditRow}>
@@ -139,8 +188,14 @@ const ModalEditar = ({ visible, usuario, onGuardar, onCerrar }) => {
             <Text style={styles.fotoEditSub}>Disponible próximamente</Text>
           </View>
 
-          <TouchableOpacity style={styles.btnGuardar} onPress={handleGuardar}>
-            <Text style={styles.btnGuardarTxt}>Guardar cambios</Text>
+          <TouchableOpacity
+            style={styles.btnGuardar}
+            onPress={handleGuardar}
+            disabled={guardando}
+          >
+            <Text style={styles.btnGuardarTxt}>
+              {guardando ? "Guardando..." : "Guardar cambios"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -150,20 +205,94 @@ const ModalEditar = ({ visible, usuario, onGuardar, onCerrar }) => {
 
 // ─── Pantalla principal ──────────────────────────────────────────────
 const ProfileScreen = () => {
-  const [usuario, setUsuario] = useState(USUARIO_MOCK);
+  // { usuario, leccionesCompletadas } — null mientras carga la primera vez
+  const [perfil, setPerfil] = useState(null);
   const [modalEditar, setModalEditar] = useState(false);
+  const [guardando, setGuardando] = useState(false);
 
-  const iniciales = usuario.nombre
+  // La pestaña queda montada: se recarga cada vez que toma foco, así si
+  // completaste una lección y volvés al perfil el XP ya está actualizado
+  useFocusEffect(
+    useCallback(() => {
+      let cancelado = false;
+
+      (async () => {
+        const sesion = await obtenerSesion();
+
+        // Sin sesión guardada (o sesión sin id) → al login
+        if (!sesion || sesion.id == null) {
+          router.replace("/LoginScreen");
+          return;
+        }
+
+        // Si se entró con otra cuenta, no mostrar los datos de la anterior
+        setPerfil((prev) => (prev?.usuario.id === sesion.id ? prev : null));
+
+        const [resUsuario, resProgreso] = await Promise.all([
+          obtenerUsuario(sesion.id),
+          obtenerProgreso(sesion.id),
+        ]);
+        if (cancelado) return;
+
+        // Si falla la red queda lo último que se cargó; si no había nada,
+        // los datos de la sesión local (nombre, email...)
+        setPerfil((prev) => ({
+          usuario:
+            (resUsuario.ok && resUsuario.usuario) || prev?.usuario || sesion,
+          leccionesCompletadas: resProgreso.ok
+            ? resProgreso.progreso?.leccionesCompletadas || {}
+            : prev?.leccionesCompletadas || {},
+        }));
+      })();
+
+      return () => {
+        cancelado = true;
+      };
+    }, []),
+  );
+
+  if (!perfil) {
+    return (
+      <SafeAreaView style={[styles.container, styles.cargando]}>
+        <ActivityIndicator size="large" color="#3D4FBB" />
+      </SafeAreaView>
+    );
+  }
+
+  const { usuario, leccionesCompletadas } = perfil;
+
+  const iniciales = (usuario.nombre || "")
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
-  const handleGuardar = (datosActualizados) => {
-    // TODO: llamada a MockAPI → PUT /users/:id
-    setUsuario(datosActualizados);
-    setModalEditar(false);
+  const handleGuardar = async (nombreNuevo) => {
+    setGuardando(true);
+    try {
+      // Solo el nombre: el PUT es parcial, no toca racha/xpTotal/rachaMaxima
+      const res = await actualizarUsuario(usuario.id, { nombre: nombreNuevo });
+      if (!res.ok) {
+        Alert.alert("Error", res.error);
+        return;
+      }
+
+      // La API devuelve el usuario completo ya actualizado
+      const usuarioActualizado = {
+        ...usuario,
+        nombre: nombreNuevo,
+        ...res.usuario,
+      };
+      setPerfil((prev) => ({ ...prev, usuario: usuarioActualizado }));
+      setModalEditar(false);
+
+      // También en la sesión local, sin perder el sesion_id
+      const sesionId = await obtenerSesionId();
+      await guardarSesion(usuarioActualizado, sesionId);
+    } finally {
+      setGuardando(false);
+    }
   };
 
   const handleCerrarSesion = () => {
@@ -172,17 +301,44 @@ const ProfileScreen = () => {
       {
         text: "Cerrar sesión",
         style: "destructive",
-        onPress: () => {
-          // TODO: limpiar token / navegación a LoginScreen
-          Alert.alert("Sesión cerrada");
+        onPress: async () => {
+          // Igual que el MenuPerfil de index.jsx: si la API falla (sin
+          // internet, endpoint caído), el logout local sigue igual
+          try {
+            const sesionId = await obtenerSesionId();
+            await cerrarSesionRemota(sesionId);
+          } catch {
+            // se sigue igual
+          }
+          await cerrarSesion();
+          router.replace("/LoginScreen");
         },
       },
     ]);
   };
 
-  const progresoPct = Math.round(
-    (STATS_MOCK.nivelesCompletados / STATS_MOCK.totalNiveles) * 100,
+  // Si algún dato viene null/undefined se muestra 0
+  const xpTotal = usuario.xpTotal ?? 0;
+  const racha = usuario.racha ?? 0;
+  const rachaMaxima = usuario.rachaMaxima ?? 0;
+  const miembroDesde = formatearMesAnio(usuario.fechaRegistro);
+
+  const nivelesCompletos = NIVELES.filter((nivel) =>
+    nivelCompleto(nivel, leccionesCompletadas),
   );
+  const nivelesCompletados = nivelesCompletos.length;
+  const totalNiveles = NIVELES.length;
+
+  const logros = calcularLogros({
+    nivelesCompletados,
+    totalNiveles,
+    abecedarioCompleto: nivelesCompletos.some((nivel) => nivel.id === 1),
+    rachaMaxima,
+  });
+
+  const progresoPct = totalNiveles
+    ? Math.round((nivelesCompletados / totalNiveles) * 100)
+    : 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -214,9 +370,12 @@ const ProfileScreen = () => {
           </View>
           <Text style={styles.usuarioNombre}>{usuario.nombre}</Text>
           <Text style={styles.usuarioEmail}>{usuario.email}</Text>
-          <Text style={styles.usuarioDesde}>
-            Miembro desde {usuario.fechaRegistro}
-          </Text>
+          {/* Sin fecha de registro, la línea no se muestra */}
+          {miembroDesde ? (
+            <Text style={styles.usuarioDesde}>
+              Miembro desde {miembroDesde}
+            </Text>
+          ) : null}
         </View>
 
         {/* ── Progreso general ── */}
@@ -225,8 +384,7 @@ const ProfileScreen = () => {
           <View style={styles.progresoWrap}>
             <View style={styles.progresoTextos}>
               <Text style={styles.progresoLabel}>
-                {STATS_MOCK.nivelesCompletados} de {STATS_MOCK.totalNiveles}{" "}
-                niveles
+                {nivelesCompletados} de {totalNiveles} niveles
               </Text>
               <Text style={styles.progresoPct}>{progresoPct}%</Text>
             </View>
@@ -244,25 +402,25 @@ const ProfileScreen = () => {
           <View style={styles.statsGrid}>
             <StatCard
               icono="⭐"
-              valor={STATS_MOCK.xpTotal}
+              valor={xpTotal}
               label="XP total"
               color="#E8A000"
             />
             <StatCard
               icono="🔥"
-              valor={STATS_MOCK.rachaDias}
+              valor={racha}
               label="Racha actual"
               color="#E53935"
             />
             <StatCard
               icono="📈"
-              valor={STATS_MOCK.rachaMaxima}
+              valor={rachaMaxima}
               label="Racha máxima"
               color="#3D4FBB"
             />
             <StatCard
               icono="🎯"
-              valor={`${STATS_MOCK.nivelesCompletados}/${STATS_MOCK.totalNiveles}`}
+              valor={`${nivelesCompletados}/${totalNiveles}`}
               label="Niveles"
               color="#2E7D32"
             />
@@ -272,11 +430,10 @@ const ProfileScreen = () => {
         {/* ── Logros ── */}
         <View style={styles.seccion}>
           <Text style={styles.seccionTitulo}>
-            Logros — {LOGROS_MOCK.filter((l) => l.obtenido).length}/
-            {LOGROS_MOCK.length}
+            Logros — {logros.filter((l) => l.obtenido).length}/{logros.length}
           </Text>
           <View style={styles.logrosGrid}>
-            {LOGROS_MOCK.map((logro) => (
+            {logros.map((logro) => (
               <View
                 key={logro.id}
                 style={[
@@ -328,6 +485,7 @@ const ProfileScreen = () => {
       <ModalEditar
         visible={modalEditar}
         usuario={usuario}
+        guardando={guardando}
         onGuardar={handleGuardar}
         onCerrar={() => setModalEditar(false)}
       />
@@ -338,6 +496,7 @@ const ProfileScreen = () => {
 // ─── Estilos ─────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F8FC" },
+  cargando: { justifyContent: "center", alignItems: "center" },
   scroll: { paddingHorizontal: 20, paddingTop: 16 },
 
   // Header
@@ -520,6 +679,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: "#1A1A2E",
   },
+  inputSoloLectura: { color: "#888", marginBottom: 4 },
+  inputAyuda: { fontSize: 12, color: "#AAAAAA", marginBottom: 16 },
   fotoEditRow: {
     backgroundColor: "#F7F8FC",
     borderRadius: 12,
