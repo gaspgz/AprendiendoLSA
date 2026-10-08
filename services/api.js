@@ -250,7 +250,6 @@ export const guardarVidas = async (usuarioId, { vidas, proximaRegen }) => {
       error: mensajeError(status, data, "No se pudieron guardar las vidas."),
     };
   }
-
   return { ok: true, data };
 };
 
