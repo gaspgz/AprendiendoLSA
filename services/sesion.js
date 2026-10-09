@@ -8,6 +8,10 @@ export const guardarSesion = async (usuario, sesion_id) => {
   await AsyncStorage.setItem(KEY_USUARIO, JSON.stringify(usuario));
   if (sesion_id) {
     await AsyncStorage.setItem(KEY_SESION_ID, sesion_id.toString());
+  } else {
+    // Sin número de sesión nuevo, borramos el viejo para no cerrarlo de nuevo
+    // ni confundirlo con el del usuario que acaba de entrar.
+    await AsyncStorage.removeItem(KEY_SESION_ID);
   }
 };
 

@@ -10,8 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { loginUsuario } from "../../services/api";
-import { guardarSesion } from "../../services/sesion";
+import { cerrarSesionRemota, loginUsuario } from "../../services/api";
+import { guardarSesion, obtenerSesionId } from "../../services/sesion";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +34,14 @@ const LoginScreen = () => {
     if (!resultado.ok) {
       setError(resultado.error);
       return;
+    }
+
+    // Si quedó una sesión anterior abierta (se llegó al login sin tocar
+    // "Cerrar sesión"), la cerramos en el servidor antes de guardar la nueva.
+    // No se espera la respuesta para que el login no tarde más.
+    const sesionAnterior = await obtenerSesionId();
+    if (sesionAnterior && sesionAnterior !== String(resultado.sesion_id)) {
+      cerrarSesionRemota(sesionAnterior);
     }
 
     // Guardar sesión local: usuario + id del registro POST en MockAPI
