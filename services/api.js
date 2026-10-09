@@ -250,11 +250,10 @@ export const guardarVidas = async (usuarioId, { vidas, proximaRegen }) => {
       error: mensajeError(status, data, "No se pudieron guardar las vidas."),
     };
   }
-
   return { ok: true, data };
 };
 
-// ── Config del juego (vidas, tiempo de regeneración, etc.) ──
+// ─ Config del juego (vidas, tiempo de regeneración, etc.) ──
 export const obtenerConfig = async () => {
   const { ok, data, status } = await apiFetch(ENDPOINTS.config);
 
