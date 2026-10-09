@@ -705,5 +705,4 @@ const styles = StyleSheet.create({
   },
   btnGuardarTxt: { fontSize: 16, fontWeight: "bold", color: "#1A1A2E" },
 });
-
 export default ProfileScreen;

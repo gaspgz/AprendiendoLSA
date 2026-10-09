@@ -5548,6 +5548,20 @@ const getNivelEstado = (nivel, leccionesCompletadas) => {
   return completadas >= totalLecciones ? "completado" : "actual";
 };
 
+// Devuelve el progreso con la lección agregada, sin modificar el original.
+// Es pura (no guarda ni llama a nada), así sirve para el updater de setProgreso.
+const agregarLeccion = (progreso, nivelId, leccionId) => {
+  const actuales = progreso.leccionesCompletadas[nivelId] || [];
+  if (actuales.includes(leccionId)) return progreso;
+  return {
+    ...progreso,
+    leccionesCompletadas: {
+      ...progreso.leccionesCompletadas,
+      [nivelId]: [...actuales, leccionId],
+    },
+  };
+};
+
 // ══════════════════════════════════════════════════════════════════════
 //  PERSISTENCIA — AsyncStorage, keyeado por id de usuario
 // ══════════════════════════════════════════════════════════════════════
@@ -7460,10 +7474,13 @@ const MenuPerfil = ({ visible, onClose }) => {
 //  PANTALLA PRINCIPAL
 // ══════════════════════════════════════════════════════════════════════
 
+// Emojis de la pastilla del nivel actual, en el header del mapa
+const EMOJI_NIVEL_EN_CURSO = "📚";
+const EMOJI_TODO_COMPLETO = "🏆";
+
 export default function HomeScreen() {
   // ── datos persistentes ──
   const [userId, setUserId] = useState(null);
-  const [usuario, setUsuario] = useState(null);
   const [progreso, setProgreso] = useState({ leccionesCompletadas: {} });
   const [vidasData, setVidasData] = useState({ vidas: 3, proximaRegen: null });
   const [cargando, setCargando] = useState(true);
@@ -7474,7 +7491,6 @@ export default function HomeScreen() {
   const [modalSinVidas, setModalSinVidas] = useState(false);
   const [nivelSeleccionado, setNivelSeleccionado] = useState(null);
   const [estadoSeleccionado, setEstadoSeleccionado] = useState(null);
-  const racha = usuario?.racha ?? 0;
 
   // ── estado del nivel abierto ──
   const [nivelAbierto, setNivelAbierto] = useState(null);
@@ -7488,6 +7504,10 @@ export default function HomeScreen() {
   // congelaría el userId inicial (null). Por eso el id vive además en un ref,
   // que siempre devuelve el valor actual.
   const userIdRef = useRef(null);
+  // Último xpTotal conocido del servidor: arranca con el de la sesión y se
+  // actualiza con cada respuesta de completarLeccion. Sirve para avisar si
+  // una lección se completó pero el XP no subió.
+  const xpTotalRef = useRef(null);
 
   // ── carga inicial: primero la sesión, después los datos de ESE usuario ──
   // ── ACA SACAMOS CARGA INICIAL POR QUE NOS DABA EL ERROR DEL PROGRESO ──
@@ -7504,18 +7524,17 @@ export default function HomeScreen() {
         if (!usuario || usuario.id == null) {
           userIdRef.current = null;
           setUserId(null);
-          setUsuario(null);
           router.replace("/LoginScreen");
           return;
         }
 
         const uid = String(usuario.id);
-        setUsuario(usuario);
 
         // Mismo usuario que ya está cargado → no hace falta pedir todo de nuevo
         if (uid === userIdRef.current) return;
 
         userIdRef.current = uid;
+        xpTotalRef.current = usuario.xpTotal ?? null;
         setCargando(true);
         setUserId(uid);
         setNivelAbierto(null);
@@ -7549,32 +7568,66 @@ export default function HomeScreen() {
   // ── helpers de progreso ──
   const leccionesComp = progreso.leccionesCompletadas;
 
-  const marcarLeccionCompleta = useCallback((nivelId, leccionId, xp) => {
-    setProgreso((prev) => {
-      const actuales = prev.leccionesCompletadas[nivelId] || [];
-      if (actuales.includes(leccionId)) return prev;
-      const nuevo = {
-        ...prev,
-        leccionesCompletadas: {
-          ...prev.leccionesCompletadas,
-          [nivelId]: [...actuales, leccionId],
-        },
-      };
+  const marcarLeccionCompleta = useCallback(
+    (nivelId, leccionId, xp) => {
+      // Repaso de una lección ya completada: no se marca de nuevo ni suma XP.
+      // Se decide con el estado actual, no con lo que calcula el updater.
+      const actuales = progreso.leccionesCompletadas[nivelId] || [];
+      if (actuales.includes(leccionId)) return;
+
+      // Sin un xp válido no se llama a la API (mandarlo vacío hacía que la API
+      // sumara 0 sin avisar). Tampoco se marca en el celular, para que no
+      // quede distinto del servidor.
+      if (!Number.isFinite(xp)) {
+        console.warn(
+          "[XP] xp inválido: no se marcó la lección ni se llamó a completarLeccion. Revisá el xp de esa lección en NIVELES.",
+          { nivel: nivelId, leccion: leccionId, xp },
+        );
+        return;
+      }
+
       const uid = userIdRef.current;
-      AsyncStorage.setItem(KEYS.progreso(uid), JSON.stringify(nuevo)).catch(
-        () => {},
-      );
-      // Este endpoint marca la lección Y suma el XP en una sola llamada
+
+      // El updater es puro: solo calcula el estado nuevo. La caché y la API
+      // van afuera, una sola vez.
+      setProgreso((prev) => agregarLeccion(prev, nivelId, leccionId));
+      AsyncStorage.setItem(
+        KEYS.progreso(uid),
+        JSON.stringify(agregarLeccion(progreso, nivelId, leccionId)),
+      ).catch(() => {});
+
+      // Este endpoint marca la lección Y suma el XP en una sola llamada.
+      // Su respuesta trae el xpTotal nuevo: si no subió, se avisa.
+      const xpAntes = xpTotalRef.current;
       completarLeccion(uid, { nivel: nivelId, leccion: leccionId, xp }).then(
         (res) => {
           if (!res.ok) {
             console.log("No se pudo completar la lección:", res.error);
+            return;
           }
+          const xpDespues = res.data?.xpTotal;
+          const subio =
+            Number.isFinite(xpDespues) &&
+            (xpAntes == null || xpDespues > xpAntes);
+          if (!subio) {
+            console.warn(
+              "[XP] completarLeccion respondió ok pero el xpTotal no subió.",
+              {
+                nivel: nivelId,
+                leccion: leccionId,
+                xp,
+                antes: xpAntes,
+                despues: xpDespues,
+                yaEstaba: res.data?.yaEstaba,
+              },
+            );
+          }
+          if (Number.isFinite(xpDespues)) xpTotalRef.current = xpDespues;
         },
       );
-      return nuevo;
-    });
-  }, []);
+    },
+    [progreso],
+  );
 
   const handlePerderVida = useCallback(() => {
     setVidasData((prev) => {
@@ -7618,7 +7671,6 @@ export default function HomeScreen() {
   const handleTerminarEjercicio = useCallback(
     ({ completada, xp }) => {
       if (completada && leccionActiva && nivelAbierto) {
-        marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id);
         setXpUltimaLeccion(xp);
         setModalResultado(true);
         marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id, xp);
@@ -7646,6 +7698,19 @@ export default function HomeScreen() {
 
   const posiciones = NIVELES.map((_, i) => getPosition(i));
   const alturaMapa = getTotalHeight(NIVELES.length);
+
+  // Nivel por el que va el usuario (pastilla del header del mapa): el primero
+  // "actual"; si están todos completos, el último completado. El último ?? es
+  // solo para que el header no se rompa si NIVELES cambia de forma rara.
+  const estadosNiveles = NIVELES.map((nivel) => ({
+    nivel,
+    estado: getNivelEstado(nivel, leccionesComp),
+  }));
+  const completados = estadosNiveles.filter((n) => n.estado === "completado");
+  const nivelActual =
+    estadosNiveles.find((n) => n.estado === "actual") ??
+    completados[completados.length - 1] ??
+    estadosNiveles[0];
 
   if (cargando || !userId) {
     return (
@@ -7792,10 +7857,23 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.rachaContainer}>
-          <Text style={styles.rachaFuego}>🔥</Text>
-          <Text style={styles.rachaDias}>{racha}</Text>
-        </View>
+        {/* Nivel por el que va el usuario: al tocarlo abre el modal del nivel */}
+        <TouchableOpacity
+          style={styles.nivelActualContainer}
+          onPress={() =>
+            handleNivelPress(nivelActual.nivel, nivelActual.estado)
+          }
+          activeOpacity={0.8}
+        >
+          <Text style={styles.nivelActualEmoji}>
+            {nivelActual.estado === "completado"
+              ? EMOJI_TODO_COMPLETO
+              : EMOJI_NIVEL_EN_CURSO}
+          </Text>
+          <Text style={styles.nivelActualTxt}>
+            Nivel {toRomano(nivelActual.nivel.id)}
+          </Text>
+        </TouchableOpacity>
         {/* Vidas en el header del mapa */}
         <View style={styles.vidasMapaWrap}>
           {[...Array(3)].map((_, i) => (
@@ -7875,7 +7953,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     marginBottom: 8,
   },
-  rachaContainer: {
+  nivelActualContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
@@ -7884,8 +7962,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 4,
   },
-  rachaFuego: { fontSize: 18 },
-  rachaDias: { fontSize: 16, fontWeight: "bold", color: "#333" },
+  nivelActualEmoji: { fontSize: 18 },
+  nivelActualTxt: { fontSize: 16, fontWeight: "bold", color: "#333" },
   vidasMapaWrap: { flexDirection: "row", gap: 2 },
   perfilBtn: {
     width: 40,
