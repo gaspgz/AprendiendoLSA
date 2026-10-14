@@ -16,6 +16,37 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
+// Ancho máximo de una tarjeta de seña (grilla de 3 columnas): así, si la
+// última fila queda incompleta, sus tarjetas no se estiran
+const ANCHO_TARJETA_SENA = (SCREEN_WIDTH - 24) / 3 - 10;
+
+// ─── Colores por categoría ───────────────────────────────────────────
+// Solo colores que ya usa la app. Nada de rojo: en la app significa error.
+const LILA = { fondo: "#EEF1FB", borde: "#C8D3F5", texto: "#3D4FBB" };
+const DORADO = { fondo: "#FFF8E1", borde: "#F5CE5A", texto: "#5A3E00" };
+const VIOLETA = { fondo: "#F4F2FD", borde: "#A99BF7", texto: "#8C7CF0" };
+const VERDE = { fondo: "#E8F5E9", borde: "#A5D6A7", texto: "#2E7D32" };
+
+// Clave = id de la categoría en CATEGORIAS. Dos categorías vecinas en la
+// lista nunca comparten color.
+const COLORES_CATEGORIA = {
+  abecedario: LILA,
+  presentacion: VERDE,
+  Interacciones: DORADO,
+  Sentimientos: VIOLETA,
+  Numeros: LILA,
+  acciones: VERDE,
+};
+
+// Para categorías nuevas que todavía no estén en COLORES_CATEGORIA
+const COLOR_CATEGORIA_DEFECTO = {
+  fondo: "#fff",
+  borde: "#E0E4F0",
+  texto: "#3D4FBB",
+};
+
+const colorDeCategoria = (categoriaId) =>
+  COLORES_CATEGORIA[categoriaId] ?? COLOR_CATEGORIA_DEFECTO;
 
 // ─── GIFs locales ─────────────────────────────────────
 const GIFS_ABECEDARIO = {
@@ -329,8 +360,8 @@ const CATEGORIAS = [
     id: "Interacciones",
     nombre: "Interacciones Cotidianas",
     emoji: "🙋",
-    color: "#E8F5E9",
-    borderColor: "#A5D6A7",
+    color: "#FFF8E1",
+    borderColor: "#F5CE5A",
     disponible: true,
     items: Object.keys(GIFS_INTERACCIONES).map((key) => ({
       id: key,
@@ -343,8 +374,8 @@ const CATEGORIAS = [
     id: "Sentimientos",
     nombre: "Sentimientos",
     emoji: "😊",
-    color: "#dcdef1",
-    borderColor: "#96a3f0",
+    color: "#F4F2FD",
+    borderColor: "#A99BF7",
     disponible: true,
     items: Object.keys(GIFS_SENTIMIENTOS).map((key) => ({
       id: key,
@@ -357,8 +388,8 @@ const CATEGORIAS = [
     id: "Numeros",
     nombre: "Números",
     emoji: "🔢",
-    color: "#F3E5F5",
-    borderColor: "#CE93D8",
+    color: "#EEF1FB",
+    borderColor: "#C8D3F5",
     disponible: true,
     items: Object.keys(GIFS_NUMEROS).map((key) => ({
       id: key,
@@ -489,6 +520,74 @@ const VideoModal = ({ visible, items, indice, onNavegar, onClose }) => {
   );
 };
 
+// ─── Tarjeta de seña (grilla y búsqueda) ─────────────────────────────
+// Solo texto, sin GIF ni Image: así la grilla no decodifica ninguna
+// animación. El GIF se carga recién al abrir la seña en el modal.
+
+// Qué muestra la tarjeta: la letra o el número grandes; para palabras y
+// frases, el nombre de la seña.
+const contenidoTarjeta = (item, categoriaId) => {
+  if (categoriaId === "abecedario") {
+    return { tipo: "letra", texto: item.id.toUpperCase() };
+  }
+  if (categoriaId === "Numeros" && /^\d+$/.test(item.id)) {
+    return { tipo: "numero", texto: item.id };
+  }
+  return { tipo: "palabra", texto: item.titulo ?? item.id };
+};
+
+const etiquetaAccesible = ({ tipo, texto }) => {
+  if (tipo === "letra") return `Seña de la letra ${texto}`;
+  if (tipo === "numero") return `Seña del número ${texto}`;
+  return `Seña de ${texto}`;
+};
+
+const TarjetaSena = ({ item, categoria, mostrarCategoria, onPress }) => {
+  const colores = colorDeCategoria(categoria.id);
+  const contenido = contenidoTarjeta(item, categoria.id);
+  const esPalabra = contenido.tipo === "palabra";
+  // Las frases usan hasta 2 líneas. Una palabra sola va en 1 línea y se
+  // achica si no entra: con 2 líneas se cortaría a la mitad de la palabra.
+  const lineas = esPalabra && contenido.texto.includes(" ") ? 2 : 1;
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.itemCard,
+        { backgroundColor: colores.fondo, borderColor: colores.borde },
+      ]}
+      onPress={onPress}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={
+        mostrarCategoria
+          ? `${etiquetaAccesible(contenido)}, ${categoria.nombre}`
+          : etiquetaAccesible(contenido)
+      }
+    >
+      <Text
+        style={[
+          esPalabra ? styles.itemTextoPalabra : styles.itemTextoGrande,
+          { color: colores.texto },
+        ]}
+        numberOfLines={lineas}
+        adjustsFontSizeToFit
+        minimumFontScale={0.6}
+      >
+        {contenido.texto}
+      </Text>
+      {mostrarCategoria && (
+        <Text
+          style={[styles.itemCategoria, { color: colores.texto }]}
+          numberOfLines={1}
+        >
+          {categoria.nombre}
+        </Text>
+      )}
+    </TouchableOpacity>
+  );
+};
+
 // ─── Pantalla interior de categoría ─────────────────────────────────
 const CategoriaDetalle = ({ categoria, busqueda, onBack, onItemPress }) => {
   const itemsFiltrados = useMemo(() => {
@@ -498,14 +597,16 @@ const CategoriaDetalle = ({ categoria, busqueda, onBack, onItemPress }) => {
     );
   }, [busqueda, categoria.items]);
 
+  const colores = colorDeCategoria(categoria.id);
+
   return (
     <View style={{ flex: 1 }}>
       <View
         style={[
           styles.catHeader,
           {
-            backgroundColor: categoria.color,
-            borderBottomColor: categoria.borderColor,
+            backgroundColor: colores.fondo,
+            borderBottomColor: colores.borde,
           },
         ]}
       >
@@ -531,32 +632,11 @@ const CategoriaDetalle = ({ categoria, busqueda, onBack, onItemPress }) => {
           numColumns={3}
           contentContainerStyle={styles.itemsGrid}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.itemCard, { borderColor: categoria.borderColor }]}
+            <TarjetaSena
+              item={item}
+              categoria={categoria}
               onPress={() => onItemPress(item, categoria.items)}
-              activeOpacity={0.75}
-            >
-              <View
-                style={[
-                  styles.itemVideoThumb,
-                  { backgroundColor: categoria.color },
-                ]}
-              >
-                {/* Preview del GIF en la card */}
-                {item.gifSource ? (
-                  <Image
-                    source={item.gifSource}
-                    style={styles.gifPreview}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <Text style={styles.itemLetra}>{item.id}</Text>
-                )}
-              </View>
-              <Text style={styles.itemTitulo} numberOfLines={1}>
-                {item.titulo}
-              </Text>
-            </TouchableOpacity>
+            />
           )}
         />
       )}
@@ -639,6 +719,7 @@ const SenasScreen = () => {
         <FlatList
           data={resultadosGlobales}
           keyExtractor={(item) => item.id + item.categoria.id}
+          numColumns={3}
           contentContainerStyle={styles.busquedaResultados}
           ListHeaderComponent={
             <Text style={styles.busquedaHeader}>
@@ -655,33 +736,12 @@ const SenasScreen = () => {
             </View>
           }
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.resultadoRow}
+            <TarjetaSena
+              item={item}
+              categoria={item.categoria}
+              mostrarCategoria
               onPress={() => handleItemPress(item, resultadosGlobales)}
-              activeOpacity={0.75}
-            >
-              <View
-                style={[
-                  styles.resultadoThumb,
-                  { backgroundColor: item.categoria.color },
-                ]}
-              >
-                {item.gifSource ? (
-                  <Image
-                    source={item.gifSource}
-                    style={styles.gifPreviewResultado}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <Text style={styles.resultadoLetra}>{item.id}</Text>
-                )}
-              </View>
-              <View style={styles.resultadoInfo}>
-                <Text style={styles.resultadoTitulo}>{item.titulo}</Text>
-                <Text style={styles.resultadoCat}>{item.categoria.nombre}</Text>
-              </View>
-              <Text style={styles.resultadoFlecha}>▶</Text>
-            </TouchableOpacity>
+            />
           )}
         />
       ) : (
@@ -835,14 +895,18 @@ const styles = StyleSheet.create({
   },
 
   itemsGrid: { padding: 12, gap: 10 },
+  // Tarjeta de seña: fondo, borde y texto los pone el color de la categoría.
+  // No lleva overflow:'hidden', así la sombra (elevation) anda en Android.
   itemCard: {
     flex: 1,
+    maxWidth: ANCHO_TARJETA_SENA,
+    height: 96,
     margin: 5,
     borderRadius: 14,
     borderWidth: 1.5,
-    backgroundColor: "#fff",
+    justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -850,29 +914,14 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
-  itemVideoThumb: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 8,
-    overflow: "hidden", // ← necesario para que el GIF no se salga del borde
-  },
-  gifPreview: {
-    width: 56,
-    height: 56,
-  },
-  gifPreviewResultado: {
-    width: 44,
-    height: 44,
-  },
-  itemLetra: { fontSize: 26, fontWeight: "800", color: "#3D4FBB" },
-  itemTitulo: {
-    fontSize: 11,
+  itemTextoGrande: { fontSize: 34, fontWeight: "800", textAlign: "center" },
+  itemTextoPalabra: { fontSize: 15, fontWeight: "700", textAlign: "center" },
+  itemCategoria: {
+    fontSize: 10,
     fontWeight: "600",
-    color: "#555",
     textAlign: "center",
+    marginTop: 4,
+    opacity: 0.8,
   },
 
   busquedaResultados: { paddingHorizontal: 16, paddingBottom: 40 },
@@ -882,31 +931,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: "600",
   },
-  resultadoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 12,
-    marginBottom: 10,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: "#E0E4F0",
-  },
-  resultadoThumb: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-  },
-  resultadoLetra: { fontSize: 22, fontWeight: "800", color: "#3D4FBB" },
-  resultadoInfo: { flex: 1 },
-  resultadoTitulo: { fontSize: 15, fontWeight: "700", color: "#1A1A2E" },
-  resultadoCat: { fontSize: 12, color: "#888", marginTop: 2 },
-  resultadoFlecha: { fontSize: 14, color: "#C8D3F5" },
-
   emptyWrap: {
     flex: 1,
     alignItems: "center",
