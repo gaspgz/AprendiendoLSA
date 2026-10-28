@@ -5,7 +5,6 @@ import {
   Image,
   Modal,
   PanResponder,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
@@ -675,7 +675,7 @@ const SenasScreen = () => {
   const enBusquedaGlobal = busqueda.trim().length > 0 && !categoriaActiva;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       {!categoriaActiva && (
         <View style={styles.header}>
           <Text style={styles.headerTitulo}>Señas</Text>

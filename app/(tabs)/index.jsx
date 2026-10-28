@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,6 +17,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   cerrarSesionRemota,
@@ -7719,6 +7719,7 @@ export default function HomeScreen() {
           styles.container,
           { justifyContent: "center", alignItems: "center" },
         ]}
+        edges={["top", "left", "right"]}
       >
         <Text style={{ fontSize: 32 }}>🤟</Text>
         <Text style={{ fontSize: 14, color: "#888", marginTop: 8 }}>
@@ -7731,7 +7732,10 @@ export default function HomeScreen() {
   // ══ RENDER: ejercicio ══
   if (nivelAbierto && leccionActiva) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: "#fff" }}
+        edges={["top", "left", "right"]}
+      >
         {vidasData.vidas === 0 ? (
           <ModalSinVidas
             visible={true}
@@ -7773,7 +7777,7 @@ export default function HomeScreen() {
     const completadas = completadasDelNivel.length;
     const total = nivelAbierto.lecciones.length;
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
         <View style={styles.nivelHeader}>
           <TouchableOpacity
             style={styles.backBtn}
@@ -7855,7 +7859,7 @@ export default function HomeScreen() {
 
   // ══ RENDER: mapa ══
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={styles.header}>
         {/* Nivel por el que va el usuario: al tocarlo abre el modal del nivel */}
         <TouchableOpacity

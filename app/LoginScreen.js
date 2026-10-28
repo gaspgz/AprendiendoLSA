@@ -3,15 +3,15 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { cerrarSesionRemota, loginUsuario } from "../../services/api";
-import { guardarSesion, obtenerSesionId } from "../../services/sesion";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { cerrarSesionRemota, loginUsuario } from "../services/api";
+import { guardarSesion, obtenerSesionId } from "../services/sesion";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -128,7 +128,7 @@ const LoginScreen = () => {
 
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../assets/images/logo.png")}
+            source={require("../assets/images/logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />

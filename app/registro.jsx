@@ -2,14 +2,14 @@ import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { registrarUsuario } from "../../services/api";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { registrarUsuario } from "../services/api";
 
 const RegistroScreen = () => {
   const [nombre, setNombre] = useState("");
@@ -41,7 +41,9 @@ const RegistroScreen = () => {
 
     // Cuenta creada. La API de registro no devuelve sesión,
     // así que mandamos al usuario a loguearse con lo recién creado.
-    router.replace("/LoginScreen");
+    // Si vino desde el login, volvemos a ese en vez de apilar otro.
+    if (router.canGoBack()) router.back();
+    else router.replace("/LoginScreen");
   };
 
   return (
@@ -118,7 +120,12 @@ const RegistroScreen = () => {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.replace("/LoginScreen")}>
+        <TouchableOpacity
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+            else router.replace("/LoginScreen");
+          }}
+        >
           <Text style={styles.footerText}>
             ¿Ya tenés cuenta?{" "}
             <Text style={styles.linkText}>Iniciar sesión</Text>

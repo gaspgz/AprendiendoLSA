@@ -5,7 +5,6 @@ import {
   Alert,
   Image,
   Modal,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   actualizarUsuario,
   cerrarSesionRemota,
@@ -253,7 +253,10 @@ const ProfileScreen = () => {
 
   if (!perfil) {
     return (
-      <SafeAreaView style={[styles.container, styles.cargando]}>
+      <SafeAreaView
+        style={[styles.container, styles.cargando]}
+        edges={["top", "left", "right"]}
+      >
         <ActivityIndicator size="large" color="#3D4FBB" />
       </SafeAreaView>
     );
@@ -341,7 +344,7 @@ const ProfileScreen = () => {
     : 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
