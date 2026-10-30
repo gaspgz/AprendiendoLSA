@@ -200,6 +200,15 @@ const GIFS_PALABRAS = {
   separados: require("../../assets/gifs/familiaypronombres/separados.gif"),
   soltero: require("../../assets/gifs/familiaypronombres/soltero.gif"),
   suegro: require("../../assets/gifs/familiaypronombres/suegro.gif"),
+
+  // ── Nivel 7 · Pronombres ──
+  el_ella: require("../../assets/gifs/familiaypronombres/el_ella.gif"),
+  ellos_ellas: require("../../assets/gifs/familiaypronombres/ellos_ellas.gif"),
+  mio: require("../../assets/gifs/familiaypronombres/mio.gif"),
+  nosotros: require("../../assets/gifs/familiaypronombres/nosotros.gif"),
+  tuyo: require("../../assets/gifs/familiaypronombres/tuyo.gif"),
+  vos: require("../../assets/gifs/familiaypronombres/vos.gif"),
+  yo: require("../../assets/gifs/familiaypronombres/yo.gif"),
 };
 
 // Un número se puede escribir con dígitos o con letras: las dos valen.
@@ -6570,6 +6579,186 @@ export const NIVELES = [
       },
     ],
   },
+  {
+    id: 7, // NIVEL 7
+    nombre: "Pronombres",
+    descripcion: "Pronombres personales y posesivos.",
+    totalXP: 50,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 7 (única)
+        titulo: "Pronombres",
+        descripcion: "él/ella, ellos/ellas, mío, nosotros, tuyo, vos y yo.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-7) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "el_ella",
+            nombre: "él/ella",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "ellos_ellas",
+            nombre: "ellos/ellas",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "mio", nombre: "mío" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "nosotros",
+            nombre: "nosotros",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "tuyo", nombre: "tuyo" },
+          { tipo: "ensenanza_palabra", gifPalabra: "vos", nombre: "vos" },
+          { tipo: "ensenanza_palabra", gifPalabra: "yo", nombre: "yo" },
+          // ── Bloque 2 (items 8-14): Tipo 2,3,2,5,3,5,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "ellos/ellas",
+            opcionesGifs: ["el_ella", "ellos_ellas", "nosotros"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "vos",
+            opciones: ["tuyo", "vos", "yo", "mío"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mío",
+            opcionesGifs: ["tuyo", "yo", "mio"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nosotros",
+            respuestaCorrecta: "nosotros",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "el_ella",
+            opciones: ["mío", "ellos/ellas", "él/ella", "tuyo"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tuyo",
+            respuestaCorrecta: "tuyo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "yo",
+            opcionesGifs: ["yo", "vos", "mio"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 15-21): Tipo 5,3,2,3,5,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mio",
+            respuestaCorrecta: "mío",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tuyo",
+            opciones: ["yo", "nosotros", "tuyo", "vos"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "vos",
+            opcionesGifs: ["yo", "tuyo", "vos"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nosotros",
+            opciones: ["nosotros", "tuyo", "yo", "mío"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "yo",
+            respuestaCorrecta: "yo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "él/ella",
+            opcionesGifs: ["el_ella", "ellos_ellas", "vos"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "ellos_ellas",
+            opciones: ["tuyo", "yo", "él/ella", "ellos/ellas"],
+            correcta: 3,
+          },
+          // ── Bloque 4 (items 22-28): Tipo 5,2,5,2,3,5,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "vos",
+            respuestaCorrecta: "vos",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tuyo",
+            opcionesGifs: ["mio", "tuyo", "vos"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "ellos_ellas",
+            respuestaCorrecta: "ellos/ellas",
+            respuestasAlternativas: [
+              "ellos",
+              "ellas",
+              "ellas/ellos",
+              "ellos o ellas",
+              "ellas o ellos",
+            ],
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nosotros",
+            opcionesGifs: ["ellos_ellas", "yo", "nosotros"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mio",
+            opciones: ["tuyo", "mío", "vos", "nosotros"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "el_ella",
+            respuestaCorrecta: "él/ella",
+            respuestasAlternativas: [
+              "él",
+              "ella",
+              "ella/él",
+              "él o ella",
+              "ella o él",
+            ],
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "yo",
+            opciones: ["nuestro", "tuyo", "vos", "yo"],
+            correcta: 3,
+          },
+          // ── Motivación: fin del nivel 7, el último de la app ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡completaste todos los niveles!",
+            subtitulo: "Ya sabés un montón de LSA",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 // ══════════════════════════════════════════════════════════════════════
@@ -7924,9 +8113,15 @@ const ItemEscrituraLibre = ({
   const [confirmado, setConf] = useState(false);
   // Un número vale escrito con dígitos o con letras: "7" y "siete" son correctas.
   const enLetras = NUMEROS_EN_LETRAS[item.respuestaCorrecta];
-  const esCorrecta =
-    normalizarTexto(texto) === normalizarTexto(item.respuestaCorrecta) ||
-    (!!enLetras && normalizarTexto(texto) === normalizarTexto(enLetras));
+  // respuestasAlternativas (opcional): otras respuestas que también valen,
+  // como "ella" para "él/ella". Los espacios alrededor de "/" no cuentan.
+  const comparable = (s) => normalizarTexto(s).replace(/\s*\/\s*/g, "/");
+  const aceptadas = [
+    item.respuestaCorrecta,
+    ...(enLetras ? [enLetras] : []),
+    ...(item.respuestasAlternativas ?? []),
+  ];
+  const esCorrecta = aceptadas.some((r) => comparable(r) === comparable(texto));
 
   const confirmar = () => {
     if (!texto.trim()) return;

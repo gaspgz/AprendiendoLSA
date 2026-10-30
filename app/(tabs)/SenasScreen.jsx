@@ -16,6 +16,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
+// Espacio entre tarjetas de categoría (gap de la grilla)
+const GAP_CATEGORIAS = 14;
+// Tarjeta de categoría ancha (anchoCompleto): dos columnas más el espacio
+// entre ellas, así sus bordes quedan alineados con los de la grilla
+const ANCHO_CATEGORIA_COMPLETA = CARD_WIDTH * 2 + GAP_CATEGORIAS;
 // Ancho máximo de una tarjeta de seña (grilla de 3 columnas): así, si la
 // última fila queda incompleta, sus tarjetas no se estiran
 const ANCHO_TARJETA_SENA = (SCREEN_WIDTH - 24) / 3 - 10;
@@ -36,6 +41,7 @@ const COLORES_CATEGORIA = {
   Sentimientos: VIOLETA,
   Numeros: LILA,
   familia: DORADO,
+  pronombres: VERDE,
   acciones: VERDE,
 };
 
@@ -356,6 +362,27 @@ const NOMBRES_FAMILIA = {
   suegro: "Suegro",
 };
 
+// ─── Pronombres ──────────────────────────────────────────────────────
+const GIFS_PRONOMBRES = {
+  el_ella: require("../../assets/gifs/familiaypronombres/el_ella.gif"),
+  ellos_ellas: require("../../assets/gifs/familiaypronombres/ellos_ellas.gif"),
+  mio: require("../../assets/gifs/familiaypronombres/mio.gif"),
+  nosotros: require("../../assets/gifs/familiaypronombres/nosotros.gif"),
+  tuyo: require("../../assets/gifs/familiaypronombres/tuyo.gif"),
+  vos: require("../../assets/gifs/familiaypronombres/vos.gif"),
+  yo: require("../../assets/gifs/familiaypronombres/yo.gif"),
+};
+
+const NOMBRES_PRONOMBRES = {
+  el_ella: "Él/Ella",
+  ellos_ellas: "Ellos/Ellas",
+  mio: "Mío",
+  nosotros: "Nosotros",
+  tuyo: "Tuyo",
+  vos: "Vos",
+  yo: "Yo",
+};
+
 // ─── Datos ───────────────────────────────────────────────────────────
 const CATEGORIAS = [
   {
@@ -470,6 +497,22 @@ const CATEGORIAS = [
       titulo: NOMBRES_FAMILIA[key],
       subtitulo: "Familia y vínculos LSA",
       gifSource: GIFS_FAMILIA[key],
+    })),
+  },
+  {
+    id: "pronombres",
+    nombre: "Pronombres",
+    emoji: "👥",
+    color: "#E8F5E9",
+    borderColor: "#A5D6A7",
+    disponible: true,
+    // Tarjeta horizontal que ocupa todo el ancho de la grilla
+    anchoCompleto: true,
+    items: Object.keys(GIFS_PRONOMBRES).map((key) => ({
+      id: key,
+      titulo: NOMBRES_PRONOMBRES[key],
+      subtitulo: "Pronombres LSA",
+      gifSource: GIFS_PRONOMBRES[key],
     })),
   },
 ];
@@ -653,6 +696,54 @@ const TarjetaSena = ({ item, categoria, mostrarCategoria, onPress }) => {
   );
 };
 
+// ─── Tarjeta de categoría ancha ──────────────────────────────────────
+// Para las categorías con anchoCompleto: ocupa toda la fila de la grilla y
+// va en horizontal (ícono, nombre y cantidad, flecha). Mismo radio, borde y
+// colores que las demás tarjetas de categoría.
+const TarjetaCategoriaAncha = ({ categoria, onPress }) => {
+  const colores = colorDeCategoria(categoria.id);
+  const cantidad = `${categoria.items.length} señas`;
+
+  return (
+    <TouchableOpacity
+      style={[styles.catAnchaSombra, { backgroundColor: categoria.color }]}
+      onPress={onPress}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={`Categoría ${categoria.nombre}, ${cantidad}`}
+    >
+      <View
+        style={[
+          styles.catAnchaInterior,
+          {
+            backgroundColor: categoria.color,
+            borderColor: categoria.borderColor,
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.catAnchaCirculo,
+            {
+              backgroundColor: categoria.color,
+              borderColor: categoria.borderColor,
+            },
+          ]}
+        >
+          <Text style={styles.catAnchaEmoji}>{categoria.emoji}</Text>
+        </View>
+        <View style={styles.catAnchaTextos}>
+          <Text style={styles.catAnchaNombre}>{categoria.nombre}</Text>
+          <Text style={[styles.catAnchaCantidad, { color: colores.texto }]}>
+            {cantidad}
+          </Text>
+        </View>
+        <Text style={[styles.catAnchaFlecha, { color: colores.texto }]}>›</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 // ─── Pantalla interior de categoría ─────────────────────────────────
 const CategoriaDetalle = ({ categoria, busqueda, onBack, onItemPress }) => {
   const itemsFiltrados = useMemo(() => {
@@ -816,39 +907,52 @@ const SenasScreen = () => {
         >
           <Text style={styles.seccionTitulo}>Categorías</Text>
           <View style={styles.grid}>
-            {CATEGORIAS.map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                style={[
-                  styles.catCard,
-                  { backgroundColor: cat.color, borderColor: cat.borderColor },
-                  !cat.disponible && styles.catCardBloqueada,
-                ]}
-                onPress={() => cat.disponible && setCategoriaActiva(cat)}
-                activeOpacity={cat.disponible ? 0.75 : 1}
-              >
-                {!cat.disponible && <Text style={styles.catLockIcon}>🔒</Text>}
-                <Text style={styles.catEmoji}>{cat.emoji}</Text>
-                <Text
+            {CATEGORIAS.map((cat) =>
+              cat.anchoCompleto ? (
+                <TarjetaCategoriaAncha
+                  key={cat.id}
+                  categoria={cat}
+                  onPress={() => cat.disponible && setCategoriaActiva(cat)}
+                />
+              ) : (
+                <TouchableOpacity
+                  key={cat.id}
                   style={[
-                    styles.catNombre,
-                    !cat.disponible && styles.catNombreBloqueada,
+                    styles.catCard,
+                    {
+                      backgroundColor: cat.color,
+                      borderColor: cat.borderColor,
+                    },
+                    !cat.disponible && styles.catCardBloqueada,
                   ]}
+                  onPress={() => cat.disponible && setCategoriaActiva(cat)}
+                  activeOpacity={cat.disponible ? 0.75 : 1}
                 >
-                  {cat.nombre}
-                </Text>
-                {cat.disponible && (
-                  <View style={styles.catBadge}>
-                    <Text style={styles.catBadgeTxt}>
-                      {cat.items.length} señas
-                    </Text>
-                  </View>
-                )}
-                {!cat.disponible && (
-                  <Text style={styles.catProximo}>Próximamente</Text>
-                )}
-              </TouchableOpacity>
-            ))}
+                  {!cat.disponible && (
+                    <Text style={styles.catLockIcon}>🔒</Text>
+                  )}
+                  <Text style={styles.catEmoji}>{cat.emoji}</Text>
+                  <Text
+                    style={[
+                      styles.catNombre,
+                      !cat.disponible && styles.catNombreBloqueada,
+                    ]}
+                  >
+                    {cat.nombre}
+                  </Text>
+                  {cat.disponible && (
+                    <View style={styles.catBadge}>
+                      <Text style={styles.catBadgeTxt}>
+                        {cat.items.length} señas
+                      </Text>
+                    </View>
+                  )}
+                  {!cat.disponible && (
+                    <Text style={styles.catProximo}>Próximamente</Text>
+                  )}
+                </TouchableOpacity>
+              ),
+            )}
           </View>
         </ScrollView>
       )}
@@ -904,7 +1008,7 @@ const styles = StyleSheet.create({
     color: "#1A1A2E",
     marginBottom: 14,
   },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 14 },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: GAP_CATEGORIAS },
   catCard: {
     width: CARD_WIDTH,
     borderRadius: 20,
@@ -939,6 +1043,44 @@ const styles = StyleSheet.create({
   },
   catBadgeTxt: { fontSize: 11, fontWeight: "600", color: "#3D4FBB" },
   catProximo: { fontSize: 11, color: "#AAAAAA", marginTop: 6 },
+
+  // Tarjeta de categoría ancha. Dos capas porque en Android elevation y
+  // overflow:'hidden' se cancelan: afuera la sombra (con fondo, porque sin
+  // fondo Android no dibuja la elevation) y adentro el borderRadius con
+  // overflow:'hidden'.
+  catAnchaSombra: {
+    width: ANCHO_CATEGORIA_COMPLETA,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  catAnchaInterior: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    overflow: "hidden",
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+  // Tiene el mismo fondo que la tarjeta: sin el borde no se vería
+  catAnchaCirculo: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  catAnchaEmoji: { fontSize: 32 },
+  catAnchaTextos: { flex: 1 },
+  catAnchaNombre: { fontSize: 16, fontWeight: "700", color: "#1A1A2E" },
+  catAnchaCantidad: { fontSize: 12, fontWeight: "600", marginTop: 3 },
+  catAnchaFlecha: { fontSize: 32, fontWeight: "300", lineHeight: 36 },
 
   catHeader: {
     flexDirection: "row",
