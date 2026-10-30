@@ -35,6 +35,7 @@ const COLORES_CATEGORIA = {
   Interacciones: DORADO,
   Sentimientos: VIOLETA,
   Numeros: LILA,
+  familia: DORADO,
   acciones: VERDE,
 };
 
@@ -296,6 +297,65 @@ const NOMBRES_NUMEROS = {
   numeros: "Números",
 };
 
+// ─── Familia y vínculos ──────────────────────────────────────────────
+const GIFS_FAMILIA = {
+  abuelo: require("../../assets/gifs/familiaypronombres/abuelo.gif"),
+  bebe: require("../../assets/gifs/familiaypronombres/bebe.gif"),
+  bisabuelo: require("../../assets/gifs/familiaypronombres/bisabuelo.gif"),
+  familia: require("../../assets/gifs/familiaypronombres/familia.gif"),
+  gemelos: require("../../assets/gifs/familiaypronombres/gemelos.gif"),
+  hermano: require("../../assets/gifs/familiaypronombres/hermano.gif"),
+  hijastro: require("../../assets/gifs/familiaypronombres/hijastro.gif"),
+  hijo: require("../../assets/gifs/familiaypronombres/hijo.gif"),
+  madrastra: require("../../assets/gifs/familiaypronombres/madrastra.gif"),
+  mama: require("../../assets/gifs/familiaypronombres/mama.gif"),
+  mellizos: require("../../assets/gifs/familiaypronombres/mellizos.gif"),
+  padrastro: require("../../assets/gifs/familiaypronombres/padrastro.gif"),
+  papa: require("../../assets/gifs/familiaypronombres/papa.gif"),
+  primo: require("../../assets/gifs/familiaypronombres/primo.gif"),
+  sobrino: require("../../assets/gifs/familiaypronombres/sobrino.gif"),
+  tio: require("../../assets/gifs/familiaypronombres/tio.gif"),
+  amante: require("../../assets/gifs/familiaypronombres/amante.gif"),
+  casados: require("../../assets/gifs/familiaypronombres/casados.gif"),
+  cunado: require("../../assets/gifs/familiaypronombres/cunado.gif"),
+  divorciado: require("../../assets/gifs/familiaypronombres/divorciado.gif"),
+  juntos: require("../../assets/gifs/familiaypronombres/juntos.gif"),
+  novio: require("../../assets/gifs/familiaypronombres/novio.gif"),
+  pareja: require("../../assets/gifs/familiaypronombres/pareja.gif"),
+  separados: require("../../assets/gifs/familiaypronombres/separados.gif"),
+  soltero: require("../../assets/gifs/familiaypronombres/soltero.gif"),
+  suegro: require("../../assets/gifs/familiaypronombres/suegro.gif"),
+};
+
+const NOMBRES_FAMILIA = {
+  abuelo: "Abuelo",
+  bebe: "Bebé",
+  bisabuelo: "Bisabuelo",
+  familia: "Familia",
+  gemelos: "Gemelos",
+  hermano: "Hermano",
+  hijastro: "Hijastro",
+  hijo: "Hijo",
+  madrastra: "Madrastra",
+  mama: "Mamá",
+  mellizos: "Mellizos",
+  padrastro: "Padrastro",
+  papa: "Papá",
+  primo: "Primo",
+  sobrino: "Sobrino",
+  tio: "Tío",
+  amante: "Amante",
+  casados: "Casados",
+  cunado: "Cuñado",
+  divorciado: "Divorciado",
+  juntos: "Juntos",
+  novio: "Novio",
+  pareja: "Pareja",
+  separados: "Separados",
+  soltero: "Soltero",
+  suegro: "Suegro",
+};
+
 // ─── Datos ───────────────────────────────────────────────────────────
 const CATEGORIAS = [
   {
@@ -399,13 +459,18 @@ const CATEGORIAS = [
     })),
   },
   {
-    id: "acciones",
-    nombre: "Acciones",
-    emoji: "⚡",
-    color: "#E0F7FA",
-    borderColor: "#80DEEA",
-    disponible: false,
-    items: [],
+    id: "familia",
+    nombre: "Familia y vínculos",
+    emoji: "👪",
+    color: "#FFF8E1",
+    borderColor: "#F5CE5A",
+    disponible: true,
+    items: Object.keys(GIFS_FAMILIA).map((key) => ({
+      id: key,
+      titulo: NOMBRES_FAMILIA[key],
+      subtitulo: "Familia y vínculos LSA",
+      gifSource: GIFS_FAMILIA[key],
+    })),
   },
 ];
 

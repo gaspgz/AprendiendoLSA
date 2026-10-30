@@ -172,6 +172,34 @@ const GIFS_PALABRAS = {
   n90: require("../../assets/gifs/numeros/90.gif"),
   n100: require("../../assets/gifs/numeros/100.gif"),
   n1000: require("../../assets/gifs/numeros/1000.gif"),
+
+  // ── Nivel 6 · Familia y vínculos ──
+  abuelo: require("../../assets/gifs/familiaypronombres/abuelo.gif"),
+  bebe: require("../../assets/gifs/familiaypronombres/bebe.gif"),
+  bisabuelo: require("../../assets/gifs/familiaypronombres/bisabuelo.gif"),
+  familia: require("../../assets/gifs/familiaypronombres/familia.gif"),
+  gemelos: require("../../assets/gifs/familiaypronombres/gemelos.gif"),
+  hermano: require("../../assets/gifs/familiaypronombres/hermano.gif"),
+  hijastro: require("../../assets/gifs/familiaypronombres/hijastro.gif"),
+  hijo: require("../../assets/gifs/familiaypronombres/hijo.gif"),
+  madrastra: require("../../assets/gifs/familiaypronombres/madrastra.gif"),
+  mama: require("../../assets/gifs/familiaypronombres/mama.gif"),
+  mellizos: require("../../assets/gifs/familiaypronombres/mellizos.gif"),
+  padrastro: require("../../assets/gifs/familiaypronombres/padrastro.gif"),
+  papa: require("../../assets/gifs/familiaypronombres/papa.gif"),
+  primo: require("../../assets/gifs/familiaypronombres/primo.gif"),
+  sobrino: require("../../assets/gifs/familiaypronombres/sobrino.gif"),
+  tio: require("../../assets/gifs/familiaypronombres/tio.gif"),
+  amante: require("../../assets/gifs/familiaypronombres/amante.gif"),
+  casados: require("../../assets/gifs/familiaypronombres/casados.gif"),
+  cunado: require("../../assets/gifs/familiaypronombres/cunado.gif"),
+  divorciado: require("../../assets/gifs/familiaypronombres/divorciado.gif"),
+  juntos: require("../../assets/gifs/familiaypronombres/juntos.gif"),
+  novio: require("../../assets/gifs/familiaypronombres/novio.gif"),
+  pareja: require("../../assets/gifs/familiaypronombres/pareja.gif"),
+  separados: require("../../assets/gifs/familiaypronombres/separados.gif"),
+  soltero: require("../../assets/gifs/familiaypronombres/soltero.gif"),
+  suegro: require("../../assets/gifs/familiaypronombres/suegro.gif"),
 };
 
 // Un número se puede escribir con dígitos o con letras: las dos valen.
@@ -5474,6 +5502,1074 @@ export const NIVELES = [
       },
     ],
   },
+  {
+    id: 6, // NIVEL 6
+    nombre: "Familia y vínculos",
+    descripcion: "Familia, parentescos y estado civil.",
+    totalXP: 350,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 6
+        titulo: "La familia",
+        descripcion: "abuelo, bebé, bisabuelo, familia y gemelos.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "abuelo", nombre: "abuelo" },
+          { tipo: "ensenanza_palabra", gifPalabra: "bebe", nombre: "bebé" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "bisabuelo",
+            nombre: "bisabuelo",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "familia",
+            nombre: "familia",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "gemelos",
+            nombre: "gemelos",
+          },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bebe",
+            opciones: ["familia", "bisabuelo", "gemelos", "bebé"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bisabuelo",
+            opcionesGifs: ["abuelo", "familia", "bisabuelo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gemelos",
+            opcionesGifs: ["gemelos", "bebe", "familia"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "abuelo",
+            respuestaCorrecta: "abuelo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "familia",
+            opciones: ["familia", "gemelos", "bebé", "abuelo"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bebe",
+            respuestaCorrecta: "bebé",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gemelos",
+            opciones: ["abuelo", "familia", "gemelos", "bebé"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bisabuelo",
+            respuestaCorrecta: "bisabuelo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "abuelo",
+            opciones: ["bebé", "familia", "abuelo", "bisabuelo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "familia",
+            opcionesGifs: ["gemelos", "familia", "abuelo"],
+            correcta: 1,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,2,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bisabuelo",
+            opciones: ["abuelo", "gemelos", "familia", "bisabuelo"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bebé",
+            opcionesGifs: ["bebe", "gemelos", "bisabuelo"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "familia",
+            respuestaCorrecta: "familia",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "abuelo",
+            opcionesGifs: ["bisabuelo", "abuelo", "bebe"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gemelos",
+            respuestaCorrecta: "gemelos",
+          },
+        ],
+      },
+      {
+        id: 2, // SECCIÓN 2, nivel 6
+        titulo: "Hijos y hermanos",
+        descripcion: "hermano, hijastro, hijo, madrastra y mamá.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "hermano",
+            nombre: "hermano",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "hijastro",
+            nombre: "hijastro",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "hijo", nombre: "hijo" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "madrastra",
+            nombre: "madrastra",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "mama", nombre: "mamá" },
+          // ── Bloque 2 (items 6-10): Tipo 2,2,3,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "madrastra",
+            opcionesGifs: ["mama", "madrastra", "hijastro"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hermano",
+            opcionesGifs: ["hijo", "hijastro", "hermano"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hijo",
+            opciones: ["madrastra", "mamá", "hijo", "ahijado"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mama",
+            respuestaCorrecta: "mamá",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hijastro",
+            opciones: ["hijastro", "hijo", "hermano", "tío"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hermano",
+            respuestaCorrecta: "hermano",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "madrastra",
+            opciones: ["papá", "padrastro", "mamá", "madrastra"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hijo",
+            respuestaCorrecta: "hijo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mama",
+            opciones: ["mamá", "papá", "madrina", "madrastra"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hijastro",
+            opcionesGifs: ["hijastro", "hijo", "madrastra"],
+            correcta: 0,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hermano",
+            opciones: ["hijo", "hermano", "hijastro", "ahijado"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mamá",
+            opcionesGifs: ["madrastra", "hermano", "mama"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "madrastra",
+            respuestaCorrecta: "madrastra",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hijastro",
+            respuestaCorrecta: "hijastro",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hijo",
+            opcionesGifs: ["hijastro", "hijo", "hermano"],
+            correcta: 1,
+          },
+        ],
+      },
+      {
+        id: 3, // SECCIÓN 3, nivel 6
+        titulo: "Padres, tíos y primos",
+        descripcion: "mellizos, padrastro, papá, primo, sobrino y tío.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-6) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "mellizos",
+            nombre: "mellizos",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "padrastro",
+            nombre: "padrastro",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "papa", nombre: "papá" },
+          { tipo: "ensenanza_palabra", gifPalabra: "primo", nombre: "primo" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "sobrino",
+            nombre: "sobrino",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "tio", nombre: "tío" },
+          // ── Bloque 2 (items 7-12): Tipo 3,2,5,2,3,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "padrastro",
+            opciones: ["papá", "primo", "tío", "padrastro"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mellizos",
+            opcionesGifs: ["mellizos", "primo", "sobrino"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sobrino",
+            respuestaCorrecta: "sobrino",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "papá",
+            opcionesGifs: ["padrastro", "tio", "papa"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tio",
+            opciones: ["papá", "sobrino", "tío", "primo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "primo",
+            opcionesGifs: ["sobrino", "primo", "tio"],
+            correcta: 1,
+          },
+          // ── Bloque 3 (items 13-18): Tipo 2,3,5,2,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tío",
+            opcionesGifs: ["papa", "primo", "tio"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "primo",
+            opciones: ["sobrino", "tío", "primo", "papá"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "padrastro",
+            respuestaCorrecta: "padrastro",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sobrino",
+            opcionesGifs: ["sobrino", "primo", "mellizos"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "papa",
+            respuestaCorrecta: "papá",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mellizos",
+            opciones: ["papá", "padrastro", "mellizos", "primo"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 19-24): Tipo 3,5,3,2,5,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "papa",
+            opciones: ["papá", "padrastro", "primo", "tío"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tio",
+            respuestaCorrecta: "tío",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sobrino",
+            opciones: ["tío", "sobrino", "primo", "padrastro"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "padrastro",
+            opcionesGifs: ["papa", "padrastro", "sobrino"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "primo",
+            respuestaCorrecta: "primo",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mellizos",
+            respuestaCorrecta: "mellizos",
+          },
+        ],
+      },
+      {
+        id: 4, // SECCIÓN 4, nivel 6
+        titulo: "Estado civil",
+        descripcion: "amante, casados, cuñado, divorciado y juntos.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "amante", nombre: "amante" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "casados",
+            nombre: "casados",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "cunado", nombre: "cuñado" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "divorciado",
+            nombre: "divorciado",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "juntos", nombre: "juntos" },
+          // ── Bloque 2 (items 6-10): Tipo 2,2,3,5,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "divorciado",
+            opcionesGifs: ["casados", "juntos", "divorciado"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "amante",
+            opcionesGifs: ["amante", "juntos", "cunado"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "casados",
+            opciones: ["divorciado", "juntos", "cuñado", "casados"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cunado",
+            respuestaCorrecta: "cuñado",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "juntos",
+            opcionesGifs: ["casados", "divorciado", "juntos"],
+            correcta: 2,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,2,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "amante",
+            respuestaCorrecta: "amante",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cunado",
+            opciones: ["cuñado", "divorciado", "juntos", "casados"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "casados",
+            opcionesGifs: ["divorciado", "casados", "amante"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "divorciado",
+            opciones: ["divorciado", "juntos", "casados", "amante"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "juntos",
+            respuestaCorrecta: "juntos",
+          },
+          // ── Bloque 4 (items 16-20): Tipo 5,2,5,3,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "divorciado",
+            respuestaCorrecta: "divorciado",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "cuñado",
+            opcionesGifs: ["cunado", "amante", "casados"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "casados",
+            respuestaCorrecta: "casados",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "amante",
+            opciones: ["juntos", "cuñado", "amante", "casados"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "juntos",
+            opciones: ["casados", "divorciado", "juntos", "separados"],
+            correcta: 2,
+          },
+        ],
+      },
+      {
+        id: 5, // SECCIÓN 5, nivel 6
+        titulo: "Noviazgo y pareja",
+        descripcion: "novio, pareja, separados, soltero y suegro.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-5) ──
+          { tipo: "ensenanza_palabra", gifPalabra: "novio", nombre: "novio" },
+          { tipo: "ensenanza_palabra", gifPalabra: "pareja", nombre: "pareja" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "separados",
+            nombre: "separados",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "soltero",
+            nombre: "soltero",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "suegro", nombre: "suegro" },
+          // ── Bloque 2 (items 6-10): Tipo 3,2,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "soltero",
+            opciones: ["casados", "soltero", "amante", "suegro"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "pareja",
+            opcionesGifs: ["novio", "pareja", "separados"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "novio",
+            opcionesGifs: ["novio", "pareja", "suegro"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "separados",
+            respuestaCorrecta: "separados",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "suegro",
+            opciones: ["separados", "novio", "pareja", "suegro"],
+            correcta: 3,
+          },
+          // ── Bloque 3 (items 11-15): Tipo 5,3,5,3,2 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "novio",
+            respuestaCorrecta: "novio",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "pareja",
+            opciones: ["suegro", "separados", "pareja", "soltero"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "suegro",
+            respuestaCorrecta: "suegro",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "separados",
+            opciones: ["separados", "juntos", "soltero", "suegro"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "soltero",
+            opcionesGifs: ["separados", "novio", "soltero"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 16-20): Tipo 3,2,5,5,2 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "novio",
+            opciones: ["soltero", "pareja", "juntos", "novio"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "separados",
+            opcionesGifs: ["separados", "soltero", "pareja"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "soltero",
+            respuestaCorrecta: "soltero",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "pareja",
+            respuestaCorrecta: "pareja",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "suegro",
+            opcionesGifs: ["novio", "suegro", "soltero"],
+            correcta: 1,
+          },
+        ],
+      },
+      {
+        id: 6, // SECCIÓN 6, nivel 6
+        titulo: "Repaso del nivel",
+        descripcion: "Todas las palabras del nivel, mezcladas.",
+        xp: 100,
+        items: [
+          // ── Bloque 1 (items 1-10): Tipo 2,3,2,5,3,2,5,5,3,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "cuñado",
+            opcionesGifs: ["hermano", "suegro", "cunado"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "gemelos",
+            opciones: ["abuelo", "familia", "gemelos", "bebé"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "separados",
+            opcionesGifs: ["separados", "divorciado", "juntos"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "novio",
+            respuestaCorrecta: "novio",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "abuelo",
+            opciones: ["bebé", "familia", "abuelo", "bisabuelo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "familia",
+            opcionesGifs: ["pareja", "familia", "abuelo"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "padrastro",
+            respuestaCorrecta: "padrastro",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "suegro",
+            respuestaCorrecta: "suegro",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "novio",
+            opciones: ["soltero", "pareja", "juntos", "novio"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "primo",
+            opcionesGifs: ["sobrino", "tio", "primo"],
+            correcta: 2,
+          },
+          // ── Bloque 2 (items 11-20): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "sobrino",
+            opciones: ["tío", "sobrino", "primo", "padrastro"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mamá",
+            opcionesGifs: ["madrastra", "mama", "papa"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bebe",
+            respuestaCorrecta: "bebé",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hermano",
+            opcionesGifs: ["hermano", "primo", "hijo"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "pareja",
+            opcionesGifs: ["pareja", "novio", "casados"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hijastro",
+            opciones: ["hijastro", "hijo", "hermano", "tío"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "bisabuelo",
+            respuestaCorrecta: "bisabuelo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tío",
+            opcionesGifs: ["sobrino", "papa", "tio"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "primo",
+            respuestaCorrecta: "primo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "papa",
+            opciones: ["papá", "padrastro", "primo", "tío"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 21-30): Tipo 3,2,5,2,2,3,5,2,5,3 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "soltero",
+            opciones: ["casados", "soltero", "amante", "suegro"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "amante",
+            opcionesGifs: ["novio", "amante", "pareja"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "abuelo",
+            respuestaCorrecta: "abuelo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mellizos",
+            opcionesGifs: ["gemelos", "hermano", "mellizos"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "sobrino",
+            opcionesGifs: ["sobrino", "primo", "hijo"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "madrastra",
+            opciones: ["papá", "padrastro", "mamá", "madrastra"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "gemelos",
+            respuestaCorrecta: "gemelos",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "casados",
+            opcionesGifs: ["divorciado", "casados", "juntos"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "cunado",
+            respuestaCorrecta: "cuñado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "juntos",
+            opciones: ["casados", "divorciado", "juntos", "separados"],
+            correcta: 2,
+          },
+          // ── Bloque 4 (items 31-40): Tipo 2,3,2,2,5,3,2,5,5,3 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "divorciado",
+            opcionesGifs: ["casados", "divorciado", "separados"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hijo",
+            opciones: ["madrastra", "mamá", "hijo", "ahijado"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "padrastro",
+            opcionesGifs: ["padrastro", "papa", "madrastra"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hijastro",
+            opcionesGifs: ["hijo", "padrastro", "hijastro"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "casados",
+            respuestaCorrecta: "casados",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tio",
+            opciones: ["papá", "sobrino", "tío", "primo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "hijo",
+            opcionesGifs: ["hijo", "hijastro", "sobrino"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hermano",
+            respuestaCorrecta: "hermano",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "familia",
+            respuestaCorrecta: "familia",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bisabuelo",
+            opciones: ["abuelo", "gemelos", "familia", "bisabuelo"],
+            correcta: 3,
+          },
+          // ── Motivación: tras los primeros 40 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "check",
+            titulo: "¡seguí así!",
+            subtitulo: "Ya llevás 40 ejercicios de esta sección",
+          },
+          // ── Bloque 5 (items 41-50): Tipo 5,3,5,3,2,2,5,3,3,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hijastro",
+            respuestaCorrecta: "hijastro",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "familia",
+            opciones: ["familia", "gemelos", "bebé", "abuelo"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mama",
+            respuestaCorrecta: "mamá",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mellizos",
+            opciones: ["papá", "padrastro", "mellizos", "primo"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bebé",
+            opcionesGifs: ["hijo", "mellizos", "bebe"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "madrastra",
+            opcionesGifs: ["mama", "madrastra", "padrastro"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "hijo",
+            respuestaCorrecta: "hijo",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "cunado",
+            opciones: ["cuñado", "divorciado", "juntos", "casados"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "amante",
+            opciones: ["juntos", "cuñado", "amante", "casados"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "madrastra",
+            respuestaCorrecta: "madrastra",
+          },
+          // ── Motivación: tras 50 ejercicios ──
+          {
+            tipo: "motivacion",
+            variante: "estrella",
+            titulo: "¡vamos por más!",
+            subtitulo: "50 ejercicios completados, ya falta poco",
+          },
+          // ── Bloque 6 (items 51-60): Tipo 5,2,3,2,5,3,2,5,3,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "soltero",
+            respuestaCorrecta: "soltero",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "novio",
+            opcionesGifs: ["novio", "amante", "soltero"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "primo",
+            opciones: ["sobrino", "tío", "primo", "papá"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "suegro",
+            opcionesGifs: ["cunado", "abuelo", "suegro"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "sobrino",
+            respuestaCorrecta: "sobrino",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mama",
+            opciones: ["mamá", "papá", "madrina", "madrastra"],
+            correcta: 0,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "papá",
+            opcionesGifs: ["padrastro", "papa", "tio"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mellizos",
+            respuestaCorrecta: "mellizos",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "divorciado",
+            opciones: ["divorciado", "juntos", "casados", "amante"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "padrastro",
+            opciones: ["papá", "primo", "tío", "padrastro"],
+            correcta: 3,
+          },
+          // ── Bloque 7 (items 61-70): Tipo 3,2,5,3,3,5,5,2,3,5 ──
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "casados",
+            opciones: ["divorciado", "juntos", "cuñado", "casados"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "juntos",
+            opcionesGifs: ["casados", "separados", "juntos"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tio",
+            respuestaCorrecta: "tío",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "separados",
+            opciones: ["separados", "juntos", "soltero", "suegro"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "pareja",
+            opciones: ["suegro", "separados", "pareja", "soltero"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "amante",
+            respuestaCorrecta: "amante",
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "papa",
+            respuestaCorrecta: "papá",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "abuelo",
+            opcionesGifs: ["abuelo", "bisabuelo", "tio"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "bebe",
+            opciones: ["familia", "bisabuelo", "gemelos", "bebé"],
+            correcta: 3,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "juntos",
+            respuestaCorrecta: "juntos",
+          },
+          // ── Bloque 8 (items 71-78): Tipo 5,2,3,2,5,3,2,5 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "separados",
+            respuestaCorrecta: "separados",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "soltero",
+            opcionesGifs: ["separados", "soltero", "divorciado"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "suegro",
+            opciones: ["separados", "novio", "pareja", "suegro"],
+            correcta: 3,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "gemelos",
+            opcionesGifs: ["mellizos", "bebe", "gemelos"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "divorciado",
+            respuestaCorrecta: "divorciado",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "hermano",
+            opciones: ["hijo", "hermano", "hijastro", "ahijado"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "bisabuelo",
+            opcionesGifs: ["bisabuelo", "abuelo", "familia"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "pareja",
+            respuestaCorrecta: "pareja",
+          },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo: "Estás avanzando muchísimo",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 // ══════════════════════════════════════════════════════════════════════
@@ -5658,16 +6754,27 @@ const guardarVidas = async (uid, vidas) => {
 
 const CIRCLE_SIZE = 80;
 const ZIGZAG_PADDING = 40;
-const POSITIONS = [0.25, 0.62, 0.18, 0.7, 0.35];
+// Ancho en el que se puede ubicar el borde izquierdo de un círculo
+const ANCHO_UTIL = SCREEN_WIDTH - ZIGZAG_PADDING * 2 - CIRCLE_SIZE;
+// Zigzag regular para cualquier cantidad de niveles: índice par a la
+// izquierda, impar a la derecha (fracciones de ANCHO_UTIL)
+const LADO_IZQ = 0.2;
+const LADO_DER = 0.8;
+// Distancia vertical entre un nivel y el siguiente
+const ESPACIO_VERTICAL = 120;
+// Aire arriba del primer nivel: su anillo de pulso sobresale 8 px del
+// círculo y en y = 0 se cortaba
+const MARGEN_ARRIBA = 24;
+// Aire debajo del último nivel. La tab bar no tapa el mapa (va debajo del
+// ScrollView, no encima), así que no hace falta sumarle su alto
+const MARGEN_ABAJO = 40;
 
 const getPosition = (i) => ({
-  x:
-    ZIGZAG_PADDING +
-    POSITIONS[i % POSITIONS.length] *
-      (SCREEN_WIDTH - ZIGZAG_PADDING * 2 - CIRCLE_SIZE),
-  y: i * 120,
+  x: ZIGZAG_PADDING + (i % 2 === 0 ? LADO_IZQ : LADO_DER) * ANCHO_UTIL,
+  y: MARGEN_ARRIBA + i * ESPACIO_VERTICAL,
 });
-const getTotalHeight = (c) => c * 120 + CIRCLE_SIZE + 40;
+const getTotalHeight = (cantidad) =>
+  MARGEN_ARRIBA + (cantidad - 1) * ESPACIO_VERTICAL + CIRCLE_SIZE + MARGEN_ABAJO;
 
 const toRomano = (n) => {
   const map = [
