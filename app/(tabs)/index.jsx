@@ -90,7 +90,8 @@ const GIFS_PALABRAS = {
   sordo: require("../../assets/gifs/presentaciones/sordo.gif"),
 
   // ── Nivel 3 · Interacciones cotidianas ──
-  // (interacciones/quien.gif es la misma seña que presentaciones/quien.gif)
+  // "¿quién?" es presentaciones/quien.gif (la clave quien de arriba). En
+  // interacciones no hay un "¿quién?": "por ejemplo" es porejemplo.gif.
   saludos: require("../../assets/gifs/interacciones/saludos.gif"),
   hola: require("../../assets/gifs/interacciones/hola.gif"),
   chau: require("../../assets/gifs/interacciones/chau.gif"),
@@ -272,7 +273,7 @@ const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
 // ══════════════════════════════════════════════════════════════════════
 export const NIVELES = [
   {
-    id: 1, // NIVEL 1
+    id: 1, // NIVEL 1 en el mapa (id 1)
     nombre: "Abecedario dactilológico",
     descripcion: "Aprendé las 27 letras del alfabeto en LSA.",
     totalXP: 290,
@@ -1403,10 +1404,190 @@ export const NIVELES = [
     ],
   },
   {
-    id: 2, // NIVEL 2
+    id: 7, // NIVEL 2 en el mapa (id 7)
+    nombre: "Pronombres",
+    descripcion: "Pronombres personales y posesivos.",
+    totalXP: 50,
+    lecciones: [
+      {
+        id: 1, // SECCIÓN 1, nivel 7 (única)
+        titulo: "Pronombres",
+        descripcion: "él/ella, ellos/ellas, mío, nosotros, tuyo, vos y yo.",
+        xp: 50,
+        items: [
+          // ── Tipo 1: enseñanza (items 1-7) ──
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "el_ella",
+            nombre: "él/ella",
+          },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "ellos_ellas",
+            nombre: "ellos/ellas",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "mio", nombre: "mío" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "nosotros",
+            nombre: "nosotros",
+          },
+          { tipo: "ensenanza_palabra", gifPalabra: "tuyo", nombre: "tuyo" },
+          { tipo: "ensenanza_palabra", gifPalabra: "vos", nombre: "vos" },
+          { tipo: "ensenanza_palabra", gifPalabra: "yo", nombre: "yo" },
+          // ── Bloque 2 (items 8-14): Tipo 2,3,2,5,3,5,2 ──
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "ellos/ellas",
+            opcionesGifs: ["el_ella", "ellos_ellas", "nosotros"],
+            correcta: 1,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "vos",
+            opciones: ["tuyo", "vos", "yo", "mío"],
+            correcta: 1,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "mío",
+            opcionesGifs: ["tuyo", "yo", "mio"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "nosotros",
+            respuestaCorrecta: "nosotros",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "el_ella",
+            opciones: ["mío", "ellos/ellas", "él/ella", "tuyo"],
+            correcta: 2,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "tuyo",
+            respuestaCorrecta: "tuyo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "yo",
+            opcionesGifs: ["yo", "vos", "mio"],
+            correcta: 0,
+          },
+          // ── Bloque 3 (items 15-21): Tipo 5,3,2,3,5,2,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "mio",
+            respuestaCorrecta: "mío",
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "tuyo",
+            opciones: ["yo", "nosotros", "tuyo", "vos"],
+            correcta: 2,
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "vos",
+            opcionesGifs: ["yo", "tuyo", "vos"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "nosotros",
+            opciones: ["nosotros", "tuyo", "yo", "mío"],
+            correcta: 0,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "yo",
+            respuestaCorrecta: "yo",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "él/ella",
+            opcionesGifs: ["el_ella", "ellos_ellas", "vos"],
+            correcta: 0,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "ellos_ellas",
+            opciones: ["tuyo", "yo", "él/ella", "ellos/ellas"],
+            correcta: 3,
+          },
+          // ── Bloque 4 (items 22-28): Tipo 5,2,5,2,3,5,3 ──
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "vos",
+            respuestaCorrecta: "vos",
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "tuyo",
+            opcionesGifs: ["mio", "tuyo", "vos"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "ellos_ellas",
+            respuestaCorrecta: "ellos/ellas",
+            respuestasAlternativas: [
+              "ellos",
+              "ellas",
+              "ellas/ellos",
+              "ellos o ellas",
+              "ellas o ellos",
+            ],
+          },
+          {
+            tipo: "elegir_sena_palabra",
+            palabra: "nosotros",
+            opcionesGifs: ["ellos_ellas", "yo", "nosotros"],
+            correcta: 2,
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "mio",
+            opciones: ["tuyo", "mío", "vos", "nosotros"],
+            correcta: 1,
+          },
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "el_ella",
+            respuestaCorrecta: "él/ella",
+            respuestasAlternativas: [
+              "él",
+              "ella",
+              "ella/él",
+              "él o ella",
+              "ella o él",
+            ],
+          },
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "yo",
+            opciones: ["nuestro", "tuyo", "vos", "yo"],
+            correcta: 3,
+          },
+          // ── Motivación: fin de la sección (y del nivel) ──
+          {
+            tipo: "motivacion",
+            variante: "corazon",
+            titulo: "¡felicidades!",
+            subtitulo: "Estás avanzando muchísimo",
+            textoBoton: "¡Terminar!",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2, // NIVEL 3 en el mapa (id 2)
     nombre: "Saludos y presentaciones",
     descripcion: "Nombre, apellido, DNI y preguntas básicas.",
-    totalXP: 280,
+    totalXP: 330,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 2
@@ -1780,7 +1961,7 @@ export const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "quien",
-            opciones: ["¿cuál?", "¿quién?", "¿quién?", "¿cómo?"],
+            opciones: ["¿cuál?", "¿quién?", "por ejemplo", "¿cómo?"],
             correcta: 1,
           },
           {
@@ -1990,7 +2171,7 @@ export const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "quien",
-            opciones: ["¿cuál?", "¿quién?", "¿quién?", "¿cómo?"],
+            opciones: ["¿cuál?", "¿quién?", "por ejemplo", "¿cómo?"],
             correcta: 1,
           },
           // ── Bloque 3 (items 21-30): Tipo 2,3,2,2,5,3,2,5,5,3 ──
@@ -2252,13 +2433,70 @@ export const NIVELES = [
           },
         ],
       },
+      {
+        id: 6, // SECCIÓN 6, nivel 2 · lección extra de frases
+        titulo: "Lección: datos personales y pronombres",
+        descripcion: "Frases con tus datos y los pronombres.",
+        xp: 50,
+        items: [
+          // ── Frases: todas en modo "armar" salvo la última, en "elegir" ──
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["mio", "dni"],
+            palabras: ["mi", "DNI"],
+            banco: ["tu", "DNI", "yo", "mi", "nombre"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["mio", "nombre"],
+            palabras: ["mi", "nombre"],
+            banco: ["nombre", "vos", "apellido", "mi", "tu"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["tuyo", "apellido"],
+            palabras: ["tu", "apellido"],
+            banco: ["mi", "apellido", "DNI", "tu", "nombre"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["nombre", "el_ella"],
+            palabras: ["nombre", "él"],
+            banco: ["yo", "nombre", "nosotros", "él", "apellido"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["apellido", "el_ella"],
+            palabras: ["apellido", "ella"],
+            banco: ["ellos", "DNI", "ella", "apellido", "vos"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "elegir",
+            secuencia: ["mio", "nombre", "tuyo", "apellido"],
+            palabras: ["mi", "nombre", "tu", "apellido"],
+            opciones: [
+              "tu nombre mi apellido",
+              "mi apellido tu nombre",
+              "mi nombre tu apellido",
+              "mi nombre tu DNI",
+            ],
+            correcta: 2,
+          },
+        ],
+      },
     ],
   },
   {
-    id: 3, // NIVEL 3
+    id: 3, // NIVEL 4 en el mapa (id 3)
     nombre: "Interacciones cotidianas",
     descripcion: "Saludos, cortesía y frases del día a día.",
-    totalXP: 300,
+    totalXP: 350,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 3
@@ -3206,13 +3444,72 @@ export const NIVELES = [
           },
         ],
       },
+      {
+        id: 6, // SECCIÓN 6, nivel 3 · lección extra de frases
+        titulo: "Lección: saludos y datos personales",
+        descripcion: "Pequeñas conversaciones con saludos y tus datos.",
+        xp: 50,
+        items: [
+          // ── Frases: todas en modo "armar" salvo la última, en "elegir" ──
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["hola", "tuyo", "nombre"],
+            palabras: ["hola", "tu", "nombre"],
+            banco: ["mi", "nombre", "chau", "hola", "apellido", "tu"],
+          },
+          // Ejercicio suelto (no es frase)
+          {
+            tipo: "que_palabra_opciones",
+            gifPalabra: "buendia",
+            opciones: ["buen día", "buenas tardes", "buenas noches", "hola"],
+            correcta: 0,
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["hola", "mio", "nombre", "tuyo", "apellido"],
+            palabras: ["hola", "mi", "nombre", "tu", "apellido"],
+            banco: [
+              "tu",
+              "gracias",
+              "nombre",
+              "hola",
+              "DNI",
+              "apellido",
+              "chau",
+              "mi",
+            ],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["tuyo", "apellido", "gracias"],
+            palabras: ["tu", "apellido", "gracias"],
+            banco: ["gracias", "mi", "apellido", "por favor", "tu", "nombre"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "elegir",
+            secuencia: ["gracias", "chau"],
+            palabras: ["gracias", "chau"],
+            opciones: [
+              "gracias chau",
+              "de nada chau",
+              "gracias hola",
+              "perdón chau",
+            ],
+            correcta: 0,
+          },
+        ],
+      },
     ],
   },
   {
-    id: 4,
+    id: 4, // NIVEL 5 en el mapa (id 4)
     nombre: "Sentimientos",
     descripcion: "Cómo te sentís y cómo se sienten los demás.",
-    totalXP: 300,
+    totalXP: 350,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 4
@@ -4142,13 +4439,63 @@ export const NIVELES = [
           },
         ],
       },
+      {
+        id: 6, // SECCIÓN 6, nivel 4 · lección extra de frases
+        titulo: "Lección: sentimientos y saludos",
+        descripcion: "Contá cómo te sentís y saludá.",
+        xp: 50,
+        items: [
+          // ── Frases: todas en modo "armar" salvo la última, en "elegir" ──
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["yo", "feliz"],
+            palabras: ["yo", "feliz"],
+            banco: ["triste", "yo", "contento", "feliz", "vos"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["el_ella", "triste"],
+            palabras: ["él", "triste"],
+            banco: ["feliz", "él", "cansado", "yo", "triste"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["el_ella", "nervioso"],
+            palabras: ["ella", "nerviosa"],
+            banco: ["yo", "nerviosa", "alegre", "ella", "triste"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["hola", "comoestas"],
+            palabras: ["hola", "¿cómo estás?"],
+            banco: ["¿cómo?", "hola", "bien", "¿cómo estás?", "chau"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "elegir",
+            secuencia: ["hola", "yo", "enojado"],
+            palabras: ["hola", "yo", "enojado"],
+            opciones: [
+              "hola yo feliz",
+              "chau yo enojado",
+              "hola vos enojado",
+              "hola yo enojado",
+            ],
+            correcta: 3,
+          },
+        ],
+      },
     ],
   },
   {
-    id: 5,
+    id: 5, // NIVEL 6 en el mapa (id 5)
     nombre: "Números",
     descripcion: "Del 0 al 1000, con la seña de cada número.",
-    totalXP: 400,
+    totalXP: 450,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 5
@@ -5509,13 +5856,60 @@ export const NIVELES = [
           },
         ],
       },
+      {
+        id: 8, // SECCIÓN 8, nivel 5 · lección extra de frases
+        titulo: "Lección: números y personas",
+        descripcion: "Números combinados con lo que ya sabés.",
+        xp: 50,
+        items: [
+          // ── Frases: todas en modo "armar" salvo la última, en "elegir" ──
+          // Ejercicio suelto (no es frase)
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n100",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "100",
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["el_ella", "n9"],
+            palabras: ["él", "9"],
+            banco: ["9", "yo", "él", "6", "nosotros"],
+          },
+          // Ejercicio suelto (no es frase)
+          {
+            tipo: "escritura_libre",
+            gifPalabra: "n8",
+            enunciado: "¿Cuál es este número?",
+            etiqueta: "Escribí el número aquí",
+            respuestaCorrecta: "8",
+          },
+          {
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["yo", "n17"],
+            palabras: ["yo", "17"],
+            banco: ["7", "vos", "17", "yo", "70"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "elegir",
+            secuencia: ["el_ella", "n40"],
+            palabras: ["ella", "40"],
+            opciones: ["yo 40", "ella 40", "ella 14", "ellos 40"],
+            correcta: 1,
+          },
+        ],
+      },
     ],
   },
   {
-    id: 6, // NIVEL 6
+    id: 6, // NIVEL 7 en el mapa (id 6)
     nombre: "Familia y vínculos",
     descripcion: "Familia, parentescos y estado civil.",
-    totalXP: 350,
+    totalXP: 400,
     lecciones: [
       {
         id: 1, // SECCIÓN 1, nivel 6
@@ -6567,7 +6961,7 @@ export const NIVELES = [
             gifPalabra: "pareja",
             respuestaCorrecta: "pareja",
           },
-          // ── Motivación: fin de la sección (y del nivel) ──
+          // ── Motivación: fin de la sección ──
           {
             tipo: "motivacion",
             variante: "corazon",
@@ -6577,177 +6971,50 @@ export const NIVELES = [
           },
         ],
       },
-    ],
-  },
-  {
-    id: 7, // NIVEL 7
-    nombre: "Pronombres",
-    descripcion: "Pronombres personales y posesivos.",
-    totalXP: 50,
-    lecciones: [
       {
-        id: 1, // SECCIÓN 1, nivel 7 (única)
-        titulo: "Pronombres",
-        descripcion: "él/ella, ellos/ellas, mío, nosotros, tuyo, vos y yo.",
+        id: 7, // SECCIÓN 7, nivel 6 · lección extra de frases
+        titulo: "Lección: familia y todo lo anterior",
+        descripcion: "Frases sobre tu familia con todo lo aprendido.",
         xp: 50,
         items: [
-          // ── Tipo 1: enseñanza (items 1-7) ──
+          // ── Frases: todas en modo "armar" salvo la última, en "elegir" ──
           {
-            tipo: "ensenanza_palabra",
-            gifPalabra: "el_ella",
-            nombre: "él/ella",
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["mio", "mama"],
+            palabras: ["mi", "mamá"],
+            banco: ["papá", "mi", "abuelo", "mamá", "tu"],
           },
           {
-            tipo: "ensenanza_palabra",
-            gifPalabra: "ellos_ellas",
-            nombre: "ellos/ellas",
-          },
-          { tipo: "ensenanza_palabra", gifPalabra: "mio", nombre: "mío" },
-          {
-            tipo: "ensenanza_palabra",
-            gifPalabra: "nosotros",
-            nombre: "nosotros",
-          },
-          { tipo: "ensenanza_palabra", gifPalabra: "tuyo", nombre: "tuyo" },
-          { tipo: "ensenanza_palabra", gifPalabra: "vos", nombre: "vos" },
-          { tipo: "ensenanza_palabra", gifPalabra: "yo", nombre: "yo" },
-          // ── Bloque 2 (items 8-14): Tipo 2,3,2,5,3,5,2 ──
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "ellos/ellas",
-            opcionesGifs: ["el_ella", "ellos_ellas", "nosotros"],
-            correcta: 1,
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["mio", "papa"],
+            palabras: ["mi", "papá"],
+            banco: ["tu", "papá", "hermano", "mi", "mamá"],
           },
           {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "vos",
-            opciones: ["tuyo", "vos", "yo", "mío"],
-            correcta: 1,
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["mio", "hermano", "feliz"],
+            palabras: ["mi", "hermano", "feliz"],
+            banco: ["feliz", "tu", "hermano", "triste", "mi", "primo"],
           },
           {
-            tipo: "elegir_sena_palabra",
-            palabra: "mío",
-            opcionesGifs: ["tuyo", "yo", "mio"],
+            tipo: "frase_senas",
+            modo: "armar",
+            secuencia: ["hola", "mio", "familia"],
+            palabras: ["hola", "mi", "familia"],
+            banco: ["familia", "chau", "mi", "abuelo", "hola", "tu"],
+          },
+          {
+            tipo: "frase_senas",
+            modo: "elegir",
+            secuencia: ["tuyo", "abuelo"],
+            palabras: ["tu", "abuelo"],
+            opciones: ["mi abuelo", "tu bisabuelo", "tu abuelo", "tu tío"],
             correcta: 2,
           },
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "nosotros",
-            respuestaCorrecta: "nosotros",
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "el_ella",
-            opciones: ["mío", "ellos/ellas", "él/ella", "tuyo"],
-            correcta: 2,
-          },
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "tuyo",
-            respuestaCorrecta: "tuyo",
-          },
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "yo",
-            opcionesGifs: ["yo", "vos", "mio"],
-            correcta: 0,
-          },
-          // ── Bloque 3 (items 15-21): Tipo 5,3,2,3,5,2,3 ──
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "mio",
-            respuestaCorrecta: "mío",
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "tuyo",
-            opciones: ["yo", "nosotros", "tuyo", "vos"],
-            correcta: 2,
-          },
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "vos",
-            opcionesGifs: ["yo", "tuyo", "vos"],
-            correcta: 2,
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "nosotros",
-            opciones: ["nosotros", "tuyo", "yo", "mío"],
-            correcta: 0,
-          },
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "yo",
-            respuestaCorrecta: "yo",
-          },
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "él/ella",
-            opcionesGifs: ["el_ella", "ellos_ellas", "vos"],
-            correcta: 0,
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "ellos_ellas",
-            opciones: ["tuyo", "yo", "él/ella", "ellos/ellas"],
-            correcta: 3,
-          },
-          // ── Bloque 4 (items 22-28): Tipo 5,2,5,2,3,5,3 ──
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "vos",
-            respuestaCorrecta: "vos",
-          },
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "tuyo",
-            opcionesGifs: ["mio", "tuyo", "vos"],
-            correcta: 1,
-          },
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "ellos_ellas",
-            respuestaCorrecta: "ellos/ellas",
-            respuestasAlternativas: [
-              "ellos",
-              "ellas",
-              "ellas/ellos",
-              "ellos o ellas",
-              "ellas o ellos",
-            ],
-          },
-          {
-            tipo: "elegir_sena_palabra",
-            palabra: "nosotros",
-            opcionesGifs: ["ellos_ellas", "yo", "nosotros"],
-            correcta: 2,
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "mio",
-            opciones: ["tuyo", "mío", "vos", "nosotros"],
-            correcta: 1,
-          },
-          {
-            tipo: "escritura_libre",
-            gifPalabra: "el_ella",
-            respuestaCorrecta: "él/ella",
-            respuestasAlternativas: [
-              "él",
-              "ella",
-              "ella/él",
-              "él o ella",
-              "ella o él",
-            ],
-          },
-          {
-            tipo: "que_palabra_opciones",
-            gifPalabra: "yo",
-            opciones: ["nuestro", "tuyo", "vos", "yo"],
-            correcta: 3,
-          },
-          // ── Motivación: fin del nivel 7, el último de la app ──
+          // ── Motivación: fin del último nivel (y de la app) ──
           {
             tipo: "motivacion",
             variante: "corazon",
@@ -6812,6 +7079,12 @@ const contarCompletadasValidas = (ids, lecciones) => {
   return [...new Set(ids)].filter((id) => validIds.has(id)).length;
 };
 
+// Número del nivel en el mapa (1, 2, 3...) según su lugar en NIVELES: es el
+// que ve el usuario. El id no sigue el orden: solo identifica al nivel y es
+// la clave del progreso guardado ({ "7": [1] } es Pronombres).
+const numeroDeNivel = (nivel) =>
+  NIVELES.findIndex((n) => n.id === nivel.id) + 1;
+
 const getNivelEstado = (nivel, leccionesCompletadas) => {
   const totalLecciones = nivel.lecciones.length;
   if (totalLecciones === 0) return "bloqueado";
@@ -6820,17 +7093,23 @@ const getNivelEstado = (nivel, leccionesCompletadas) => {
     leccionesCompletadas[nivel.id] || [],
     nivel.lecciones,
   );
+  // Un nivel terminado queda completado aunque el anterior no lo esté: así
+  // nadie pierde el acceso a lo que ya hizo si cambia el orden del mapa
+  if (completadas >= totalLecciones) return "completado";
+  // Un nivel empezado sigue abierto aunque el anterior no esté completo: por
+  // ejemplo, si a un nivel ya terminado se le agrega una lección nueva
+  if (completadas > 0) return "actual";
 
-  if (nivel.id === 1) {
-    return completadas >= totalLecciones ? "completado" : "actual";
-  }
-  const nivelAnterior = NIVELES.find((n) => n.id === nivel.id - 1);
+  // El primero y el anterior salen del orden en NIVELES, no del id
+  const indice = numeroDeNivel(nivel) - 1;
+  if (indice === 0) return "actual";
+  const nivelAnterior = NIVELES[indice - 1];
   const completadasAnterior = contarCompletadasValidas(
     leccionesCompletadas[nivelAnterior.id] || [],
     nivelAnterior.lecciones,
   );
   if (completadasAnterior < nivelAnterior.lecciones.length) return "bloqueado";
-  return completadas >= totalLecciones ? "completado" : "actual";
+  return "actual";
 };
 
 // Devuelve el progreso con la lección agregada, sin modificar el original.
@@ -7039,7 +7318,7 @@ const NivelCirculo = ({ nivel, posicion, estado, onPress }) => {
     >
       {estado === "actual" && <View style={styles.pulsoAnillo} />}
       <Text style={[styles.circuloNumero, { color: c.text }]}>
-        {toRomano(nivel.id)}
+        {toRomano(numeroDeNivel(nivel))}
       </Text>
       {estado === "completado" && <Text style={styles.checkmark}>✓</Text>}
     </TouchableOpacity>
@@ -7069,7 +7348,9 @@ const NivelModal = ({ visible, nivel, estado, onClose, onIrNivel }) => {
         <View style={styles.modalOverlay}>
           <TouchableWithoutFeedback>
             <View style={styles.modalCard}>
-              <Text style={styles.modalNivel}>Nivel {toRomano(nivel.id)}</Text>
+              <Text style={styles.modalNivel}>
+                Nivel {toRomano(numeroDeNivel(nivel))}
+              </Text>
               <Text style={styles.modalNombre}>{nivel.nombre}</Text>
               <Text style={[styles.modalEstado, { color: colorEtiqu[estado] }]}>
                 {etiqueta[estado]}
@@ -8229,6 +8510,317 @@ const ItemEscrituraLibre = ({
   );
 };
 
+// ── Frases en señas (frase_senas): varias señas seguidas ─────────────
+// Visor: una sola seña por vez, del mismo tamaño que en los demás
+// ejercicios (los GIFs de vocabulario son apaisados y en fila quedaban de
+// ~80×45 px). Flechas y chips numerados para moverse entre las señas.
+const VisorFrase = ({ secuencia, actual, onCambiar }) => {
+  const total = secuencia.length;
+  const esPrimera = actual === 0;
+  const esUltima = actual === total - 1;
+
+  return (
+    <>
+      <View style={styles.gifGrandeWrap}>
+        {/* Un solo GIF montado; con key, cada seña arranca desde el inicio */}
+        <SenaGif
+          key={actual}
+          clave={secuencia[actual]}
+          style={styles.gifGrande}
+        />
+      </View>
+      {total > 1 && (
+        <View style={styles.fraseNav}>
+          <TouchableOpacity
+            style={[styles.fraseFlecha, esPrimera && styles.fraseFlechaOff]}
+            onPress={() => onCambiar(actual - 1)}
+            disabled={esPrimera}
+            accessibilityRole="button"
+            accessibilityLabel="Seña anterior"
+          >
+            <Text
+              style={[
+                styles.fraseFlechaTxt,
+                esPrimera && styles.fraseFlechaTxtOff,
+              ]}
+            >
+              ‹
+            </Text>
+          </TouchableOpacity>
+          {secuencia.map((_, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[styles.fraseChip, i === actual && styles.fraseChipActivo]}
+              onPress={() => onCambiar(i)}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel={`Ver seña ${i + 1} de ${total}`}
+              accessibilityState={{ selected: i === actual }}
+            >
+              <Text
+                style={[
+                  styles.fraseChipTxt,
+                  i === actual && styles.fraseChipTxtActivo,
+                ]}
+              >
+                {i + 1}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity
+            style={[styles.fraseFlecha, esUltima && styles.fraseFlechaOff]}
+            onPress={() => onCambiar(actual + 1)}
+            disabled={esUltima}
+            accessibilityRole="button"
+            accessibilityLabel="Seña siguiente"
+          >
+            <Text
+              style={[
+                styles.fraseFlechaTxt,
+                esUltima && styles.fraseFlechaTxtOff,
+              ]}
+            >
+              ›
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </>
+  );
+};
+
+// modo "armar": tocar palabras del banco para completar la frase en orden
+// (misma mecánica que ItemQuePalabra). modo "elegir": 4 frases para elegir
+// (misma mecánica y colores que ItemQuePalabraOpciones).
+const ItemFraseSenas = ({
+  item,
+  idx,
+  total,
+  vidasGlobales,
+  onCorrecto,
+  onPerderVida,
+  onSalir,
+}) => {
+  const armar = item.modo === "armar";
+  const n = item.secuencia.length;
+  const [actual, setActual] = useState(0); // seña que muestra el visor
+  const [slots, setSlots] = useState(() => Array(n).fill(null)); // "armar"
+  const [seleccionado, setSelec] = useState(null); // "elegir"
+  const [confirmado, setConf] = useState(false);
+
+  // En "armar" cada espacio guarda el índice de una palabra del banco
+  const usadas = new Set(slots.filter((s) => s !== null));
+  const completo = armar
+    ? slots.every((s) => s !== null)
+    : seleccionado !== null;
+  const esCorrecta = armar
+    ? slots.every((s, i) => s !== null && item.banco[s] === item.palabras[i])
+    : seleccionado === item.correcta;
+  // Todos los espacios en una fila: ancho útil (padding 20 por lado) menos
+  // los gaps de 8 de palabraGifsRow, con un máximo de 120
+  const anchoSlot = Math.min(
+    120,
+    Math.floor((SCREEN_WIDTH - 40 - 8 * (n - 1)) / n),
+  );
+
+  const tapPalabra = (bancoIdx) => {
+    if (confirmado || usadas.has(bancoIdx)) return;
+    const primerVacio = slots.findIndex((s) => s === null);
+    if (primerVacio === -1) return;
+    const nuevo = [...slots];
+    nuevo[primerVacio] = bancoIdx;
+    setSlots(nuevo);
+    // El visor pasa solo a la seña del siguiente espacio vacío
+    const siguienteVacio = nuevo.findIndex((s) => s === null);
+    if (siguienteVacio !== -1) setActual(siguienteVacio);
+  };
+
+  const tapSlot = (slotIdx) => {
+    if (confirmado || slots[slotIdx] === null) return;
+    const nuevo = [...slots];
+    nuevo[slotIdx] = null;
+    setSlots(nuevo);
+    setActual(slotIdx); // se ve la seña del espacio que se vació
+  };
+
+  const confirmar = () => {
+    if (!completo) return;
+    setConf(true);
+    if (!esCorrecta) onPerderVida();
+  };
+  const siguiente = () => {
+    if (esCorrecta) {
+      onCorrecto();
+      return;
+    }
+    setSlots(Array(n).fill(null));
+    setSelec(null);
+    setConf(false);
+    if (armar) setActual(0);
+  };
+
+  const bgOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
+    if (i === item.correcta) return "#C8F5D3";
+    if (i === seleccionado) return "#FFCDD2";
+    return "#F5F6FA";
+  };
+  const bdOp = (i) => {
+    if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
+    if (i === item.correcta) return "#2E7D32";
+    if (i === seleccionado) return "#C62828";
+    return "#E0E0E0";
+  };
+
+  return (
+    <View style={styles.ejercicioContainer}>
+      <EjercicioHeader
+        idx={idx}
+        total={total}
+        vidasGlobales={vidasGlobales}
+        onSalir={onSalir}
+      />
+      <ScrollView contentContainerStyle={styles.ejercicioContent}>
+        <View style={styles.itemCard}>
+          <Text style={styles.itemCardTitulo}>Mirá bien las señas</Text>
+          <Text style={styles.itemCardSub}>
+            {armar ? "Armá la frase que ves" : "¿Qué frase es esta?"}
+          </Text>
+        </View>
+
+        <VisorFrase
+          secuencia={item.secuencia}
+          actual={actual}
+          onCambiar={setActual}
+        />
+
+        {armar ? (
+          <>
+            <View style={styles.palabraGifsRow}>
+              {slots.map((s, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.palabraSlot,
+                    { width: anchoSlot, paddingHorizontal: 4 },
+                    s !== null && styles.palabraSlotLleno,
+                    i === actual && !confirmado && styles.fraseSlotActual,
+                    confirmado && esCorrecta && styles.palabraSlotCorrecto,
+                    confirmado && !esCorrecta && styles.palabraSlotError,
+                  ]}
+                  onPress={() => tapSlot(i)}
+                >
+                  <Text
+                    style={[styles.palabraSlotLetra, styles.fraseSlotTxt]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.6}
+                  >
+                    {s !== null ? item.banco[s] : ""}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.letrasDisponiblesLabel}>
+              Palabras disponibles
+            </Text>
+            <View style={styles.letrasDisponiblesGrid}>
+              {item.banco.map((palabra, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[
+                    styles.letraBtn,
+                    styles.frasePalabraBtn,
+                    usadas.has(i) && styles.letraBtnUsada,
+                  ]}
+                  onPress={() => tapPalabra(i)}
+                  activeOpacity={usadas.has(i) ? 1 : 0.7}
+                >
+                  <Text
+                    style={[
+                      styles.letraBtnTxt,
+                      usadas.has(i) && styles.letraBtnTxtUsada,
+                    ]}
+                  >
+                    {palabra}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        ) : (
+          <View style={styles.opcionesWrap}>
+            {item.opciones.map((op, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[
+                  styles.opcion,
+                  { backgroundColor: bgOp(i), borderColor: bdOp(i) },
+                ]}
+                onPress={() => !confirmado && setSelec(i)}
+                activeOpacity={confirmado ? 1 : 0.75}
+              >
+                <Text style={styles.opcionLetra}>
+                  {["A", "B", "C", "D"][i]}
+                </Text>
+                <Text style={styles.opcionTxt}>{op}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      {confirmado && (
+        <View
+          style={[
+            styles.feedbackBanner,
+            { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.feedbackTxt,
+              { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+            ]}
+          >
+            {esCorrecta
+              ? "¡Correcto! 🎉"
+              : `Incorrecto ❌ — La frase es: ${item.palabras.join(" ")}`}
+          </Text>
+        </View>
+      )}
+      <View style={styles.ejercicioBtnWrap}>
+        {!confirmado ? (
+          <TouchableOpacity
+            style={[styles.btnPrincipal, { opacity: completo ? 1 : 0.45 }]}
+            onPress={confirmar}
+          >
+            <Text style={styles.btnPrincipalTxt}>Confirmar</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.btnPrincipal,
+              { backgroundColor: esCorrecta ? "#C8F5D3" : "#FFCDD2" },
+            ]}
+            onPress={siguiente}
+          >
+            <Text
+              style={[
+                styles.btnPrincipalTxt,
+                { color: esCorrecta ? "#1B5E20" : "#B71C1C" },
+              ]}
+            >
+              {esCorrecta ? "Siguiente →" : "Reintentar 🔄"}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
+
 // ── Motivación: checkpoint entre ejercicios (sin pregunta) ────────────
 const MOTIVACION_ICONO = {
   check: "checkmark",
@@ -8503,6 +9095,8 @@ const PantallaEjercicioNueva = ({
     return <ItemQuePalabraOpciones key={idx} item={item} {...common} />;
   if (item.tipo === "que_palabra")
     return <ItemQuePalabra key={idx} item={item} {...common} />;
+  if (item.tipo === "frase_senas")
+    return <ItemFraseSenas key={idx} item={item} {...common} />;
   if (item.tipo === "escritura_libre")
     return <ItemEscrituraLibre key={idx} item={item} {...common} />;
   if (item.tipo === "motivacion")
@@ -9089,7 +9683,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <View style={styles.nivelHeaderCenter}>
             <Text style={styles.nivelHeaderLabel}>
-              Nivel {toRomano(nivelAbierto.id)}
+              Nivel {toRomano(numeroDeNivel(nivelAbierto))}
             </Text>
             <Text style={styles.nivelHeaderNombre} numberOfLines={1}>
               {nivelAbierto.nombre}
@@ -9177,7 +9771,7 @@ export default function HomeScreen() {
               : EMOJI_NIVEL_EN_CURSO}
           </Text>
           <Text style={styles.nivelActualTxt}>
-            Nivel {toRomano(nivelActual.nivel.id)}
+            Nivel {toRomano(numeroDeNivel(nivelActual.nivel))}
           </Text>
         </TouchableOpacity>
         {/* Vidas en el header del mapa */}
@@ -9769,6 +10363,52 @@ const styles = StyleSheet.create({
   letraBtnTxtUsada: {
     color: "#BDBDBD",
   },
+
+  // ── Frases en señas: visor (flechas y chips), espacios y banco ──
+  fraseNav: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: -6,
+    marginBottom: 18,
+  },
+  fraseFlecha: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#EEF1FB",
+    borderWidth: 1.5,
+    borderColor: "#C8D3F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fraseFlechaOff: { backgroundColor: "#F5F5F5", borderColor: "#E8E8E8" },
+  fraseFlechaTxt: {
+    fontSize: 26,
+    color: "#3D4FBB",
+    fontWeight: "300",
+    lineHeight: 30,
+  },
+  fraseFlechaTxtOff: { color: "#CCCCCC" },
+  fraseChip: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#EEF1FB",
+    borderWidth: 1.5,
+    borderColor: "#C8D3F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fraseChipActivo: { backgroundColor: "#3D4FBB", borderColor: "#3D4FBB" },
+  fraseChipTxt: { fontSize: 14, fontWeight: "700", color: "#3D4FBB" },
+  fraseChipTxtActivo: { color: "#fff" },
+  // Espacio de la seña que se está viendo
+  fraseSlotActual: { borderColor: "#E8A000" },
+  fraseSlotTxt: { fontSize: 15 },
+  // letraBtn tiene ancho fijo para una letra: las palabras usan su ancho
+  frasePalabraBtn: { width: "auto", minWidth: 40, paddingHorizontal: 14 },
 
   // ── Vocabulario (Nivel 2+): título de palabra y escritura libre ──
   itemCardPalabraGrande: {

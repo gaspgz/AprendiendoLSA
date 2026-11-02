@@ -155,7 +155,7 @@ const GIFS_INTERACCIONES = {
   perdon: require("../../assets/gifs/interacciones/perdon.gif"),
   permiso: require("../../assets/gifs/interacciones/permiso.gif"),
   porfavor: require("../../assets/gifs/interacciones/porfavor.gif"),
-  quien: require("../../assets/gifs/interacciones/quien.gif"),
+  porejemplo: require("../../assets/gifs/interacciones/porejemplo.gif"),
   saludos: require("../../assets/gifs/interacciones/saludos.gif"),
   si: require("../../assets/gifs/interacciones/si.gif"),
 };
@@ -181,7 +181,7 @@ const NOMBRES_INTERACCIONES = {
   perdon: "Perdón",
   permiso: "Permiso",
   porfavor: "Por favor",
-  quien: "¿Quién?",
+  porejemplo: "Por ejemplo",
   saludos: "Saludos",
   si: "Si",
 };
@@ -744,12 +744,28 @@ const TarjetaCategoriaAncha = ({ categoria, onPress }) => {
   );
 };
 
+// ─── Búsqueda ────────────────────────────────────────────────────────
+// Deja un texto listo para comparar; pasan por acá la búsqueda y los
+// nombres de las señas: minúsculas, sin tildes, sin ¿?¡!., y sin espacios
+// de más. Así "mio" encuentra "Mío". Por cómo funciona NFD, la ñ queda como
+// n ("nino" encuentra "niño"). Es solo para comparar: lo que se muestra no
+// cambia.
+const normalizarBusqueda = (texto) =>
+  String(texto ?? "")
+    .toLowerCase()
+    .normalize("NFD") // separa cada letra de su tilde (á -> a + ´)
+    .replace(/[\u0300-\u036f]/g, "") // saca las tildes sueltas
+    .replace(/[¿?¡!.,]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
 // ─── Pantalla interior de categoría ─────────────────────────────────
 const CategoriaDetalle = ({ categoria, busqueda, onBack, onItemPress }) => {
   const itemsFiltrados = useMemo(() => {
     if (!busqueda.trim()) return categoria.items;
+    const buscado = normalizarBusqueda(busqueda);
     return categoria.items.filter((item) =>
-      item.titulo.toLowerCase().includes(busqueda.toLowerCase()),
+      normalizarBusqueda(item.titulo).includes(buscado),
     );
   }, [busqueda, categoria.items]);
 
@@ -810,10 +826,11 @@ const SenasScreen = () => {
 
   const resultadosGlobales = useMemo(() => {
     if (!busqueda.trim()) return [];
+    const buscado = normalizarBusqueda(busqueda);
     const resultados = [];
     CATEGORIAS.forEach((cat) => {
       cat.items.forEach((item) => {
-        if (item.titulo.toLowerCase().includes(busqueda.toLowerCase())) {
+        if (normalizarBusqueda(item.titulo).includes(buscado)) {
           resultados.push({ ...item, categoria: cat });
         }
       });
