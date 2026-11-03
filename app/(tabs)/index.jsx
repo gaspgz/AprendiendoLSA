@@ -19,6 +19,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import Tutorial from "../../components/Tutorial";
 import {
   cerrarSesionRemota,
   completarLeccion,
@@ -32,6 +33,10 @@ import {
   obtenerSesion,
   obtenerSesionId,
 } from "../../services/sesion";
+import {
+  marcarTutorialVisto,
+  tutorialPendiente,
+} from "../../services/tutorial";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const GIFS = {
@@ -9312,7 +9317,7 @@ const ModalResultado = ({ visible, xpGanado, onClose }) => (
 //  MENÚ PERFIL
 // ══════════════════════════════════════════════════════════════════════
 
-const MenuPerfil = ({ visible, onClose }) => {
+const MenuPerfil = ({ visible, onClose, onVerTutorial }) => {
   if (!visible) return null;
   return (
     <TouchableWithoutFeedback onPress={onClose}>
@@ -9328,6 +9333,18 @@ const MenuPerfil = ({ visible, onClose }) => {
             >
               <Text style={styles.menuItemIcono}>👤</Text>
               <Text style={styles.menuItemTxt}>Ver mi perfil</Text>
+              <Text style={styles.menuItemFlecha}>›</Text>
+            </TouchableOpacity>
+            <View style={styles.menuDivider} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                onClose();
+                onVerTutorial();
+              }}
+            >
+              <Text style={styles.menuItemIcono}>📖</Text>
+              <Text style={styles.menuItemTxt}>Tutorial</Text>
               <Text style={styles.menuItemFlecha}>›</Text>
             </TouchableOpacity>
             <View style={styles.menuDivider} />
@@ -9388,6 +9405,15 @@ export default function HomeScreen() {
   const [nivelSeleccionado, setNivelSeleccionado] = useState(null);
   const [estadoSeleccionado, setEstadoSeleccionado] = useState(null);
 
+  // ── tutorial: solo para cuentas nuevas, o desde el menú 👤 ──
+  // clave = email de la sesión (es la que deja el registro)
+  const [tutorial, setTutorial] = useState({
+    visible: false,
+    desdeMenu: false,
+    clave: null,
+  });
+  const [nombreUsuario, setNombreUsuario] = useState("");
+
   // ── estado del nivel abierto ──
   const [nivelAbierto, setNivelAbierto] = useState(null);
   const [leccionActiva, setLeccionActiva] = useState(null);
@@ -9433,6 +9459,7 @@ export default function HomeScreen() {
         xpTotalRef.current = usuario.xpTotal ?? null;
         setCargando(true);
         setUserId(uid);
+        setNombreUsuario(usuario.nombre ?? "");
         setNivelAbierto(null);
         setLeccionActiva(null);
 
@@ -9441,6 +9468,17 @@ export default function HomeScreen() {
         setProgreso(p);
         setVidasData(v);
         setCargando(false);
+
+        // Cuenta recién creada (el registro dejó la marca): el tutorial se
+        // abre ahora, con el progreso ya cargado
+        if (await tutorialPendiente(usuario.email)) {
+          if (userIdRef.current !== uid) return;
+          setTutorial({
+            visible: true,
+            desdeMenu: false,
+            clave: usuario.email,
+          });
+        }
       })();
     }, []),
   );
@@ -9575,6 +9613,18 @@ export default function HomeScreen() {
     },
     [leccionActiva, nivelAbierto, marcarLeccionCompleta],
   );
+
+  // ── handlers tutorial ──
+  const abrirTutorialDesdeMenu = () =>
+    setTutorial({ visible: true, desdeMenu: true, clave: null });
+
+  // Recién al terminarlo u omitirlo deja de estar pendiente; si se cierra la
+  // app en la mitad, vuelve a aparecer. Abierto desde el menú no toca la marca.
+  // Se cierra sin borrar desdeMenu: así el texto no cambia durante el fade.
+  const cerrarTutorial = () => {
+    if (!tutorial.desdeMenu) marcarTutorialVisto(tutorial.clave);
+    setTutorial((t) => ({ ...t, visible: false }));
+  };
 
   // ── utilidades de render ──
   const completadasDelNivel = nivelAbierto
@@ -9825,11 +9875,18 @@ export default function HomeScreen() {
       <MenuPerfil
         visible={menuPerfilVisible}
         onClose={() => setMenuPerfilVisible(false)}
+        onVerTutorial={abrirTutorialDesdeMenu}
       />
       <ModalSinVidas
         visible={modalSinVidas}
         proximaRegen={vidasData.proximaRegen}
         onClose={() => setModalSinVidas(false)}
+      />
+      <Tutorial
+        visible={tutorial.visible}
+        nombre={nombreUsuario}
+        desdeMenu={tutorial.desdeMenu}
+        onCerrar={cerrarTutorial}
       />
     </SafeAreaView>
   );

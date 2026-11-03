@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { registrarUsuario } from "../services/api";
+import { marcarTutorialPendiente } from "../services/tutorial";
 
 const RegistroScreen = () => {
   const [nombre, setNombre] = useState("");
@@ -38,6 +39,9 @@ const RegistroScreen = () => {
       setError(resultado.error);
       return;
     }
+
+    // Cuenta nueva: al entrar por primera vez le aparece el tutorial
+    await marcarTutorialPendiente(email);
 
     // Cuenta creada. La API de registro no devuelve sesión,
     // así que mandamos al usuario a loguearse con lo recién creado.
