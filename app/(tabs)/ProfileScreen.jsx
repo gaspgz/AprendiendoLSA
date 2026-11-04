@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   actualizarUsuario,
+  borrarCuenta,
   cerrarSesionRemota,
   obtenerProgreso,
   obtenerUsuario,
@@ -320,6 +321,40 @@ const ProfileScreen = () => {
     ]);
   };
 
+  // Borra la cuenta en el servidor y después sale de la app.
+  // Se pregunta dos veces porque no tiene vuelta atrás.
+  const handleBorrarCuenta = () => {
+    Alert.alert(
+      "Borrar cuenta",
+      "Se borran tu cuenta, tu progreso, tus vidas y tus logros. No se puede deshacer.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Continuar",
+          style: "destructive",
+          onPress: () =>
+            Alert.alert("¿Seguro?", "Tu cuenta se borra para siempre.", [
+              { text: "Cancelar", style: "cancel" },
+              {
+                text: "Borrar mi cuenta",
+                style: "destructive",
+                onPress: async () => {
+                  const res = await borrarCuenta(usuario.id);
+                  if (!res.ok) {
+                    Alert.alert("Error", res.error);
+                    return;
+                  }
+                  await cerrarSesion();
+                  router.replace("/LoginScreen");
+                  Alert.alert("Listo", "Tu cuenta fue borrada.");
+                },
+              },
+            ]),
+        },
+      ],
+    );
+  };
+
   // Si algún dato viene null/undefined se muestra 0
   const xpTotal = usuario.xpTotal ?? 0;
   const racha = usuario.racha ?? 0;
@@ -479,6 +514,14 @@ const ProfileScreen = () => {
           onPress={handleCerrarSesion}
         >
           <Text style={styles.btnCerrarSesionTxt}>Cerrar sesión</Text>
+        </TouchableOpacity>
+
+        {/* ── Borrar cuenta ── */}
+        <TouchableOpacity
+          style={styles.btnBorrarCuenta}
+          onPress={handleBorrarCuenta}
+        >
+          <Text style={styles.btnBorrarCuentaTxt}>Borrar mi cuenta</Text>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -643,6 +686,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   btnCerrarSesionTxt: { fontSize: 16, fontWeight: "700", color: "#C62828" },
+
+  // Borrar cuenta (más discreto que cerrar sesión, para no tocarlo sin querer)
+  btnBorrarCuenta: {
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  btnBorrarCuentaTxt: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#9E9E9E",
+    textDecorationLine: "underline",
+  },
 
   // Modal editar
   modalOverlay: {

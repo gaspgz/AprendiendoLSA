@@ -177,6 +177,26 @@ export const cerrarSesionRemota = async (sesion_id) => {
   return { ok: true, sesion: data };
 };
 
+// ── Borrar la cuenta ──
+// DELETE /usuarios/{id}: el servidor borra el usuario y todo lo suyo
+// (progreso, vidas, logros y sesiones). Google Play y Apple exigen que
+// se pueda hacer desde la app.
+export const borrarCuenta = async (usuarioId) => {
+  const { ok, data, status } = await apiFetch(
+    `${ENDPOINTS.usuarios}/${usuarioId}`,
+    { method: "DELETE" },
+  );
+
+  if (!ok) {
+    return {
+      ok: false,
+      error: mensajeError(status, data, "No se pudo borrar la cuenta."),
+    };
+  }
+
+  return { ok: true };
+};
+
 // ── Progreso ──
 export const obtenerProgreso = async (usuarioId) => {
   const { ok, data, status } = await apiFetch(ENDPOINTS.progreso(usuarioId));
