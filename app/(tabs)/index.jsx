@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -28,6 +28,7 @@ import {
   obtenerProgreso,
   obtenerVidas,
 } from "../../services/api";
+import { guardarLogro } from "../../services/logros";
 import {
   cerrarSesion,
   obtenerSesion,
@@ -132,7 +133,7 @@ const GIFS_PALABRAS = {
   contento: require("../../assets/gifs/sentimientos/contento.gif"),
   culpa: require("../../assets/gifs/sentimientos/culpa.gif"),
   deprimido: require("../../assets/gifs/sentimientos/deprimido.gif"),
-  enojado: require("../../assets/gifs/sentimientos/enojado.gif"),
+  loco: require("../../assets/gifs/sentimientos/loco.gif"),
   feliz: require("../../assets/gifs/sentimientos/feliz.gif"),
   gracioso: require("../../assets/gifs/sentimientos/gracioso.gif"),
   llorar: require("../../assets/gifs/sentimientos/llorar.gif"),
@@ -141,7 +142,7 @@ const GIFS_PALABRAS = {
   orgulloso: require("../../assets/gifs/sentimientos/orgulloso.gif"),
   preocupado: require("../../assets/gifs/sentimientos/preocupado.gif"),
   sorprendido: require("../../assets/gifs/sentimientos/sorprendido.gif"),
-  timido: require("../../assets/gifs/sentimientos/timido.gif"),
+  verguenza: require("../../assets/gifs/sentimientos/verguenza.gif"),
   tranquilo: require("../../assets/gifs/sentimientos/tranquilo.gif"),
   triste: require("../../assets/gifs/sentimientos/triste.gif"),
 
@@ -216,6 +217,12 @@ const GIFS_PALABRAS = {
   vos: require("../../assets/gifs/familiaypronombres/vos.gif"),
   yo: require("../../assets/gifs/familiaypronombres/yo.gif"),
 };
+
+// Señas que en la app se ven iguales: cuentan como UNA sola seña, igual que
+// "él" y "ella" (las dos son el_ella). En los ejercicios, dos señas de un
+// mismo grupo nunca van juntas en las opciones ni en un banco, y la escritura
+// libre las acepta todas (respuestasAlternativas). Para otro par, sumalo acá.
+export const SENAS_EQUIVALENTES = [["hola", "chau"]];
 
 // Un número se puede escribir con dígitos o con letras: las dos valen.
 const NUMEROS_EN_LETRAS = {
@@ -2471,6 +2478,8 @@ export const NIVELES = [
             modo: "armar",
             secuencia: ["nombre", "el_ella"],
             palabras: ["nombre", "él"],
+            // "de" no tiene seña: va fijo, antes de la palabra 1 (él)
+            fijas: { 1: "de" },
             banco: ["yo", "nombre", "nosotros", "él", "apellido"],
           },
           {
@@ -2478,6 +2487,8 @@ export const NIVELES = [
             modo: "armar",
             secuencia: ["apellido", "el_ella"],
             palabras: ["apellido", "ella"],
+            // "de" no tiene seña: va fijo, antes de la palabra 1 (ella)
+            fijas: { 1: "de" },
             banco: ["ellos", "DNI", "ella", "apellido", "vos"],
           },
           {
@@ -2531,13 +2542,13 @@ export const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "hola",
-            opciones: ["chau", "gracias", "hola", "saludo"],
+            opciones: ["bienvenida", "gracias", "hola", "saludo"],
             correcta: 2,
           },
           {
             tipo: "elegir_sena_palabra",
             palabra: "gracias",
-            opcionesGifs: ["hola", "gracias", "chau"],
+            opcionesGifs: ["hola", "gracias", "bienvenida"],
             correcta: 1,
           },
           {
@@ -2548,7 +2559,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "chau",
-            opcionesGifs: ["hola", "saludos", "chau"],
+            opcionesGifs: ["gracias", "saludos", "chau"],
             correcta: 2,
           },
           {
@@ -2561,7 +2572,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "hola",
-            opcionesGifs: ["chau", "hola", "gracias"],
+            opcionesGifs: ["saludos", "hola", "gracias"],
             correcta: 1,
           },
           {
@@ -2574,6 +2585,8 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "chau",
             respuestaCorrecta: "chau",
+            // Se ve igual que hola (SENAS_EQUIVALENTES): las dos valen
+            respuestasAlternativas: ["hola"],
           },
           {
             tipo: "que_palabra_opciones",
@@ -2602,11 +2615,13 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "hola",
             respuestaCorrecta: "hola",
+            // Se ve igual que chau (SENAS_EQUIVALENTES): las dos valen
+            respuestasAlternativas: ["chau"],
           },
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "chau",
-            opciones: ["hola", "bienvenida", "chau", "bien"],
+            opciones: ["saludos", "bienvenida", "chau", "bien"],
             correcta: 2,
           },
           {
@@ -3031,7 +3046,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "hola",
-            opcionesGifs: ["chau", "hola", "saludos"],
+            opcionesGifs: ["bienvenida", "hola", "saludos"],
             correcta: 1,
           },
           {
@@ -3112,7 +3127,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "chau",
-            opcionesGifs: ["chau", "hola", "saludos"],
+            opcionesGifs: ["chau", "gracias", "saludos"],
             correcta: 0,
           },
           {
@@ -3172,6 +3187,8 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "chau",
             respuestaCorrecta: "chau",
+            // Se ve igual que hola (SENAS_EQUIVALENTES): las dos valen
+            respuestasAlternativas: ["hola"],
           },
           {
             tipo: "que_palabra_opciones",
@@ -3381,6 +3398,8 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "hola",
             respuestaCorrecta: "hola",
+            // Se ve igual que chau (SENAS_EQUIVALENTES): las dos valen
+            respuestasAlternativas: ["chau"],
           },
           {
             tipo: "escritura_libre",
@@ -3414,13 +3433,13 @@ export const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "hola",
-            opciones: ["chau", "gracias", "hola", "saludo"],
+            opciones: ["bienvenida", "gracias", "hola", "saludo"],
             correcta: 2,
           },
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "chau",
-            opciones: ["hola", "bienvenida", "chau", "bien"],
+            opciones: ["saludos", "bienvenida", "chau", "bien"],
             correcta: 2,
           },
           {
@@ -3461,7 +3480,7 @@ export const NIVELES = [
             modo: "armar",
             secuencia: ["hola", "tuyo", "nombre"],
             palabras: ["hola", "tu", "nombre"],
-            banco: ["mi", "nombre", "chau", "hola", "apellido", "tu"],
+            banco: ["mi", "nombre", "gracias", "hola", "apellido", "tu"],
           },
           // Ejercicio suelto (no es frase)
           {
@@ -3482,7 +3501,7 @@ export const NIVELES = [
               "hola",
               "DNI",
               "apellido",
-              "chau",
+              "saludos",
               "mi",
             ],
           },
@@ -3501,7 +3520,7 @@ export const NIVELES = [
             opciones: [
               "gracias chau",
               "de nada chau",
-              "gracias hola",
+              "gracias saludos",
               "perdón chau",
             ],
             correcta: 0,
@@ -3751,14 +3770,14 @@ export const NIVELES = [
       {
         id: 3, // SECCIÓN 3, nivel 4
         titulo: "Emociones fuertes",
-        descripcion: "enojado, feliz, gracioso, llorar, miedoso y nervioso.",
+        descripcion: "loco, feliz, gracioso, llorar, miedoso y nervioso.",
         xp: 50,
         items: [
           // ── Tipo 1: enseñanza (items 1-6) ──
           {
             tipo: "ensenanza_palabra",
-            gifPalabra: "enojado",
-            nombre: "enojado",
+            gifPalabra: "loco",
+            nombre: "loco",
           },
           { tipo: "ensenanza_palabra", gifPalabra: "feliz", nombre: "feliz" },
           {
@@ -3786,8 +3805,8 @@ export const NIVELES = [
           },
           {
             tipo: "que_palabra_opciones",
-            gifPalabra: "enojado",
-            opciones: ["nervioso", "enojado", "triste", "preocupado"],
+            gifPalabra: "loco",
+            opciones: ["nervioso", "loco", "triste", "preocupado"],
             correcta: 1,
           },
           {
@@ -3799,7 +3818,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "llorar",
-            opcionesGifs: ["miedoso", "enojado", "llorar"],
+            opcionesGifs: ["miedoso", "loco", "llorar"],
             correcta: 2,
           },
           {
@@ -3827,8 +3846,8 @@ export const NIVELES = [
           },
           {
             tipo: "elegir_sena_palabra",
-            palabra: "enojado",
-            opcionesGifs: ["feliz", "enojado", "gracioso"],
+            palabra: "loco",
+            opcionesGifs: ["feliz", "loco", "gracioso"],
             correcta: 1,
           },
           {
@@ -3839,7 +3858,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "nervioso",
-            opcionesGifs: ["nervioso", "miedoso", "enojado"],
+            opcionesGifs: ["nervioso", "miedoso", "loco"],
             correcta: 0,
           },
           {
@@ -3863,8 +3882,8 @@ export const NIVELES = [
           },
           {
             tipo: "escritura_libre",
-            gifPalabra: "enojado",
-            respuestaCorrecta: "enojado",
+            gifPalabra: "loco",
+            respuestaCorrecta: "loco",
           },
           {
             tipo: "que_palabra_opciones",
@@ -3894,7 +3913,7 @@ export const NIVELES = [
         id: 4, // SECCIÓN 4, nivel 4
         titulo: "Carácter y calma",
         descripcion:
-          "orgulloso, preocupado, sorprendido, tímido, tranquilo y triste.",
+          "orgulloso, preocupado, sorprendido, vergüenza, tranquilo y triste.",
         xp: 50,
         items: [
           // ── Tipo 1: enseñanza (items 1-6) ──
@@ -3913,7 +3932,11 @@ export const NIVELES = [
             gifPalabra: "sorprendido",
             nombre: "sorprendido",
           },
-          { tipo: "ensenanza_palabra", gifPalabra: "timido", nombre: "tímido" },
+          {
+            tipo: "ensenanza_palabra",
+            gifPalabra: "verguenza",
+            nombre: "vergüenza",
+          },
           {
             tipo: "ensenanza_palabra",
             gifPalabra: "tranquilo",
@@ -3930,7 +3953,7 @@ export const NIVELES = [
           {
             tipo: "elegir_sena_palabra",
             palabra: "sorprendido",
-            opcionesGifs: ["sorprendido", "preocupado", "timido"],
+            opcionesGifs: ["sorprendido", "preocupado", "verguenza"],
             correcta: 0,
           },
           {
@@ -3952,8 +3975,8 @@ export const NIVELES = [
           },
           {
             tipo: "elegir_sena_palabra",
-            palabra: "tímido",
-            opcionesGifs: ["tranquilo", "preocupado", "timido"],
+            palabra: "vergüenza",
+            opcionesGifs: ["tranquilo", "preocupado", "verguenza"],
             correcta: 2,
           },
           // ── Bloque 3 (items 13-18): Tipo 2,3,5,2,5,3 ──
@@ -3987,15 +4010,15 @@ export const NIVELES = [
           },
           {
             tipo: "que_palabra_opciones",
-            gifPalabra: "timido",
-            opciones: ["tímido", "vergonzoso", "preocupado", "triste"],
+            gifPalabra: "verguenza",
+            opciones: ["vergüenza", "cansado", "preocupado", "triste"],
             correcta: 0,
           },
           // ── Bloque 4 (items 19-24): Tipo 3,5,3,2,5,5 ──
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "sorprendido",
-            opciones: ["deprimido", "tímido", "alegre", "sorprendido"],
+            opciones: ["deprimido", "vergüenza", "alegre", "sorprendido"],
             correcta: 3,
           },
           {
@@ -4017,8 +4040,8 @@ export const NIVELES = [
           },
           {
             tipo: "escritura_libre",
-            gifPalabra: "timido",
-            respuestaCorrecta: "tímido",
+            gifPalabra: "verguenza",
+            respuestaCorrecta: "vergüenza",
           },
           {
             tipo: "escritura_libre",
@@ -4059,8 +4082,8 @@ export const NIVELES = [
           },
           {
             tipo: "que_palabra_opciones",
-            gifPalabra: "timido",
-            opciones: ["tímido", "vergonzoso", "preocupado", "triste"],
+            gifPalabra: "verguenza",
+            opciones: ["vergüenza", "cansado", "preocupado", "triste"],
             correcta: 0,
           },
           {
@@ -4100,8 +4123,8 @@ export const NIVELES = [
           },
           {
             tipo: "elegir_sena_palabra",
-            palabra: "enojado",
-            opcionesGifs: ["nervioso", "enojado", "miedoso"],
+            palabra: "loco",
+            opcionesGifs: ["nervioso", "loco", "miedoso"],
             correcta: 1,
           },
           {
@@ -4169,8 +4192,8 @@ export const NIVELES = [
           },
           {
             tipo: "elegir_sena_palabra",
-            palabra: "tímido",
-            opcionesGifs: ["timido", "tranquilo", "preocupado"],
+            palabra: "vergüenza",
+            opcionesGifs: ["verguenza", "tranquilo", "preocupado"],
             correcta: 0,
           },
           {
@@ -4204,7 +4227,7 @@ export const NIVELES = [
           {
             tipo: "que_palabra_opciones",
             gifPalabra: "sorprendido",
-            opciones: ["deprimido", "tímido", "alegre", "sorprendido"],
+            opciones: ["deprimido", "vergüenza", "alegre", "sorprendido"],
             correcta: 3,
           },
           // ── Bloque 4 (items 31-40): Tipo 2,3,2,2,5,3,2,5,5,3 ──
@@ -4275,8 +4298,8 @@ export const NIVELES = [
           // ── Bloque 5 (items 41-50): Tipo 5,3,5,3,2,2,5,3,3,5 ──
           {
             tipo: "escritura_libre",
-            gifPalabra: "timido",
-            respuestaCorrecta: "tímido",
+            gifPalabra: "verguenza",
+            respuestaCorrecta: "vergüenza",
           },
           {
             tipo: "que_palabra_opciones",
@@ -4309,8 +4332,8 @@ export const NIVELES = [
           },
           {
             tipo: "escritura_libre",
-            gifPalabra: "enojado",
-            respuestaCorrecta: "enojado",
+            gifPalabra: "loco",
+            respuestaCorrecta: "loco",
           },
           {
             tipo: "que_palabra_opciones",
@@ -4320,8 +4343,8 @@ export const NIVELES = [
           },
           {
             tipo: "que_palabra_opciones",
-            gifPalabra: "enojado",
-            opciones: ["nervioso", "enojado", "triste", "preocupado"],
+            gifPalabra: "loco",
+            opciones: ["nervioso", "loco", "triste", "preocupado"],
             correcta: 1,
           },
           {
@@ -4477,18 +4500,18 @@ export const NIVELES = [
             modo: "armar",
             secuencia: ["hola", "comoestas"],
             palabras: ["hola", "¿cómo estás?"],
-            banco: ["¿cómo?", "hola", "bien", "¿cómo estás?", "chau"],
+            banco: ["¿cómo?", "hola", "bien", "¿cómo estás?", "gracias"],
           },
           {
             tipo: "frase_senas",
             modo: "elegir",
-            secuencia: ["hola", "yo", "enojado"],
-            palabras: ["hola", "yo", "enojado"],
+            secuencia: ["hola", "yo", "contento"],
+            palabras: ["hola", "yo", "contento"],
             opciones: [
-              "hola yo feliz",
-              "chau yo enojado",
-              "hola vos enojado",
-              "hola yo enojado",
+              "hola yo triste",
+              "gracias yo contento",
+              "hola vos contento",
+              "hola yo contento",
             ],
             correcta: 3,
           },
@@ -7009,7 +7032,7 @@ export const NIVELES = [
             modo: "armar",
             secuencia: ["hola", "mio", "familia"],
             palabras: ["hola", "mi", "familia"],
-            banco: ["familia", "chau", "mi", "abuelo", "hola", "tu"],
+            banco: ["familia", "mamá", "mi", "abuelo", "hola", "tu"],
           },
           {
             tipo: "frase_senas",
@@ -8594,9 +8617,26 @@ const VisorFrase = ({ secuencia, actual, onCambiar }) => {
   );
 };
 
+// Texto de la frase con sus palabras fijas (sin seña) en su lugar:
+// fijas: { 1: "de" } pone "de" antes de la palabra 1 → "nombre de él".
+// Con el índice palabras.length, la fija va al final.
+const textoDeFrase = ({ palabras, fijas = {} }) => {
+  const partes = [];
+  palabras.forEach((palabra, i) => {
+    if (fijas[i]) partes.push(fijas[i]);
+    partes.push(palabra);
+  });
+  if (fijas[palabras.length]) partes.push(fijas[palabras.length]);
+  return partes.join(" ");
+};
+
 // modo "armar": tocar palabras del banco para completar la frase en orden
 // (misma mecánica que ItemQuePalabra). modo "elegir": 4 frases para elegir
 // (misma mecánica y colores que ItemQuePalabraOpciones).
+// fijas (opcional): palabras sin seña, como "de". Se ven entre los espacios
+// pero no son un espacio, no están en el banco ni en el visor, y la respuesta
+// se sigue evaluando solo con las señas. En "elegir" las opciones ya las
+// traen escritas.
 const ItemFraseSenas = ({
   item,
   idx,
@@ -8621,11 +8661,17 @@ const ItemFraseSenas = ({
   const esCorrecta = armar
     ? slots.every((s, i) => s !== null && item.banco[s] === item.palabras[i])
     : seleccionado === item.correcta;
+  const fijas = item.fijas ?? {};
   // Todos los espacios en una fila: ancho útil (padding 20 por lado) menos
-  // los gaps de 8 de palabraGifsRow, con un máximo de 120
+  // los gaps de 8 de palabraGifsRow, con un máximo de 120. Cada palabra fija
+  // ocupa su texto (~9 px por letra) más un gap.
+  const anchoFijas = Object.values(fijas).reduce(
+    (total, fija) => total + fija.length * 9 + 8,
+    0,
+  );
   const anchoSlot = Math.min(
     120,
-    Math.floor((SCREEN_WIDTH - 40 - 8 * (n - 1)) / n),
+    Math.floor((SCREEN_WIDTH - 40 - anchoFijas - 8 * (n - 1)) / n),
   );
 
   const tapPalabra = (bancoIdx) => {
@@ -8703,28 +8749,35 @@ const ItemFraseSenas = ({
           <>
             <View style={styles.palabraGifsRow}>
               {slots.map((s, i) => (
-                <TouchableOpacity
-                  key={i}
-                  style={[
-                    styles.palabraSlot,
-                    { width: anchoSlot, paddingHorizontal: 4 },
-                    s !== null && styles.palabraSlotLleno,
-                    i === actual && !confirmado && styles.fraseSlotActual,
-                    confirmado && esCorrecta && styles.palabraSlotCorrecto,
-                    confirmado && !esCorrecta && styles.palabraSlotError,
-                  ]}
-                  onPress={() => tapSlot(i)}
-                >
-                  <Text
-                    style={[styles.palabraSlotLetra, styles.fraseSlotTxt]}
-                    numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.6}
+                <Fragment key={i}>
+                  {fijas[i] ? (
+                    <Text style={styles.fraseFija}>{fijas[i]}</Text>
+                  ) : null}
+                  <TouchableOpacity
+                    style={[
+                      styles.palabraSlot,
+                      { width: anchoSlot, paddingHorizontal: 4 },
+                      s !== null && styles.palabraSlotLleno,
+                      i === actual && !confirmado && styles.fraseSlotActual,
+                      confirmado && esCorrecta && styles.palabraSlotCorrecto,
+                      confirmado && !esCorrecta && styles.palabraSlotError,
+                    ]}
+                    onPress={() => tapSlot(i)}
                   >
-                    {s !== null ? item.banco[s] : ""}
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={[styles.palabraSlotLetra, styles.fraseSlotTxt]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.6}
+                    >
+                      {s !== null ? item.banco[s] : ""}
+                    </Text>
+                  </TouchableOpacity>
+                </Fragment>
               ))}
+              {fijas[n] ? (
+                <Text style={styles.fraseFija}>{fijas[n]}</Text>
+              ) : null}
             </View>
 
             <Text style={styles.letrasDisponiblesLabel}>
@@ -8791,7 +8844,7 @@ const ItemFraseSenas = ({
           >
             {esCorrecta
               ? "¡Correcto! 🎉"
-              : `Incorrecto ❌ — La frase es: ${item.palabras.join(" ")}`}
+              : `Incorrecto ❌ — La frase es: ${textoDeFrase(item)}`}
           </Text>
         </View>
       )}
@@ -9058,22 +9111,30 @@ const PantallaEjercicioNueva = ({
   onPerderVida,
 }) => {
   const [idx, setIdx] = useState(0);
+  // Vidas perdidas en este intento: arranca en 0 cada vez que se abre la
+  // lección. Una respuesta mal cuenta aunque después se acierte al reintentar.
+  const [errores, setErrores] = useState(0);
   const items = leccion.items;
   const total = items.length;
   const item = items[idx];
 
   const avanzar = () => {
-    if (idx + 1 >= total) onTerminar({ completada: true, xp: leccion.xp });
+    if (idx + 1 >= total)
+      onTerminar({ completada: true, xp: leccion.xp, errores });
     else setIdx((i) => i + 1);
   };
   const salir = () => onTerminar({ completada: false });
+  const perderVida = () => {
+    setErrores((n) => n + 1);
+    onPerderVida();
+  };
 
   const common = {
     idx,
     total,
     vidasGlobales,
     onCorrecto: avanzar,
-    onPerderVida,
+    onPerderVida: perderVida,
     onSalir: salir,
   };
 
@@ -9391,6 +9452,10 @@ const MenuPerfil = ({ visible, onClose, onVerTutorial }) => {
 const EMOJI_NIVEL_EN_CURSO = "📚";
 const EMOJI_TODO_COMPLETO = "🏆";
 
+// Ítems que solo se miran, sin respuesta: una lección que tiene solo estos no
+// cuenta para el logro "Lección perfecta"
+const ITEMS_SIN_RESPUESTA = ["ensenanza", "ensenanza_palabra", "motivacion"];
+
 export default function HomeScreen() {
   // ── datos persistentes ──
   const [userId, setUserId] = useState(null);
@@ -9603,11 +9668,19 @@ export default function HomeScreen() {
 
   // ── handlers ejercicio ──
   const handleTerminarEjercicio = useCallback(
-    ({ completada, xp }) => {
+    ({ completada, xp, errores }) => {
       if (completada && leccionActiva && nivelAbierto) {
         setXpUltimaLeccion(xp);
         setModalResultado(true);
         marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id, xp);
+
+        // Lección perfecta: terminada sin perder ninguna vida y con al menos
+        // un ejercicio. También vale al repetir una lección ya completada.
+        const tieneEjercicios = (leccionActiva.items || []).some(
+          (item) => !ITEMS_SIN_RESPUESTA.includes(item.tipo),
+        );
+        if (errores === 0 && tieneEjercicios)
+          guardarLogro(userIdRef.current, "leccion_perfecta");
       }
       setLeccionActiva(null);
     },
@@ -10464,6 +10537,13 @@ const styles = StyleSheet.create({
   // Espacio de la seña que se está viendo
   fraseSlotActual: { borderColor: "#E8A000" },
   fraseSlotTxt: { fontSize: 15 },
+  // Palabra fija sin seña ("de"): texto gris entre los espacios
+  fraseFija: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#888",
+    alignSelf: "center",
+  },
   // letraBtn tiene ancho fijo para una letra: las palabras usan su ancho
   frasePalabraBtn: { width: "auto", minWidth: 40, paddingHorizontal: 14 },
 

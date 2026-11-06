@@ -208,7 +208,7 @@ const armarPasos = ({ nombre, desdeMenu }) => [
       ? `¡Te damos la bienvenida, ${nombre}!`
       : "¡Te damos la bienvenida!",
     texto:
-      "Con Aprendiendo LSA vas a aprender Lengua de Señas Argentina paso a paso. Las señas fueron validadas por Cambiando miradas, una organización de la comunidad sorda.",
+      "Con Aprendiendo LSA vas a aprender Lengua de Señas Argentina paso a paso. Gran mayoría de las señas fueron validadas por Cambiando miradas, una organización de la comunidad sorda.",
     nota: "Podés volver a ver este tutorial cuando quieras desde el menú 👤.",
     Dibujo: DibujoLogo,
   },

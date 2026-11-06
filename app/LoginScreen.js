@@ -115,7 +115,7 @@ const LoginScreen = () => {
             style={styles.googleIcon}
           />
           <Text style={styles.googleButtonText}>
-            Inicia sesión con tu cuenta de{" "}
+            Proximamente inicio de sesión con{" "}
             <Text style={{ fontWeight: "bold" }}>Google</Text>
           </Text>
         </TouchableOpacity>

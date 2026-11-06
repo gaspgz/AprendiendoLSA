@@ -19,6 +19,7 @@ import {
   obtenerProgreso,
   obtenerUsuario,
 } from "../../services/api";
+import { obtenerLogrosGuardados } from "../../services/logros";
 import {
   cerrarSesion,
   guardarSesion,
@@ -51,67 +52,83 @@ const formatearMesAnio = (iso) => {
   return `${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`;
 };
 
-// Un nivel está completo si TODAS sus lecciones están en leccionesCompletadas.
-// El JSON trae las claves como string ("1"): obj[1] y obj["1"] son lo mismo
-// en JS. Los ids de lección se comparan como string por si vienen así.
-const nivelCompleto = (nivel, leccionesCompletadas) => {
+// Lecciones del nivel que están en leccionesCompletadas. Las que el progreso
+// tiene pero ya no existen en NIVELES no cuentan. El JSON trae las claves
+// como string ("1"): obj[1] y obj["1"] son lo mismo en JS. Los ids de
+// lección se comparan como string por si vienen así.
+const leccionesHechasDelNivel = (nivel, leccionesCompletadas) => {
   const hechas = (leccionesCompletadas[nivel.id] || []).map(String);
-  return (
-    nivel.lecciones.length > 0 &&
-    nivel.lecciones.every((leccion) => hechas.includes(String(leccion.id)))
+  return nivel.lecciones.filter((leccion) =>
+    hechas.includes(String(leccion.id)),
   );
 };
 
-// Misma lista visual de siempre; `obtenido` sale de los datos reales
+// Un nivel está completo si TODAS sus lecciones están completadas
+const nivelCompleto = (nivel, leccionesCompletadas) =>
+  nivel.lecciones.length > 0 &&
+  leccionesHechasDelNivel(nivel, leccionesCompletadas).length ===
+    nivel.lecciones.length;
+
+// Seña que enseña un ítem, por su clave de GIF: las letras la tienen en
+// `letra` (clave de GIFS) y las palabras en `gifPalabra` (de GIFS_PALABRAS).
+// null si el ítem no es de enseñanza. El prefijo separa letras de palabras.
+const senaEnsenada = (item) => {
+  if (item.tipo === "ensenanza") return `letra:${item.letra}`;
+  if (item.tipo === "ensenanza_palabra") return `palabra:${item.gifPalabra}`;
+  return null;
+};
+
+// Misma tarjeta de siempre; `obtenido` sale de los datos reales
 const calcularLogros = ({
+  abecedarioCompleto,
+  leccionPerfecta,
+  senasAprendidas,
+  primeraFrase,
   nivelesCompletados,
   totalNiveles,
-  abecedarioCompleto,
-  rachaMaxima,
 }) => [
   {
-    id: "1",
-    icono: "🏆",
-    nombre: "Primer nivel",
-    descripcion: "Completaste tu primer nivel",
-    obtenido: nivelesCompletados >= 1,
-  },
-  {
-    id: "2",
-    icono: "🔥",
-    nombre: "Racha de 7 días",
-    descripcion: "7 días seguidos practicando",
-    obtenido: rachaMaxima >= 7,
-  },
-  {
-    id: "3",
-    icono: "⭐",
-    nombre: "Perfeccionista",
-    descripcion: "10 ejercicios perfectos seguidos",
-    // TODO: no hay datos de ejercicios perfectos seguidos para calcularlo.
-    // Queda bloqueado hasta que exista ese dato.
-    obtenido: false,
-  },
-  {
-    id: "4",
+    id: "abecedario_completo",
     icono: "🤟",
     nombre: "Abecedario completo",
-    descripcion: "Aprendiste todas las letras",
+    descripcion: "Completaste todas las letras",
     obtenido: abecedarioCompleto,
   },
   {
-    id: "5",
+    id: "leccion_perfecta",
+    icono: "💯",
+    nombre: "Lección perfecta",
+    descripcion: "Terminaste una lección sin errores",
+    obtenido: leccionPerfecta,
+  },
+  {
+    id: "50_senas",
+    icono: "🏅",
+    nombre: "50 señas",
+    descripcion: "Aprendiste 50 señas",
+    obtenido: senasAprendidas >= 50,
+  },
+  {
+    id: "primera_frase",
+    icono: "💬",
+    nombre: "Primera frase",
+    descripcion: "Completaste tu primera lección de frases",
+    obtenido: primeraFrase,
+  },
+  {
+    id: "mitad_del_camino",
+    icono: "🧭",
+    nombre: "Mitad del camino",
+    descripcion: "Completaste la mitad de los niveles",
+    obtenido:
+      totalNiveles > 0 && nivelesCompletados >= Math.ceil(totalNiveles / 2),
+  },
+  {
+    id: "graduado",
     icono: "🎓",
     nombre: "Graduado",
     descripcion: "Completaste todos los niveles",
     obtenido: totalNiveles > 0 && nivelesCompletados === totalNiveles,
-  },
-  {
-    id: "6",
-    icono: "💪",
-    nombre: "Constante",
-    descripcion: "30 días seguidos practicando",
-    obtenido: rachaMaxima >= 30,
   },
 ];
 
@@ -205,7 +222,8 @@ const ModalEditar = ({ visible, usuario, guardando, onGuardar, onCerrar }) => {
 
 // ─── Pantalla principal ──────────────────────────────────────────────
 const ProfileScreen = () => {
-  // { usuario, leccionesCompletadas } — null mientras carga la primera vez
+  // { usuario, leccionesCompletadas, logrosGuardados } — null mientras carga
+  // la primera vez
   const [perfil, setPerfil] = useState(null);
   const [modalEditar, setModalEditar] = useState(false);
   const [guardando, setGuardando] = useState(false);
@@ -228,9 +246,12 @@ const ProfileScreen = () => {
         // Si se entró con otra cuenta, no mostrar los datos de la anterior
         setPerfil((prev) => (prev?.usuario.id === sesion.id ? prev : null));
 
-        const [resUsuario, resProgreso] = await Promise.all([
+        // Los logros que se ganan jugando ("Lección perfecta") están en el
+        // celular, guardados por cuenta
+        const [resUsuario, resProgreso, logrosGuardados] = await Promise.all([
           obtenerUsuario(sesion.id),
           obtenerProgreso(sesion.id),
+          obtenerLogrosGuardados(sesion.id),
         ]);
         if (cancelado) return;
 
@@ -242,6 +263,7 @@ const ProfileScreen = () => {
           leccionesCompletadas: resProgreso.ok
             ? resProgreso.progreso?.leccionesCompletadas || {}
             : prev?.leccionesCompletadas || {},
+          logrosGuardados,
         }));
       })();
 
@@ -262,7 +284,7 @@ const ProfileScreen = () => {
     );
   }
 
-  const { usuario, leccionesCompletadas } = perfil;
+  const { usuario, leccionesCompletadas, logrosGuardados = [] } = perfil;
 
   const iniciales = (usuario.nombre || "")
     .split(" ")
@@ -274,7 +296,7 @@ const ProfileScreen = () => {
   const handleGuardar = async (nombreNuevo) => {
     setGuardando(true);
     try {
-      // Solo el nombre: el PUT es parcial, no toca racha/xpTotal/rachaMaxima
+      // Solo el nombre: el PUT es parcial, no toca los otros campos (xpTotal)
       const res = await actualizarUsuario(usuario.id, { nombre: nombreNuevo });
       if (!res.ok) {
         Alert.alert("Error", res.error);
@@ -322,8 +344,6 @@ const ProfileScreen = () => {
 
   // Si algún dato viene null/undefined se muestra 0
   const xpTotal = usuario.xpTotal ?? 0;
-  const racha = usuario.racha ?? 0;
-  const rachaMaxima = usuario.rachaMaxima ?? 0;
   const miembroDesde = formatearMesAnio(usuario.fechaRegistro);
 
   const nivelesCompletos = NIVELES.filter((nivel) =>
@@ -332,11 +352,34 @@ const ProfileScreen = () => {
   const nivelesCompletados = nivelesCompletos.length;
   const totalNiveles = NIVELES.length;
 
+  // Lecciones completadas de todos los niveles (solo las que existen)
+  const leccionesHechas = NIVELES.flatMap((nivel) =>
+    leccionesHechasDelNivel(nivel, leccionesCompletadas),
+  );
+  const totalLecciones = NIVELES.reduce(
+    (total, nivel) => total + nivel.lecciones.length,
+    0,
+  );
+
+  // Señas distintas que se enseñan en esas lecciones: si una seña se enseña
+  // en dos lecciones, cuenta una sola vez
+  const senasAprendidas = new Set(
+    leccionesHechas.flatMap((leccion) =>
+      (leccion.items || []).map(senaEnsenada).filter(Boolean),
+    ),
+  ).size;
+
   const logros = calcularLogros({
+    abecedarioCompleto: nivelesCompletos.some((nivel) => nivel.id === 1),
+    leccionPerfecta: logrosGuardados.includes("leccion_perfecta"),
+    senasAprendidas,
+    // Lección de frases: la que tiene ejercicios frase_senas (se reconoce
+    // por el contenido, no por el id)
+    primeraFrase: leccionesHechas.some((leccion) =>
+      (leccion.items || []).some((item) => item.tipo === "frase_senas"),
+    ),
     nivelesCompletados,
     totalNiveles,
-    abecedarioCompleto: nivelesCompletos.some((nivel) => nivel.id === 1),
-    rachaMaxima,
   });
 
   const progresoPct = totalNiveles
@@ -410,22 +453,22 @@ const ProfileScreen = () => {
               color="#E8A000"
             />
             <StatCard
-              icono="🔥"
-              valor={racha}
-              label="Racha actual"
-              color="#E53935"
-            />
-            <StatCard
-              icono="📈"
-              valor={rachaMaxima}
-              label="Racha máxima"
-              color="#3D4FBB"
-            />
-            <StatCard
               icono="🎯"
               valor={`${nivelesCompletados}/${totalNiveles}`}
               label="Niveles"
               color="#2E7D32"
+            />
+            <StatCard
+              icono="📖"
+              valor={`${leccionesHechas.length}/${totalLecciones}`}
+              label="Lecciones completadas"
+              color="#3D4FBB"
+            />
+            <StatCard
+              icono="📚"
+              valor={senasAprendidas}
+              label="Señas aprendidas"
+              color="#8C7CF0"
             />
           </View>
         </View>
