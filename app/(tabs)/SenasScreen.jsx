@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
-  Image,
   Modal,
   PanResponder,
   ScrollView,
@@ -13,6 +12,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import SenaGif, { linkDeSena } from "../../components/SenaGif";
+import { precargar } from "../../services/precargaSenas";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
@@ -55,38 +57,45 @@ const COLOR_CATEGORIA_DEFECTO = {
 const colorDeCategoria = (categoriaId) =>
   COLORES_CATEGORIA[categoriaId] ?? COLOR_CATEGORIA_DEFECTO;
 
-// ─── GIFs locales ─────────────────────────────────────
-const GIFS_ABECEDARIO = {
-  A: require("../../assets/gifs/abecedario/A.gif"),
-  B: require("../../assets/gifs/abecedario/B.gif"),
-  C: require("../../assets/gifs/abecedario/C.gif"),
-  Ch: require("../../assets/gifs/abecedario/Ch.gif"),
-  D: require("../../assets/gifs/abecedario/D.gif"),
-  E: require("../../assets/gifs/abecedario/E.gif"),
-  F: require("../../assets/gifs/abecedario/F.gif"),
-  G: require("../../assets/gifs/abecedario/G.gif"),
-  H: require("../../assets/gifs/abecedario/H.gif"),
-  I: require("../../assets/gifs/abecedario/I.gif"),
-  J: require("../../assets/gifs/abecedario/J.gif"),
-  K: require("../../assets/gifs/abecedario/K.gif"),
-  L: require("../../assets/gifs/abecedario/L.gif"),
-  Ll: require("../../assets/gifs/abecedario/Ll.gif"),
-  M: require("../../assets/gifs/abecedario/M.gif"),
-  N: require("../../assets/gifs/abecedario/N.gif"),
-  Ñ: require("../../assets/gifs/abecedario/NN.gif"),
-  O: require("../../assets/gifs/abecedario/O.gif"),
-  P: require("../../assets/gifs/abecedario/P.gif"),
-  Q: require("../../assets/gifs/abecedario/Q.gif"),
-  R: require("../../assets/gifs/abecedario/R.gif"),
-  S: require("../../assets/gifs/abecedario/S.gif"),
-  T: require("../../assets/gifs/abecedario/T.gif"),
-  U: require("../../assets/gifs/abecedario/U.gif"),
-  V: require("../../assets/gifs/abecedario/V.gif"),
-  W: require("../../assets/gifs/abecedario/W.gif"),
-  X: require("../../assets/gifs/abecedario/X.gif"),
-  Y: require("../../assets/gifs/abecedario/Y.gif"),
-  Z: require("../../assets/gifs/abecedario/Z.gif"),
+// ─── GIFs de las señas ───────────────────────────────────────────────
+// Los GIFs están en la nube: SenaGif (components/SenaGif.jsx) muestra cada
+// seña desde su clave de la app, la misma de NIVELES y constants/gifsNube.js.
+// Las señas que en esta pantalla se llaman distinto se traducen acá, en un
+// solo lugar; todas las demás se llaman igual en los dos lados.
+const CLAVE_EN_LA_APP = {
+  Ch: "CH",
+  Ll: "LL",
+  1: "n1",
+  2: "n2",
+  3: "n3",
+  4: "n4",
+  5: "n5",
+  6: "n6",
+  7: "n7",
+  8: "n8",
+  9: "n9",
+  10: "n10",
+  11: "n11",
+  12: "n12",
+  13: "n13",
+  14: "n14",
+  15: "n15",
+  16: "n16",
+  17: "n17",
+  18: "n18",
+  19: "n19",
+  20: "n20",
+  30: "n30",
+  40: "n40",
+  50: "n50",
+  60: "n60",
+  70: "n70",
+  80: "n80",
+  90: "n90",
+  100: "n100",
+  1000: "n1000",
 };
+const claveApp = (nombre) => CLAVE_EN_LA_APP[nombre] ?? nombre;
 // ─── Nombres de display para presentaciones ──────────────────────────
 const NOMBRES_PRESENTACION = {
   apellido: "Apellido",
@@ -111,54 +120,7 @@ const NOMBRES_PRESENTACION = {
   sordo: "Sordo/a",
 };
 
-const GIFS_PRESENTACION = {
-  apellido: require("../../assets/gifs/presentaciones/apellido.gif"),
-  comoestas: require("../../assets/gifs/presentaciones/comoestas.gif"),
-  comotellamas: require("../../assets/gifs/presentaciones/comotellamas.gif"),
-  como: require("../../assets/gifs/presentaciones/como.gif"),
-  cualestuedad: require("../../assets/gifs/presentaciones/cualestuedad.gif"),
-  cual: require("../../assets/gifs/presentaciones/cual.gif"),
-  cuando: require("../../assets/gifs/presentaciones/cuando.gif"),
-  cuanto: require("../../assets/gifs/presentaciones/cuanto.gif"),
-  deque: require("../../assets/gifs/presentaciones/deque.gif"),
-  dni: require("../../assets/gifs/presentaciones/dni.gif"),
-  donde: require("../../assets/gifs/presentaciones/donde.gif"),
-  nombre: require("../../assets/gifs/presentaciones/nombre.gif"),
-  oyente: require("../../assets/gifs/presentaciones/oyente.gif"),
-  paraque: require("../../assets/gifs/presentaciones/paraque.gif"),
-  porque: require("../../assets/gifs/presentaciones/porque.gif"),
-  presentandonos: require("../../assets/gifs/presentaciones/presentandonos.gif"),
-  quedice: require("../../assets/gifs/presentaciones/quedice.gif"),
-  que: require("../../assets/gifs/presentaciones/que.gif"),
-  quien: require("../../assets/gifs/presentaciones/quien.gif"),
-  sordo: require("../../assets/gifs/presentaciones/sordo.gif"),
-};
 // ─── Interacciones cotidianas ────────────────────────────────────────
-const GIFS_INTERACCIONES = {
-  basta: require("../../assets/gifs/interacciones/basta.gif"),
-  bien: require("../../assets/gifs/interacciones/bien.gif"),
-  bienvenida: require("../../assets/gifs/interacciones/bienvenida.gif"),
-  buenasnoches: require("../../assets/gifs/interacciones/buenasnoches.gif"),
-  buenastardes: require("../../assets/gifs/interacciones/buenastardes.gif"),
-  buendia: require("../../assets/gifs/interacciones/buendia.gif"),
-  chau: require("../../assets/gifs/interacciones/chau.gif"),
-  comunicar: require("../../assets/gifs/interacciones/comunicar.gif"),
-  conversar: require("../../assets/gifs/interacciones/conversar.gif"),
-  denada: require("../../assets/gifs/interacciones/denada.gif"),
-  gracias: require("../../assets/gifs/interacciones/gracias.gif"),
-  hablaroral: require("../../assets/gifs/interacciones/hablaroral.gif"),
-  hablarsenas: require("../../assets/gifs/interacciones/hablarsenas.gif"),
-  hola: require("../../assets/gifs/interacciones/hola.gif"),
-  llamar: require("../../assets/gifs/interacciones/llamar.gif"),
-  mal: require("../../assets/gifs/interacciones/mal.gif"),
-  no: require("../../assets/gifs/interacciones/no.gif"),
-  perdon: require("../../assets/gifs/interacciones/perdon.gif"),
-  permiso: require("../../assets/gifs/interacciones/permiso.gif"),
-  porfavor: require("../../assets/gifs/interacciones/porfavor.gif"),
-  porejemplo: require("../../assets/gifs/interacciones/porejemplo.gif"),
-  saludos: require("../../assets/gifs/interacciones/saludos.gif"),
-  si: require("../../assets/gifs/interacciones/si.gif"),
-};
 
 const NOMBRES_INTERACCIONES = {
   basta: "Basta",
@@ -187,30 +149,6 @@ const NOMBRES_INTERACCIONES = {
 };
 
 // ─── Sentimientos ──────────────────────────────────────────────────
-const GIFS_SENTIMIENTOS = {
-  aburrido: require("../../assets/gifs/sentimientos/aburrido.gif"),
-  alegre: require("../../assets/gifs/sentimientos/alegre.gif"),
-  amar: require("../../assets/gifs/sentimientos/amar.gif"),
-  asustado: require("../../assets/gifs/sentimientos/asustado.gif"),
-  cansado: require("../../assets/gifs/sentimientos/cansado.gif"),
-  caprichoso: require("../../assets/gifs/sentimientos/caprichoso.gif"),
-  contento: require("../../assets/gifs/sentimientos/contento.gif"),
-  culpa: require("../../assets/gifs/sentimientos/culpa.gif"),
-  deprimido: require("../../assets/gifs/sentimientos/deprimido.gif"),
-  loco: require("../../assets/gifs/sentimientos/loco.gif"),
-  feliz: require("../../assets/gifs/sentimientos/feliz.gif"),
-  gracioso: require("../../assets/gifs/sentimientos/gracioso.gif"),
-  llorar: require("../../assets/gifs/sentimientos/llorar.gif"),
-  miedoso: require("../../assets/gifs/sentimientos/miedoso.gif"),
-  nervioso: require("../../assets/gifs/sentimientos/nervioso.gif"),
-  orgulloso: require("../../assets/gifs/sentimientos/orgulloso.gif"),
-  preocupado: require("../../assets/gifs/sentimientos/preocupado.gif"),
-  sentimientos: require("../../assets/gifs/sentimientos/sentimientos.gif"),
-  sorprendido: require("../../assets/gifs/sentimientos/sorprendido.gif"),
-  verguenza: require("../../assets/gifs/sentimientos/verguenza.gif"),
-  tranquilo: require("../../assets/gifs/sentimientos/tranquilo.gif"),
-  triste: require("../../assets/gifs/sentimientos/triste.gif"),
-};
 
 const NOMBRES_SENTIMIENTOS = {
   aburrido: "Aburrido",
@@ -235,39 +173,6 @@ const NOMBRES_SENTIMIENTOS = {
   verguenza: "Vergüenza",
   tranquilo: "Tranquilo",
   triste: "Triste",
-};
-
-const GIFS_NUMEROS = {
-  1: require("../../assets/gifs/numeros/1.gif"),
-  2: require("../../assets/gifs/numeros/2.gif"),
-  3: require("../../assets/gifs/numeros/3.gif"),
-  4: require("../../assets/gifs/numeros/4.gif"),
-  5: require("../../assets/gifs/numeros/5.gif"),
-  6: require("../../assets/gifs/numeros/6.gif"),
-  7: require("../../assets/gifs/numeros/7.gif"),
-  8: require("../../assets/gifs/numeros/8.gif"),
-  9: require("../../assets/gifs/numeros/9.gif"),
-  10: require("../../assets/gifs/numeros/10.gif"),
-  11: require("../../assets/gifs/numeros/11.gif"),
-  12: require("../../assets/gifs/numeros/12.gif"),
-  13: require("../../assets/gifs/numeros/13.gif"),
-  14: require("../../assets/gifs/numeros/14.gif"),
-  15: require("../../assets/gifs/numeros/15.gif"),
-  16: require("../../assets/gifs/numeros/16.gif"),
-  17: require("../../assets/gifs/numeros/17.gif"),
-  18: require("../../assets/gifs/numeros/18.gif"),
-  19: require("../../assets/gifs/numeros/19.gif"),
-  20: require("../../assets/gifs/numeros/20.gif"),
-  30: require("../../assets/gifs/numeros/30.gif"),
-  40: require("../../assets/gifs/numeros/40.gif"),
-  50: require("../../assets/gifs/numeros/50.gif"),
-  60: require("../../assets/gifs/numeros/60.gif"),
-  70: require("../../assets/gifs/numeros/70.gif"),
-  80: require("../../assets/gifs/numeros/80.gif"),
-  90: require("../../assets/gifs/numeros/90.gif"),
-  100: require("../../assets/gifs/numeros/100.gif"),
-  1000: require("../../assets/gifs/numeros/1000.gif"),
-  numeros: require("../../assets/gifs/numeros/numeros.gif"),
 };
 
 const NOMBRES_NUMEROS = {
@@ -304,34 +209,6 @@ const NOMBRES_NUMEROS = {
 };
 
 // ─── Familia y vínculos ──────────────────────────────────────────────
-const GIFS_FAMILIA = {
-  abuelo: require("../../assets/gifs/familiaypronombres/abuelo.gif"),
-  bebe: require("../../assets/gifs/familiaypronombres/bebe.gif"),
-  bisabuelo: require("../../assets/gifs/familiaypronombres/bisabuelo.gif"),
-  familia: require("../../assets/gifs/familiaypronombres/familia.gif"),
-  gemelos: require("../../assets/gifs/familiaypronombres/gemelos.gif"),
-  hermano: require("../../assets/gifs/familiaypronombres/hermano.gif"),
-  hijastro: require("../../assets/gifs/familiaypronombres/hijastro.gif"),
-  hijo: require("../../assets/gifs/familiaypronombres/hijo.gif"),
-  madrastra: require("../../assets/gifs/familiaypronombres/madrastra.gif"),
-  mama: require("../../assets/gifs/familiaypronombres/mama.gif"),
-  mellizos: require("../../assets/gifs/familiaypronombres/mellizos.gif"),
-  padrastro: require("../../assets/gifs/familiaypronombres/padrastro.gif"),
-  papa: require("../../assets/gifs/familiaypronombres/papa.gif"),
-  primo: require("../../assets/gifs/familiaypronombres/primo.gif"),
-  sobrino: require("../../assets/gifs/familiaypronombres/sobrino.gif"),
-  tio: require("../../assets/gifs/familiaypronombres/tio.gif"),
-  amante: require("../../assets/gifs/familiaypronombres/amante.gif"),
-  casados: require("../../assets/gifs/familiaypronombres/casados.gif"),
-  cunado: require("../../assets/gifs/familiaypronombres/cunado.gif"),
-  divorciado: require("../../assets/gifs/familiaypronombres/divorciado.gif"),
-  juntos: require("../../assets/gifs/familiaypronombres/juntos.gif"),
-  novio: require("../../assets/gifs/familiaypronombres/novio.gif"),
-  pareja: require("../../assets/gifs/familiaypronombres/pareja.gif"),
-  separados: require("../../assets/gifs/familiaypronombres/separados.gif"),
-  soltero: require("../../assets/gifs/familiaypronombres/soltero.gif"),
-  suegro: require("../../assets/gifs/familiaypronombres/suegro.gif"),
-};
 
 const NOMBRES_FAMILIA = {
   abuelo: "Abuelo",
@@ -363,15 +240,6 @@ const NOMBRES_FAMILIA = {
 };
 
 // ─── Pronombres ──────────────────────────────────────────────────────
-const GIFS_PRONOMBRES = {
-  el_ella: require("../../assets/gifs/familiaypronombres/el_ella.gif"),
-  ellos_ellas: require("../../assets/gifs/familiaypronombres/ellos_ellas.gif"),
-  mio: require("../../assets/gifs/familiaypronombres/mio.gif"),
-  nosotros: require("../../assets/gifs/familiaypronombres/nosotros.gif"),
-  tuyo: require("../../assets/gifs/familiaypronombres/tuyo.gif"),
-  vos: require("../../assets/gifs/familiaypronombres/vos.gif"),
-  yo: require("../../assets/gifs/familiaypronombres/yo.gif"),
-};
 
 const NOMBRES_PRONOMBRES = {
   el_ella: "Él/Ella",
@@ -426,7 +294,7 @@ const CATEGORIAS = [
       id: letra,
       titulo: `Letra ${letra}`,
       subtitulo: "Abecedario LSA",
-      gifSource: GIFS_ABECEDARIO[letra], // ← GIF local
+      clave: claveApp(letra),
     })),
   },
   {
@@ -436,11 +304,11 @@ const CATEGORIAS = [
     color: "#E8F5E9",
     borderColor: "#A5D6A7",
     disponible: true,
-    items: Object.keys(GIFS_PRESENTACION).map((key) => ({
+    items: Object.keys(NOMBRES_PRESENTACION).map((key) => ({
       id: key,
       titulo: NOMBRES_PRESENTACION[key], // ← nombre legible
       subtitulo: "Presentaciones LSA",
-      gifSource: GIFS_PRESENTACION[key],
+      clave: claveApp(key),
     })),
   },
   {
@@ -450,11 +318,11 @@ const CATEGORIAS = [
     color: "#FFF8E1",
     borderColor: "#F5CE5A",
     disponible: true,
-    items: Object.keys(GIFS_INTERACCIONES).map((key) => ({
+    items: Object.keys(NOMBRES_INTERACCIONES).map((key) => ({
       id: key,
       titulo: NOMBRES_INTERACCIONES[key],
       subtitulo: "Interacciones Cotidianas LSA",
-      gifSource: GIFS_INTERACCIONES[key],
+      clave: claveApp(key),
     })),
   },
   {
@@ -464,11 +332,11 @@ const CATEGORIAS = [
     color: "#F4F2FD",
     borderColor: "#A99BF7",
     disponible: true,
-    items: Object.keys(GIFS_SENTIMIENTOS).map((key) => ({
+    items: Object.keys(NOMBRES_SENTIMIENTOS).map((key) => ({
       id: key,
       titulo: NOMBRES_SENTIMIENTOS[key],
       subtitulo: "Sentimientos LSA",
-      gifSource: GIFS_SENTIMIENTOS[key],
+      clave: claveApp(key),
     })),
   },
   {
@@ -478,11 +346,11 @@ const CATEGORIAS = [
     color: "#EEF1FB",
     borderColor: "#C8D3F5",
     disponible: true,
-    items: Object.keys(GIFS_NUMEROS).map((key) => ({
+    items: Object.keys(NOMBRES_NUMEROS).map((key) => ({
       id: key,
       titulo: NOMBRES_NUMEROS[key],
       subtitulo: "Números LSA",
-      gifSource: GIFS_NUMEROS[key],
+      clave: claveApp(key),
     })),
   },
   {
@@ -492,11 +360,11 @@ const CATEGORIAS = [
     color: "#FFF8E1",
     borderColor: "#F5CE5A",
     disponible: true,
-    items: Object.keys(GIFS_FAMILIA).map((key) => ({
+    items: Object.keys(NOMBRES_FAMILIA).map((key) => ({
       id: key,
       titulo: NOMBRES_FAMILIA[key],
       subtitulo: "Familia y vínculos LSA",
-      gifSource: GIFS_FAMILIA[key],
+      clave: claveApp(key),
     })),
   },
   {
@@ -508,11 +376,11 @@ const CATEGORIAS = [
     disponible: true,
     // Tarjeta horizontal que ocupa todo el ancho de la grilla
     anchoCompleto: true,
-    items: Object.keys(GIFS_PRONOMBRES).map((key) => ({
+    items: Object.keys(NOMBRES_PRONOMBRES).map((key) => ({
       id: key,
       titulo: NOMBRES_PRONOMBRES[key],
       subtitulo: "Pronombres LSA",
-      gifSource: GIFS_PRONOMBRES[key],
+      clave: claveApp(key),
     })),
   },
 ];
@@ -580,19 +448,7 @@ const VideoModal = ({ visible, items, indice, onNavegar, onClose }) => {
               style={[styles.videoPlayer, { flex: 1, marginBottom: 0 }]}
               {...panResponder.panHandlers}
             >
-              {item.gifSource ? (
-                <Image
-                  source={item.gifSource}
-                  style={styles.gifImagen}
-                  resizeMode="contain"
-                />
-              ) : (
-                <>
-                  <Text style={styles.videoPlayerEmoji}>🤟</Text>
-                  <Text style={styles.videoPlayerTxt}>{item.titulo}</Text>
-                  <Text style={styles.videoPlayerSub}>GIF próximamente</Text>
-                </>
-              )}
+              <SenaGif clave={item.clave} style={styles.gifImagen} />
             </View>
 
             <TouchableOpacity
@@ -838,10 +694,21 @@ const SenasScreen = () => {
     return resultados;
   }, [busqueda]);
 
+  // En el modal se precargan la seña anterior y la siguiente: al pasar con
+  // las flechas o deslizando, ya están bajadas
+  const mostrarSena = (lista, indice) => {
+    setIndiceModal(indice);
+    precargar(
+      [lista[indice - 1], lista[indice + 1]].map(
+        (sena) => sena && linkDeSena(sena.clave),
+      ),
+    );
+  };
+
   const handleItemPress = (item, listaCompleta) => {
     const idx = listaCompleta.findIndex((i) => i.id === item.id);
     setItemsModal(listaCompleta);
-    setIndiceModal(idx >= 0 ? idx : 0);
+    mostrarSena(listaCompleta, idx >= 0 ? idx : 0);
     setVideoVisible(true);
   };
 
@@ -978,7 +845,7 @@ const SenasScreen = () => {
         visible={videoVisible}
         items={itemsModal}
         indice={indiceModal}
-        onNavegar={(nuevoIndice) => setIndiceModal(nuevoIndice)}
+        onNavegar={(nuevoIndice) => mostrarSena(itemsModal, nuevoIndice)}
         onClose={() => setVideoVisible(false)}
       />
     </SafeAreaView>
@@ -1199,9 +1066,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  videoPlayerEmoji: { fontSize: 52, marginBottom: 8 },
-  videoPlayerTxt: { fontSize: 18, fontWeight: "700", color: "#3D4FBB" },
-  videoPlayerSub: { fontSize: 13, color: "#888", marginTop: 4 },
   videoModalSub: {
     fontSize: 14,
     color: "#888",

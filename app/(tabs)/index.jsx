@@ -1,6 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Image } from "expo-image";
 import { router, useFocusEffect } from "expo-router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -20,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FullWindowOverlay } from "react-native-screens";
 
+import SenaGif, { linkDeSena } from "../../components/SenaGif";
 import Tutorial from "../../components/Tutorial";
 import {
   cerrarSesionRemota,
@@ -36,6 +36,7 @@ import {
   obtenerTodasEnCurso,
 } from "../../services/leccionEnCurso";
 import { guardarLogro } from "../../services/logros";
+import { crearPrecarga } from "../../services/precargaSenas";
 import {
   cerrarSesion,
   obtenerSesion,
@@ -47,183 +48,9 @@ import {
 } from "../../services/tutorial";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const GIFS = {
-  A: require("../../assets/gifs/abecedario/A.gif"),
-  B: require("../../assets/gifs/abecedario/B.gif"),
-  C: require("../../assets/gifs/abecedario/C.gif"),
-  CH: require("../../assets/gifs/abecedario/Ch.gif"),
-  D: require("../../assets/gifs/abecedario/D.gif"),
-  E: require("../../assets/gifs/abecedario/E.gif"),
-  F: require("../../assets/gifs/abecedario/F.gif"),
-  G: require("../../assets/gifs/abecedario/G.gif"),
-  H: require("../../assets/gifs/abecedario/H.gif"),
-  I: require("../../assets/gifs/abecedario/I.gif"),
-  J: require("../../assets/gifs/abecedario/J.gif"),
-  K: require("../../assets/gifs/abecedario/K.gif"),
-  L: require("../../assets/gifs/abecedario/L.gif"),
-  LL: require("../../assets/gifs/abecedario/Ll.gif"),
-  M: require("../../assets/gifs/abecedario/M.gif"),
-  N: require("../../assets/gifs/abecedario/N.gif"),
-  Ñ: require("../../assets/gifs/abecedario/NN.gif"),
-  O: require("../../assets/gifs/abecedario/O.gif"),
-  P: require("../../assets/gifs/abecedario/P.gif"),
-  Q: require("../../assets/gifs/abecedario/Q.gif"),
-  R: require("../../assets/gifs/abecedario/R.gif"),
-  S: require("../../assets/gifs/abecedario/S.gif"),
-  T: require("../../assets/gifs/abecedario/T.gif"),
-  U: require("../../assets/gifs/abecedario/U.gif"),
-  V: require("../../assets/gifs/abecedario/V.gif"),
-  W: require("../../assets/gifs/abecedario/W.gif"),
-  X: require("../../assets/gifs/abecedario/X.gif"),
-  Y: require("../../assets/gifs/abecedario/Y.gif"),
-  Z: require("../../assets/gifs/abecedario/Z.gif"),
-};
-
-// GIFs de VOCABULARIO (Nivel 2+). Keys = nombre del archivo sin acentos ni signos.
-const GIFS_PALABRAS = {
-  apellido: require("../../assets/gifs/presentaciones/apellido.gif"),
-  comoestas: require("../../assets/gifs/presentaciones/comoestas.gif"),
-  como: require("../../assets/gifs/presentaciones/como.gif"),
-  comotellamas: require("../../assets/gifs/presentaciones/comotellamas.gif"),
-  cual: require("../../assets/gifs/presentaciones/cual.gif"),
-  cualestuedad: require("../../assets/gifs/presentaciones/cualestuedad.gif"),
-  cuando: require("../../assets/gifs/presentaciones/cuando.gif"),
-  cuanto: require("../../assets/gifs/presentaciones/cuanto.gif"),
-  deque: require("../../assets/gifs/presentaciones/deque.gif"),
-  dni: require("../../assets/gifs/presentaciones/dni.gif"),
-  donde: require("../../assets/gifs/presentaciones/donde.gif"),
-  nombre: require("../../assets/gifs/presentaciones/nombre.gif"),
-  oyente: require("../../assets/gifs/presentaciones/oyente.gif"),
-  paraque: require("../../assets/gifs/presentaciones/paraque.gif"),
-  porque: require("../../assets/gifs/presentaciones/porque.gif"),
-  presentandonos: require("../../assets/gifs/presentaciones/presentandonos.gif"),
-  que: require("../../assets/gifs/presentaciones/que.gif"),
-  quedice: require("../../assets/gifs/presentaciones/quedice.gif"),
-  quien: require("../../assets/gifs/presentaciones/quien.gif"),
-  sordo: require("../../assets/gifs/presentaciones/sordo.gif"),
-
-  // ── Nivel 3 · Interacciones cotidianas ──
-  // "¿quién?" es presentaciones/quien.gif (la clave quien de arriba). En
-  // interacciones no hay un "¿quién?": "por ejemplo" es porejemplo.gif.
-  saludos: require("../../assets/gifs/interacciones/saludos.gif"),
-  hola: require("../../assets/gifs/interacciones/hola.gif"),
-  chau: require("../../assets/gifs/interacciones/chau.gif"),
-  gracias: require("../../assets/gifs/interacciones/gracias.gif"),
-  bienvenida: require("../../assets/gifs/interacciones/bienvenida.gif"),
-  permiso: require("../../assets/gifs/interacciones/permiso.gif"),
-  perdon: require("../../assets/gifs/interacciones/perdon.gif"),
-  bien: require("../../assets/gifs/interacciones/bien.gif"),
-  mal: require("../../assets/gifs/interacciones/mal.gif"),
-  basta: require("../../assets/gifs/interacciones/basta.gif"),
-  porfavor: require("../../assets/gifs/interacciones/porfavor.gif"),
-  no: require("../../assets/gifs/interacciones/no.gif"),
-  comunicar: require("../../assets/gifs/interacciones/comunicar.gif"),
-  si: require("../../assets/gifs/interacciones/si.gif"),
-  conversar: require("../../assets/gifs/interacciones/conversar.gif"),
-  denada: require("../../assets/gifs/interacciones/denada.gif"),
-  hablarsenas: require("../../assets/gifs/interacciones/hablarsenas.gif"),
-  llamar: require("../../assets/gifs/interacciones/llamar.gif"),
-  hablaroral: require("../../assets/gifs/interacciones/hablaroral.gif"),
-  buendia: require("../../assets/gifs/interacciones/buendia.gif"),
-  buenasnoches: require("../../assets/gifs/interacciones/buenasnoches.gif"),
-  buenastardes: require("../../assets/gifs/interacciones/buenastardes.gif"),
-  porejemplo: require("../../assets/gifs/interacciones/porejemplo.gif"),
-
-  // ── Nivel 4 · Sentimientos ──
-  sentimientos: require("../../assets/gifs/sentimientos/sentimientos.gif"),
-  aburrido: require("../../assets/gifs/sentimientos/aburrido.gif"),
-  alegre: require("../../assets/gifs/sentimientos/alegre.gif"),
-  amar: require("../../assets/gifs/sentimientos/amar.gif"),
-  asustado: require("../../assets/gifs/sentimientos/asustado.gif"),
-  cansado: require("../../assets/gifs/sentimientos/cansado.gif"),
-  caprichoso: require("../../assets/gifs/sentimientos/caprichoso.gif"),
-  contento: require("../../assets/gifs/sentimientos/contento.gif"),
-  culpa: require("../../assets/gifs/sentimientos/culpa.gif"),
-  deprimido: require("../../assets/gifs/sentimientos/deprimido.gif"),
-  loco: require("../../assets/gifs/sentimientos/loco.gif"),
-  feliz: require("../../assets/gifs/sentimientos/feliz.gif"),
-  gracioso: require("../../assets/gifs/sentimientos/gracioso.gif"),
-  llorar: require("../../assets/gifs/sentimientos/llorar.gif"),
-  miedoso: require("../../assets/gifs/sentimientos/miedoso.gif"),
-  nervioso: require("../../assets/gifs/sentimientos/nervioso.gif"),
-  orgulloso: require("../../assets/gifs/sentimientos/orgulloso.gif"),
-  preocupado: require("../../assets/gifs/sentimientos/preocupado.gif"),
-  sorprendido: require("../../assets/gifs/sentimientos/sorprendido.gif"),
-  verguenza: require("../../assets/gifs/sentimientos/verguenza.gif"),
-  tranquilo: require("../../assets/gifs/sentimientos/tranquilo.gif"),
-  triste: require("../../assets/gifs/sentimientos/triste.gif"),
-
-  // ── Nivel 5 · Números ──
-  // Las claves llevan prefijo n para no chocar con los índices numéricos de JS.
-  numeros: require("../../assets/gifs/numeros/numeros.gif"),
-  n0: require("../../assets/gifs/numeros/0.gif"),
-  n1: require("../../assets/gifs/numeros/1.gif"),
-  n2: require("../../assets/gifs/numeros/2.gif"),
-  n3: require("../../assets/gifs/numeros/3.gif"),
-  n4: require("../../assets/gifs/numeros/4.gif"),
-  n5: require("../../assets/gifs/numeros/5.gif"),
-  n6: require("../../assets/gifs/numeros/6.gif"),
-  n7: require("../../assets/gifs/numeros/7.gif"),
-  n8: require("../../assets/gifs/numeros/8.gif"),
-  n9: require("../../assets/gifs/numeros/9.gif"),
-  n10: require("../../assets/gifs/numeros/10.gif"),
-  n11: require("../../assets/gifs/numeros/11.gif"),
-  n12: require("../../assets/gifs/numeros/12.gif"),
-  n13: require("../../assets/gifs/numeros/13.gif"),
-  n14: require("../../assets/gifs/numeros/14.gif"),
-  n15: require("../../assets/gifs/numeros/15.gif"),
-  n16: require("../../assets/gifs/numeros/16.gif"),
-  n17: require("../../assets/gifs/numeros/17.gif"),
-  n18: require("../../assets/gifs/numeros/18.gif"),
-  n19: require("../../assets/gifs/numeros/19.gif"),
-  n20: require("../../assets/gifs/numeros/20.gif"),
-  n30: require("../../assets/gifs/numeros/30.gif"),
-  n40: require("../../assets/gifs/numeros/40.gif"),
-  n50: require("../../assets/gifs/numeros/50.gif"),
-  n60: require("../../assets/gifs/numeros/60.gif"),
-  n70: require("../../assets/gifs/numeros/70.gif"),
-  n80: require("../../assets/gifs/numeros/80.gif"),
-  n90: require("../../assets/gifs/numeros/90.gif"),
-  n100: require("../../assets/gifs/numeros/100.gif"),
-  n1000: require("../../assets/gifs/numeros/1000.gif"),
-
-  // ── Nivel 6 · Familia y vínculos ──
-  abuelo: require("../../assets/gifs/familiaypronombres/abuelo.gif"),
-  bebe: require("../../assets/gifs/familiaypronombres/bebe.gif"),
-  bisabuelo: require("../../assets/gifs/familiaypronombres/bisabuelo.gif"),
-  familia: require("../../assets/gifs/familiaypronombres/familia.gif"),
-  gemelos: require("../../assets/gifs/familiaypronombres/gemelos.gif"),
-  hermano: require("../../assets/gifs/familiaypronombres/hermano.gif"),
-  hijastro: require("../../assets/gifs/familiaypronombres/hijastro.gif"),
-  hijo: require("../../assets/gifs/familiaypronombres/hijo.gif"),
-  madrastra: require("../../assets/gifs/familiaypronombres/madrastra.gif"),
-  mama: require("../../assets/gifs/familiaypronombres/mama.gif"),
-  mellizos: require("../../assets/gifs/familiaypronombres/mellizos.gif"),
-  padrastro: require("../../assets/gifs/familiaypronombres/padrastro.gif"),
-  papa: require("../../assets/gifs/familiaypronombres/papa.gif"),
-  primo: require("../../assets/gifs/familiaypronombres/primo.gif"),
-  sobrino: require("../../assets/gifs/familiaypronombres/sobrino.gif"),
-  tio: require("../../assets/gifs/familiaypronombres/tio.gif"),
-  amante: require("../../assets/gifs/familiaypronombres/amante.gif"),
-  casados: require("../../assets/gifs/familiaypronombres/casados.gif"),
-  cunado: require("../../assets/gifs/familiaypronombres/cunado.gif"),
-  divorciado: require("../../assets/gifs/familiaypronombres/divorciado.gif"),
-  juntos: require("../../assets/gifs/familiaypronombres/juntos.gif"),
-  novio: require("../../assets/gifs/familiaypronombres/novio.gif"),
-  pareja: require("../../assets/gifs/familiaypronombres/pareja.gif"),
-  separados: require("../../assets/gifs/familiaypronombres/separados.gif"),
-  soltero: require("../../assets/gifs/familiaypronombres/soltero.gif"),
-  suegro: require("../../assets/gifs/familiaypronombres/suegro.gif"),
-
-  // ── Nivel 7 · Pronombres ──
-  el_ella: require("../../assets/gifs/familiaypronombres/el_ella.gif"),
-  ellos_ellas: require("../../assets/gifs/familiaypronombres/ellos_ellas.gif"),
-  mio: require("../../assets/gifs/familiaypronombres/mio.gif"),
-  nosotros: require("../../assets/gifs/familiaypronombres/nosotros.gif"),
-  tuyo: require("../../assets/gifs/familiaypronombres/tuyo.gif"),
-  vos: require("../../assets/gifs/familiaypronombres/vos.gif"),
-  yo: require("../../assets/gifs/familiaypronombres/yo.gif"),
-};
+// Los GIFs de las señas están en la nube: SenaGif (components/SenaGif.jsx)
+// muestra cada uno desde su clave. Los links están en constants/gifsNube.js,
+// que se genera desde docs/gifs_nube.json con scripts/generarGifs.js.
 
 // Señas que en la app se ven iguales: cuentan como UNA sola seña, igual que
 // "él" y "ella" (las dos son el_ella). En los ejercicios, dos señas de un
@@ -7255,8 +7082,8 @@ const guardarVidas = async (uid, vidas) => {
 //  LECCIÓN EN CURSO — avance de una lección a medias (services/leccionEnCurso)
 // ══════════════════════════════════════════════════════════════════════
 
-// Campos de un ítem que nombran un GIF (de GIFS o GIFS_PALABRAS). Si se agrega
-// un tipo de ítem con otro campo de GIF, sumarlo acá.
+// Campos de un ítem que nombran un GIF (claves de constants/gifsNube.js). Si
+// se agrega un tipo de ítem con otro campo de GIF, sumarlo acá.
 const CAMPOS_GIF = [
   "letra",
   "gifLetra",
@@ -7265,6 +7092,16 @@ const CAMPOS_GIF = [
   "opcionesGifs",
   "secuencia",
 ];
+
+// Links de los GIFs de una lección desde el ítem `desde` hasta el final, en
+// orden y sin repetir: enseñanza, opciones, secuencias de letras y de frases.
+// Las claves sin link se saltean (SenaGif muestra el error al aparecer).
+const linksDeLeccion = (leccion, desde) => {
+  const claves = (leccion.items || [])
+    .slice(desde)
+    .flatMap((item) => CAMPOS_GIF.flatMap((campo) => item[campo] ?? []));
+  return [...new Set(claves.map(linkDeSena).filter(Boolean))];
+};
 
 // Firma de una lección: "<cantidad de ítems>-<hash>" (la de "Letras A–E" es
 // "20-1r2mihr"). El hash sale del tipo y los GIFs de cada ítem, en orden.
@@ -7824,11 +7661,7 @@ const ItemEnsenanza = ({
         <Text style={styles.itemCardSub}>Mirá bien la seña</Text>
       </View>
       <View style={styles.gifGrandeWrap}>
-        <Image
-          source={GIFS[item.letra]}
-          style={styles.gifGrande}
-          contentFit="contain"
-        />
+        <SenaGif clave={item.letra} style={styles.gifGrande} />
       </View>
     </ScrollView>
     <View style={styles.ejercicioBtnWrap}>
@@ -7912,11 +7745,7 @@ const ItemElegirSena = ({
                   activeOpacity={confirmado ? 1 : 0.75}
                 >
                   <View style={styles.gifOpcionImgWrap}>
-                    <Image
-                      source={GIFS[letra]}
-                      style={styles.gifOpcion}
-                      contentFit="contain"
-                    />
+                    <SenaGif clave={letra} style={styles.gifOpcion} />
                   </View>
                   <View
                     style={[
@@ -8035,11 +7864,7 @@ const ItemQueLEtra = ({
           <Text style={styles.itemCardSub}>¿Qué letra es esta?</Text>
         </View>
         <View style={styles.gifGrandeWrap}>
-          <Image
-            source={GIFS[item.gifLetra]}
-            style={styles.gifGrande}
-            contentFit="contain"
-          />
+          <SenaGif clave={item.gifLetra} style={styles.gifGrande} />
         </View>
         <View style={styles.opcionesWrap}>
           {item.opciones.map((op, i) => (
@@ -8196,10 +8021,11 @@ const ItemQuePalabra = ({
                   { width: gifW, height: gifW * 1.3 },
                 ]}
               >
-                <Image
-                  source={GIFS[letra]}
+                <SenaGif
+                  clave={letra}
                   style={{ width: gifW, height: gifW * 1.3 }}
                   contentFit="cover"
+                  compacto
                 />
               </View>
               <TouchableOpacity
@@ -8293,20 +8119,6 @@ const ItemQuePalabra = ({
       </View>
     </View>
   );
-};
-
-// GIF de una seña de vocabulario. Si el archivo todavía no está en assets
-// avisa en pantalla en vez de mostrar un recuadro vacío.
-const SenaGif = ({ clave, style }) => {
-  const source = GIFS_PALABRAS[clave];
-  if (!source)
-    return (
-      <View style={[style, styles.gifFaltante]}>
-        <Text style={styles.gifFaltanteTxt}>GIF pendiente</Text>
-        <Text style={styles.gifFaltanteSub}>{clave}</Text>
-      </View>
-    );
-  return <Image source={source} style={style} contentFit="contain" />;
 };
 
 // ── Tipo 1 (palabras): enseñanza de vocabulario ───────────────────────
@@ -9672,6 +9484,21 @@ const EMOJI_TODO_COMPLETO = "🏆";
 // cuenta para el logro "Lección perfecta"
 const ITEMS_SIN_RESPUESTA = ["ensenanza", "ensenanza_palabra", "motivacion"];
 
+// Pantalla de carga de la app: al entrar ("Cargando tu progreso...") y al
+// abrir una lección ("Cargando lección...")
+const PantallaCargando = ({ texto }) => (
+  <SafeAreaView
+    style={[
+      styles.container,
+      { justifyContent: "center", alignItems: "center" },
+    ]}
+    edges={["top", "left", "right"]}
+  >
+    <Text style={{ fontSize: 32 }}>🤟</Text>
+    <Text style={{ fontSize: 14, color: "#888", marginTop: 8 }}>{texto}</Text>
+  </SafeAreaView>
+);
+
 export default function HomeScreen() {
   // ── datos persistentes ──
   const [userId, setUserId] = useState(null);
@@ -9708,6 +9535,15 @@ export default function HomeScreen() {
   const [enCurso, setEnCurso] = useState({});
   // Cartel "Tenés esta lección a medias": { leccion, indice, total } o null
   const [cartelEnCurso, setCartelEnCurso] = useState(null);
+
+  // ── GIFs de la lección que se abre (ver abrirLeccion) ──
+  // Mientras bajan los primeros se ve "Cargando lección...". precargaRef es
+  // la precarga de la lección abierta (se cancela al cerrarla); aperturaRef
+  // cuenta las aperturas, para no abrir una que ya no corresponde (por
+  // ejemplo, si cambió la cuenta mientras cargaba).
+  const [cargandoLeccion, setCargandoLeccion] = useState(false);
+  const precargaRef = useRef(null);
+  const aperturaRef = useRef(0);
 
   // ── regeneración de vidas (timer) ──
   const regenTimerRef = useRef(null);
@@ -9754,6 +9590,10 @@ export default function HomeScreen() {
         setEnCurso({});
         setCartelEnCurso(null);
         setModalResultado(false); // el resultado era de la cuenta anterior
+        // Si se estaba abriendo una lección, ya no se abre
+        aperturaRef.current++;
+        precargaRef.current?.cancelar();
+        setCargandoLeccion(false);
 
         const { progreso: p, vidas: v } = await cargarDatos(uid);
         const todasEnCurso = await obtenerTodasEnCurso(uid);
@@ -9921,6 +9761,32 @@ export default function HomeScreen() {
     [vidasData.vidas],
   );
 
+  // Abre una lección desde el ítem `desde` (0, o el guardado al continuar):
+  // espera solo los 3 primeros GIFs, con un tope de 8 s para no trabar la
+  // lección si la red está lenta, y recién ahí la abre. El resto se baja en
+  // segundo plano mientras se avanza (efecto de abajo).
+  const abrirLeccion = useCallback(async (leccion, desde) => {
+    const apertura = ++aperturaRef.current;
+    precargaRef.current?.cancelar();
+    const precarga = crearPrecarga(linksDeLeccion(leccion, desde));
+    precargaRef.current = precarga;
+    setCargandoLeccion(true);
+    await precarga.listaParaAbrir;
+    if (aperturaRef.current !== apertura) return; // ya no corresponde
+    setCargandoLeccion(false);
+    setLeccionActiva(leccion);
+  }, []);
+
+  // Con la lección abierta, el resto de sus GIFs se baja de a 2 y en orden.
+  // Al cerrarla (salir, terminar, quedarse sin vidas, cambiar de cuenta) se
+  // deja de bajar.
+  useEffect(() => {
+    if (!leccionActiva) return;
+    const precarga = precargaRef.current;
+    precarga?.seguirEnSegundoPlano();
+    return () => precarga?.cancelar();
+  }, [leccionActiva]);
+
   const handleIrLeccion = useCallback(
     (leccion) => {
       if (vidasData.vidas === 0) {
@@ -9950,9 +9816,16 @@ export default function HomeScreen() {
           avisarAvanceDescartado(nivelId, leccion.id, revision.motivo);
         borrarAvance(nivelId, leccion.id);
       }
-      setLeccionActiva(leccion);
+      abrirLeccion(leccion, 0);
     },
-    [vidasData.vidas, nivelAbierto, enCurso, progreso, borrarAvance],
+    [
+      vidasData.vidas,
+      nivelAbierto,
+      enCurso,
+      progreso,
+      borrarAvance,
+      abrirLeccion,
+    ],
   );
 
   // ── cartel "Tenés esta lección a medias" ──
@@ -9965,8 +9838,9 @@ export default function HomeScreen() {
       setModalSinVidas(true);
       return;
     }
-    // Abre en el ítem guardado: lo toma de enCurso (ver avanceParaSeguir)
-    setLeccionActiva(cartelEnCurso.leccion);
+    // Abre en el ítem guardado: lo toma de enCurso (ver avanceParaSeguir), y
+    // los GIFs se precargan desde ese ítem
+    abrirLeccion(cartelEnCurso.leccion, cartelEnCurso.indice);
   };
 
   const empezarDeNuevo = () => {
@@ -9977,7 +9851,7 @@ export default function HomeScreen() {
       return;
     }
     borrarAvance(nivelAbierto.id, cartelEnCurso.leccion.id);
-    setLeccionActiva(cartelEnCurso.leccion);
+    abrirLeccion(cartelEnCurso.leccion, 0);
   };
 
   // ── handlers ejercicio ──
@@ -10072,20 +9946,12 @@ export default function HomeScreen() {
     estadosNiveles[0];
 
   if (cargando || !userId) {
-    return (
-      <SafeAreaView
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-        edges={["top", "left", "right"]}
-      >
-        <Text style={{ fontSize: 32 }}>🤟</Text>
-        <Text style={{ fontSize: 14, color: "#888", marginTop: 8 }}>
-          Cargando tu progreso...
-        </Text>
-      </SafeAreaView>
-    );
+    return <PantallaCargando texto="Cargando tu progreso..." />;
+  }
+
+  // Bajando los primeros GIFs de la lección que se va a abrir
+  if (cargandoLeccion) {
+    return <PantallaCargando texto="Cargando lección..." />;
   }
 
   // ══ RENDER: ejercicio ══
@@ -10962,18 +10828,6 @@ const styles = StyleSheet.create({
     borderColor: "#C62828",
     backgroundColor: "#FFCDD2",
   },
-
-  gifFaltante: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#EEF1FB",
-    borderWidth: 1.5,
-    borderColor: "#C8D3F5",
-    borderStyle: "dashed",
-    borderRadius: 16,
-  },
-  gifFaltanteTxt: { fontSize: 15, fontWeight: "700", color: "#3D4FBB" },
-  gifFaltanteSub: { fontSize: 12, color: "#9CA3AF", marginTop: 4 },
 
   // ── Motivación (checkpoints) ───────────────────────────────────────
   motivacionBody: {
