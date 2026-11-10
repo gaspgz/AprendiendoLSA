@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FullWindowOverlay } from "react-native-screens";
 
 import Tutorial from "../../components/Tutorial";
 import {
@@ -28,6 +29,12 @@ import {
   obtenerProgreso,
   obtenerVidas,
 } from "../../services/api";
+import {
+  borrarLeccionEnCurso,
+  claveLeccionEnCurso,
+  guardarLeccionEnCurso,
+  obtenerTodasEnCurso,
+} from "../../services/leccionEnCurso";
 import { guardarLogro } from "../../services/logros";
 import {
   cerrarSesion,
@@ -7245,6 +7252,97 @@ const guardarVidas = async (uid, vidas) => {
 };
 
 // ══════════════════════════════════════════════════════════════════════
+//  LECCIÓN EN CURSO — avance de una lección a medias (services/leccionEnCurso)
+// ══════════════════════════════════════════════════════════════════════
+
+// Campos de un ítem que nombran un GIF (de GIFS o GIFS_PALABRAS). Si se agrega
+// un tipo de ítem con otro campo de GIF, sumarlo acá.
+const CAMPOS_GIF = [
+  "letra",
+  "gifLetra",
+  "gifPalabra",
+  "opcionesLetras",
+  "opcionesGifs",
+  "secuencia",
+];
+
+// Firma de una lección: "<cantidad de ítems>-<hash>" (la de "Letras A–E" es
+// "20-1r2mihr"). El hash sale del tipo y los GIFs de cada ítem, en orden.
+// Cambia si se agregan, sacan o reordenan ítems, o si cambia el tipo o un GIF
+// de alguno: ahí el índice guardado ya no apunta al mismo ítem. No cambia por
+// los textos (títulos, opciones escritas, motivación) ni por la respuesta
+// correcta.
+const firmaDeLeccion = (leccion) => {
+  const items = leccion.items || [];
+  const gifsDe = (item) => CAMPOS_GIF.flatMap((campo) => item[campo] ?? []);
+  // Por ejemplo "ensenanza,A|...|que_letra,B|elegir_sena,D,A,E,D|..."
+  const texto = items
+    .map((item) => [item.tipo, ...gifsDe(item)].join(","))
+    .join("|");
+  // FNV-1a de 32 bits: un número corto que cambia si cambia cualquier letra
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < texto.length; i++) {
+    hash ^= texto.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `${items.length}-${(hash >>> 0).toString(36)}`;
+};
+
+// Compara lo guardado con la lección actual. null: no hay nada guardado.
+// { valido: true, indice, errores, total } o { valido: false, motivo }.
+const revisarAvance = (leccion, guardado) => {
+  if (guardado == null) return null;
+  const total = leccion.items?.length ?? 0;
+  const { indice, errores } = guardado;
+  let motivo = null;
+  if (guardado.firma !== firmaDeLeccion(leccion) || guardado.total !== total)
+    motivo = "la lección cambió (la firma no coincide)";
+  else if (!Number.isInteger(errores) || errores < 0)
+    motivo = `los errores no son válidos (${errores})`;
+  // total sería después del último ítem
+  else if (!Number.isInteger(indice) || indice < 0 || indice >= total)
+    motivo = `el índice no es válido (${indice} de ${total})`;
+  // En el ítem 0 solo se guarda si hubo errores: sin errores es lo mismo que
+  // empezar de cero
+  else if (indice === 0 && errores === 0)
+    motivo = "no hay nada para continuar (ítem 1 sin errores)";
+  return motivo
+    ? { valido: false, motivo }
+    : { valido: true, indice, errores, total };
+};
+
+const avisarAvanceDescartado = (nivelId, leccionId, motivo) =>
+  console.warn(
+    `[Lección en curso] Se descartó el avance guardado: ${motivo}. La lección empieza de cero.`,
+    { nivel: nivelId, leccion: leccionId },
+  );
+
+// Al cargar la cuenta queda solo el avance que todavía sirve. El de una
+// lección completada (por ejemplo, en otro celular) se borra sin avisar; el
+// que ya no coincide con la lección, con un console.warn.
+const limpiarEnCurso = (uid, todas, leccionesCompletadas) => {
+  const validas = {};
+  for (const nivel of NIVELES) {
+    for (const leccion of nivel.lecciones) {
+      const clave = claveLeccionEnCurso(nivel.id, leccion.id);
+      const revision = revisarAvance(leccion, todas[clave]);
+      if (!revision) continue;
+      const completada = (leccionesCompletadas[nivel.id] || []).includes(
+        leccion.id,
+      );
+      if (!completada && revision.valido) {
+        validas[clave] = todas[clave];
+        continue;
+      }
+      if (!completada)
+        avisarAvanceDescartado(nivel.id, leccion.id, revision.motivo);
+      borrarLeccionEnCurso(uid, nivel.id, leccion.id);
+    }
+  }
+  return validas;
+};
+
+// ══════════════════════════════════════════════════════════════════════
 //  MAPA — componentes
 // ══════════════════════════════════════════════════════════════════════
 
@@ -7500,7 +7598,8 @@ const BarraProgreso = ({ completadas, total }) => (
   </View>
 );
 
-const LeccionCard = ({ leccion, index, onPress, bloqueada }) => {
+// avance: { indice, total } si la lección está a medias (si no, null)
+const LeccionCard = ({ leccion, index, onPress, bloqueada, avance }) => {
   const estado = leccion.completada
     ? "completada"
     : bloqueada
@@ -7526,6 +7625,11 @@ const LeccionCard = ({ leccion, index, onPress, bloqueada }) => {
       iconColor: "#BDBDBD",
     },
   }[estado];
+  const xp = (
+    <Text style={[styles.leccionXP, { color: c.iconColor }]}>
+      +{leccion.xp} XP
+    </Text>
+  );
   return (
     <TouchableOpacity
       style={[
@@ -7549,6 +7653,17 @@ const LeccionCard = ({ leccion, index, onPress, bloqueada }) => {
         >
           {leccion.titulo}
         </Text>
+        {/* A medias: cuánto hizo (ítems vistos / total) */}
+        {avance && (
+          <View style={styles.leccionAvanceFondo}>
+            <View
+              style={[
+                styles.leccionAvanceRelleno,
+                { width: `${(avance.indice / avance.total) * 100}%` },
+              ]}
+            />
+          </View>
+        )}
         <Text
           style={[
             styles.leccionDesc,
@@ -7558,14 +7673,100 @@ const LeccionCard = ({ leccion, index, onPress, bloqueada }) => {
         >
           {leccion.descripcion}
         </Text>
-        <Text style={[styles.leccionXP, { color: c.iconColor }]}>
-          +{leccion.xp} XP
-        </Text>
+        {avance ? (
+          <View style={styles.leccionPie}>
+            {xp}
+            <View style={styles.leccionEtiqueta}>
+              <Text style={styles.leccionEtiquetaTxt}>
+                En curso · {avance.indice}/{avance.total}
+              </Text>
+            </View>
+          </View>
+        ) : (
+          xp
+        )}
       </View>
-      <Text style={[styles.leccionIconEstado, { color: c.iconColor }]}>
-        {c.icon}
-      </Text>
+      {avance ? (
+        <Text style={[styles.leccionContinuarTxt, { color: c.iconColor }]}>
+          Continuar
+        </Text>
+      ) : (
+        <Text style={[styles.leccionIconEstado, { color: c.iconColor }]}>
+          {c.icon}
+        </Text>
+      )}
     </TouchableOpacity>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════════
+//  NIVEL — cartel "Tenés esta lección a medias"
+// ══════════════════════════════════════════════════════════════════════
+
+// iOS presenta un solo Modal de RN por vez: si este cartel se abriera o se
+// cerrara justo cuando otro Modal se abre o se cierra (el del nivel al entrar,
+// el del resultado al cerrarlo, el de "Sin vidas"), alguno podría no
+// aparecer. Por eso en iOS va en un FullWindowOverlay, que no es un Modal
+// (como en PantallaSinConexion). En Android cada Modal es otra ventana y en
+// web otro portal: ahí se pueden abrir y cerrar varios a la vez.
+const CapaCartelIOS = ({ children }) => (
+  <FullWindowOverlay>{children}</FullWindowOverlay>
+);
+const CapaCartelModal = ({ children, onCerrar }) => (
+  <Modal visible transparent animationType="fade" onRequestClose={onCerrar}>
+    {children}
+  </Modal>
+);
+const CapaCartel = Platform.OS === "ios" ? CapaCartelIOS : CapaCartelModal;
+
+// cartel: { leccion, indice, total } o null (cerrado)
+const CartelLeccionEnCurso = ({
+  cartel,
+  onContinuar,
+  onEmpezarDeNuevo,
+  onCancelar,
+}) => {
+  if (!cartel) return null;
+  return (
+    <CapaCartel onCerrar={onCancelar}>
+      <TouchableWithoutFeedback onPress={onCancelar}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalNivel}>{cartel.leccion.titulo}</Text>
+              <Text style={styles.modalNombre}>
+                Tenés esta lección a medias
+              </Text>
+              <Text style={styles.modalDescripcion}>
+                Podés seguir donde la dejaste o empezarla otra vez desde el
+                principio.
+              </Text>
+              <TouchableOpacity style={styles.modalBoton} onPress={onContinuar}>
+                <Text style={styles.modalBotonTexto}>
+                  Continuar (ejercicio {cartel.indice + 1} de {cartel.total})
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBoton, styles.modalBotonSecundario]}
+                onPress={onEmpezarDeNuevo}
+              >
+                <Text
+                  style={[
+                    styles.modalBotonTexto,
+                    styles.modalBotonSecundarioTexto,
+                  ]}
+                >
+                  Empezar de nuevo
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onCancelar} style={styles.modalCerrar}>
+                <Text style={styles.modalCerrarTexto}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </CapaCartel>
   );
 };
 
@@ -9104,16 +9305,21 @@ const ItemMotivacion = ({
   );
 };
 
+// inicio: { indice, errores } para seguir una lección a medias (o null).
+// onAvance({ indice, errores }): avisa por dónde va, para guardarlo.
 const PantallaEjercicioNueva = ({
   leccion,
   vidasGlobales,
   onTerminar,
   onPerderVida,
+  inicio,
+  onAvance,
 }) => {
-  const [idx, setIdx] = useState(0);
-  // Vidas perdidas en este intento: arranca en 0 cada vez que se abre la
-  // lección. Una respuesta mal cuenta aunque después se acierte al reintentar.
-  const [errores, setErrores] = useState(0);
+  const [idx, setIdx] = useState(inicio?.indice ?? 0);
+  // Vidas perdidas en este intento: arranca en 0 al empezar la lección y en
+  // lo guardado al continuarla. Una respuesta mal cuenta aunque después se
+  // acierte al reintentar.
+  const [errores, setErrores] = useState(inicio?.errores ?? 0);
   const items = leccion.items;
   const total = items.length;
   const item = items[idx];
@@ -9121,12 +9327,18 @@ const PantallaEjercicioNueva = ({
   const avanzar = () => {
     if (idx + 1 >= total)
       onTerminar({ completada: true, xp: leccion.xp, errores });
-    else setIdx((i) => i + 1);
+    else {
+      setIdx((i) => i + 1);
+      onAvance?.({ indice: idx + 1, errores });
+    }
   };
   const salir = () => onTerminar({ completada: false });
   const perderVida = () => {
     setErrores((n) => n + 1);
     onPerderVida();
+    // El error también se guarda, aunque sea en el primer ítem: si no, salir
+    // y volver lo borraría (y así se podría conseguir "Lección perfecta")
+    onAvance?.({ indice: idx, errores: errores + 1 });
   };
 
   const common = {
@@ -9351,6 +9563,7 @@ const PantallaEjercicio = ({
   );
 };
 
+// xpGanado: el XP que sumó esa lección. En un repaso es 0 y no se muestra.
 const ModalResultado = ({ visible, xpGanado, onClose }) => (
   <Modal visible={visible} transparent animationType="slide">
     <View style={styles.modalOverlay}>
@@ -9360,9 +9573,11 @@ const ModalResultado = ({ visible, xpGanado, onClose }) => (
         <Text style={{ fontSize: 15, color: "#666", marginBottom: 24 }}>
           Respondiste todas las preguntas correctamente
         </Text>
-        <View style={styles.xpBadge}>
-          <Text style={styles.xpBadgeTxt}>+{xpGanado} XP</Text>
-        </View>
+        {xpGanado > 0 && (
+          <View style={styles.xpBadge}>
+            <Text style={styles.xpBadgeTxt}>+{xpGanado} XP</Text>
+          </View>
+        )}
         <TouchableOpacity
           style={[styles.btnPrincipal, { width: "100%", marginTop: 8 }]}
           onPress={onClose}
@@ -9422,8 +9637,9 @@ const MenuPerfil = ({ visible, onClose, onVerTutorial }) => {
                   console.log("No se pudo cerrar la sesión remota:", e);
                 }
                 // 2) borrar usuario + sesion_id de AsyncStorage. OJO: no se
-                //    tocan progreso_<uid> ni vidas_<uid>, que son la caché por
-                //    usuario y tienen que sobrevivir al logout.
+                //    tocan progreso_<uid>, vidas_<uid> ni
+                //    leccion_en_curso_<uid>, que son por usuario y tienen que
+                //    sobrevivir al logout.
                 await cerrarSesion();
                 // 3) recién ahora, al login
                 router.replace("/LoginScreen");
@@ -9485,6 +9701,14 @@ export default function HomeScreen() {
   const [modalResultadoVisible, setModalResultado] = useState(false);
   const [xpUltimaLeccion, setXpUltimaLeccion] = useState(0);
 
+  // ── lecciones a medias ──
+  // Copia en memoria de leccion_en_curso_<uid>: "<nivelId>_<leccionId>" →
+  // { indice, total, errores, firma }. Se carga con la cuenta y cambia junto
+  // con cada guardado o borrado.
+  const [enCurso, setEnCurso] = useState({});
+  // Cartel "Tenés esta lección a medias": { leccion, indice, total } o null
+  const [cartelEnCurso, setCartelEnCurso] = useState(null);
+
   // ── regeneración de vidas (timer) ──
   const regenTimerRef = useRef(null);
   // El interval de regeneración se crea una sola vez, así que su closure
@@ -9527,11 +9751,18 @@ export default function HomeScreen() {
         setNombreUsuario(usuario.nombre ?? "");
         setNivelAbierto(null);
         setLeccionActiva(null);
+        setEnCurso({});
+        setCartelEnCurso(null);
+        setModalResultado(false); // el resultado era de la cuenta anterior
 
         const { progreso: p, vidas: v } = await cargarDatos(uid);
+        const todasEnCurso = await obtenerTodasEnCurso(uid);
         if (userIdRef.current !== uid) return; // cambió el usuario mientras cargaba
         setProgreso(p);
         setVidasData(v);
+        setEnCurso(
+          limpiarEnCurso(uid, todasEnCurso, p.leccionesCompletadas || {}),
+        );
         setCargando(false);
 
         // Cuenta recién creada (el registro dejó la marca): el tutorial se
@@ -9636,6 +9867,41 @@ export default function HomeScreen() {
     });
   }, []);
 
+  // ── helpers de lecciones a medias (memoria + celular, nunca la API) ──
+  const guardarAvance = useCallback((nivelId, leccionId, datos) => {
+    const clave = claveLeccionEnCurso(nivelId, leccionId);
+    setEnCurso((prev) => ({ ...prev, [clave]: datos }));
+    guardarLeccionEnCurso(userIdRef.current, nivelId, leccionId, datos);
+  }, []);
+
+  const borrarAvance = useCallback((nivelId, leccionId) => {
+    const clave = claveLeccionEnCurso(nivelId, leccionId);
+    setEnCurso((prev) => {
+      if (prev[clave] === undefined) return prev;
+      const resto = { ...prev };
+      delete resto[clave];
+      return resto;
+    });
+    borrarLeccionEnCurso(userIdRef.current, nivelId, leccionId);
+  }, []);
+
+  // Cada vez que se pasa al ítem siguiente (o se pierde una vida). Los repasos
+  // de lecciones completadas no se guardan: empiezan siempre de cero.
+  const handleAvanceLeccion = useCallback(
+    ({ indice, errores }) => {
+      if (!nivelAbierto || !leccionActiva?.items) return;
+      const completadas = progreso.leccionesCompletadas[nivelAbierto.id] || [];
+      if (completadas.includes(leccionActiva.id)) return;
+      guardarAvance(nivelAbierto.id, leccionActiva.id, {
+        indice,
+        total: leccionActiva.items.length,
+        errores,
+        firma: firmaDeLeccion(leccionActiva),
+      });
+    },
+    [nivelAbierto, leccionActiva, progreso, guardarAvance],
+  );
+
   // ── handlers mapa ──
   const handleNivelPress = useCallback((nivel, estado) => {
     setNivelSeleccionado(nivel);
@@ -9661,18 +9927,75 @@ export default function HomeScreen() {
         setModalSinVidas(true);
         return;
       }
+      const nivelId = nivelAbierto.id;
+      const revision = revisarAvance(
+        leccion,
+        enCurso[claveLeccionEnCurso(nivelId, leccion.id)],
+      );
+      if (revision) {
+        const completada = (
+          progreso.leccionesCompletadas[nivelId] || []
+        ).includes(leccion.id);
+        if (!completada && revision.valido) {
+          // A medias: se pregunta si sigue o empieza de nuevo
+          setCartelEnCurso({
+            leccion,
+            indice: revision.indice,
+            total: revision.total,
+          });
+          return;
+        }
+        // Completada (repaso, de cero) o ya no coincide con la lección
+        if (!completada)
+          avisarAvanceDescartado(nivelId, leccion.id, revision.motivo);
+        borrarAvance(nivelId, leccion.id);
+      }
       setLeccionActiva(leccion);
     },
-    [vidasData.vidas],
+    [vidasData.vidas, nivelAbierto, enCurso, progreso, borrarAvance],
   );
 
+  // ── cartel "Tenés esta lección a medias" ──
+  // Sin vidas se comporta igual que al querer entrar a cualquier lección (y
+  // no se borra nada)
+  const continuarLeccion = () => {
+    if (!cartelEnCurso) return;
+    setCartelEnCurso(null);
+    if (vidasData.vidas === 0) {
+      setModalSinVidas(true);
+      return;
+    }
+    // Abre en el ítem guardado: lo toma de enCurso (ver avanceParaSeguir)
+    setLeccionActiva(cartelEnCurso.leccion);
+  };
+
+  const empezarDeNuevo = () => {
+    if (!cartelEnCurso) return;
+    setCartelEnCurso(null);
+    if (vidasData.vidas === 0) {
+      setModalSinVidas(true);
+      return;
+    }
+    borrarAvance(nivelAbierto.id, cartelEnCurso.leccion.id);
+    setLeccionActiva(cartelEnCurso.leccion);
+  };
+
   // ── handlers ejercicio ──
+  // Al terminar se vuelve a la lista y ahí aparece ModalResultado (en la
+  // pantalla del ejercicio no está: se cierra en este mismo render).
   const handleTerminarEjercicio = useCallback(
     ({ completada, xp, errores }) => {
       if (completada && leccionActiva && nivelAbierto) {
-        setXpUltimaLeccion(xp);
+        // Un repaso no suma XP (ver marcarLeccionCompleta): el cartel no
+        // muestra el "+XP"
+        const esRepaso = (
+          progreso.leccionesCompletadas[nivelAbierto.id] || []
+        ).includes(leccionActiva.id);
+        setXpUltimaLeccion(esRepaso ? 0 : xp);
         setModalResultado(true);
         marcarLeccionCompleta(nivelAbierto.id, leccionActiva.id, xp);
+        // Terminada: ya no queda nada para continuar
+        borrarAvance(nivelAbierto.id, leccionActiva.id);
 
         // Lección perfecta: terminada sin perder ninguna vida y con al menos
         // un ejercicio. También vale al repetir una lección ya completada.
@@ -9684,7 +10007,13 @@ export default function HomeScreen() {
       }
       setLeccionActiva(null);
     },
-    [leccionActiva, nivelAbierto, marcarLeccionCompleta],
+    [
+      leccionActiva,
+      nivelAbierto,
+      progreso,
+      marcarLeccionCompleta,
+      borrarAvance,
+    ],
   );
 
   // ── handlers tutorial ──
@@ -9713,6 +10042,17 @@ export default function HomeScreen() {
     if (index === 0) return false;
     const anterior = nivelAbierto.lecciones[index - 1];
     return !completadasDelNivel.includes(anterior.id);
+  };
+
+  // Avance guardado con el que se puede seguir una lección: { indice, total,
+  // errores } o null. Las completadas no tienen: se repasan de cero.
+  const avanceParaSeguir = (nivel, leccion) => {
+    if ((leccionesComp[nivel.id] || []).includes(leccion.id)) return null;
+    const revision = revisarAvance(
+      leccion,
+      enCurso[claveLeccionEnCurso(nivel.id, leccion.id)],
+    );
+    return revision?.valido ? revision : null;
   };
 
   const posiciones = NIVELES.map((_, i) => getPosition(i));
@@ -9763,29 +10103,24 @@ export default function HomeScreen() {
               setLeccionActiva(null);
             }}
           />
+        ) : leccionActiva.items ? (
+          <PantallaEjercicioNueva
+            leccion={leccionActiva}
+            vidasGlobales={vidasData.vidas}
+            onTerminar={handleTerminarEjercicio}
+            onPerderVida={handlePerderVida}
+            // Solo se usa al montarse: "Continuar" abre en lo guardado,
+            // "Empezar de nuevo" ya lo borró y arranca de cero
+            inicio={avanceParaSeguir(nivelAbierto, leccionActiva)}
+            onAvance={handleAvanceLeccion}
+          />
         ) : (
-          <>
-            {leccionActiva.items ? (
-              <PantallaEjercicioNueva
-                leccion={leccionActiva}
-                vidasGlobales={vidasData.vidas}
-                onTerminar={handleTerminarEjercicio}
-                onPerderVida={handlePerderVida}
-              />
-            ) : (
-              <PantallaEjercicio
-                leccion={leccionActiva}
-                vidasGlobales={vidasData.vidas}
-                onTerminar={handleTerminarEjercicio}
-                onPerderVida={handlePerderVida}
-              />
-            )}
-            <ModalResultado
-              visible={modalResultadoVisible}
-              xpGanado={xpUltimaLeccion}
-              onClose={() => setModalResultado(false)}
-            />
-          </>
+          <PantallaEjercicio
+            leccion={leccionActiva}
+            vidasGlobales={vidasData.vidas}
+            onTerminar={handleTerminarEjercicio}
+            onPerderVida={handlePerderVida}
+          />
         )}
       </SafeAreaView>
     );
@@ -9848,6 +10183,9 @@ export default function HomeScreen() {
                 index={index}
                 onPress={handleIrLeccion}
                 bloqueada={bloqueada}
+                avance={
+                  bloqueada ? null : avanceParaSeguir(nivelAbierto, leccion)
+                }
               />
             );
           })}
@@ -9867,6 +10205,19 @@ export default function HomeScreen() {
           )}
         </ScrollView>
 
+        {/* Al terminar una lección se vuelve acá: el resultado aparece en ese
+            momento y se cierra con su "Continuar" */}
+        <ModalResultado
+          visible={modalResultadoVisible}
+          xpGanado={xpUltimaLeccion}
+          onClose={() => setModalResultado(false)}
+        />
+        <CartelLeccionEnCurso
+          cartel={cartelEnCurso}
+          onContinuar={continuarLeccion}
+          onEmpezarDeNuevo={empezarDeNuevo}
+          onCancelar={() => setCartelEnCurso(null)}
+        />
         <ModalSinVidas
           visible={modalSinVidas}
           proximaRegen={vidasData.proximaRegen}
@@ -10082,6 +10433,12 @@ const styles = StyleSheet.create({
   },
   modalBotonBloqueado: { backgroundColor: "#F0F0F0" },
   modalBotonTexto: { fontSize: 16, fontWeight: "bold", color: "#1A1A2E" },
+  modalBotonSecundario: {
+    backgroundColor: "#fff",
+    borderWidth: 2,
+    borderColor: "#C8D3F5",
+  },
+  modalBotonSecundarioTexto: { color: "#3D4FBB" },
   modalCerrar: { alignItems: "center", paddingVertical: 8 },
   modalCerrarTexto: { fontSize: 14, color: "#999" },
 
@@ -10217,6 +10574,31 @@ const styles = StyleSheet.create({
   leccionDesc: { fontSize: 13, marginBottom: 4 },
   leccionXP: { fontSize: 12, fontWeight: "600" },
   leccionIconEstado: { fontSize: 20 },
+  // Lección a medias: barrita fina, etiqueta dorada y "Continuar"
+  leccionAvanceFondo: {
+    height: 4,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 2,
+    overflow: "hidden",
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  leccionAvanceRelleno: {
+    height: "100%",
+    backgroundColor: "#F5CE5A",
+    borderRadius: 2,
+  },
+  leccionPie: { flexDirection: "row", alignItems: "center", gap: 8 },
+  leccionEtiqueta: {
+    backgroundColor: "#FFF8E1",
+    borderColor: "#F5CE5A",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+  },
+  leccionEtiquetaTxt: { fontSize: 11, fontWeight: "700", color: "#5A3E00" },
+  leccionContinuarTxt: { fontSize: 13, fontWeight: "700" },
 
   // Nivel completo
   nivelCompletoBanner: {
