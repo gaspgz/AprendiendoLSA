@@ -195,18 +195,20 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
   letras: ["A", "B", "C", "D", "E"],  // las letras que cubre esta sección
   xp: 50,
   items: [
+    // Los GIFs se nombran por su clave (constants/gifsNube.js); SenaGif los muestra
+
     // Items tipo GIF de enseñanza (sin pregunta)
-    { tipo: "ensenanza", gifSource: GIFS["A"], letra: "A" },
-    { tipo: "ensenanza", gifSource: GIFS["B"], letra: "B" },
+    { tipo: "ensenanza", letra: "A" },
+    { tipo: "ensenanza", letra: "B" },
     // ...
 
     // Items tipo ejercicio
-    { tipo: "elegir_sena", letra: "A", opcionesGifs: [...], correcta: 2 },
-    { tipo: "que_letra",   gifSource: GIFS["B"], opciones: ["B","h","w"], correcta: 0 },
-    { tipo: "que_palabra", secuenciaGifs: [...], opciones: ["bebé","cada","debe"], correcta: 0 },
+    { tipo: "elegir_sena", letra: "A", opcionesLetras: ["C", "D", "A"], correcta: 2 },
+    { tipo: "que_letra",   gifLetra: "B", opciones: ["B","h","w"], correcta: 0 },
+    { tipo: "que_palabra", secuencia: ["B", "E", "B", "E"], opciones: ["bebé","cada","debe"], correcta: 0 },
 
     // Tipo 5 — escritura libre (Nivel 2+)
-    { tipo: "escritura_libre", gifSource: GIFS_PALABRAS["hola"], respuestaCorrecta: "hola" },
+    { tipo: "escritura_libre", gifPalabra: "hola", respuestaCorrecta: "hola" },
   ]
 }
 ```
@@ -240,5 +242,5 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 - El sistema de vidas global (3 vidas, 2h de regeneración) aplica igual
 - La regla de "debe responder correctamente para avanzar" aplica a todos los tipos
 - La navegación sigue siendo por estado interno (no Expo Router)
-- Los GIFs siguen siendo `require()` estático (no dinámico)
+- Las señas se muestran con `<SenaGif clave="..." />`: los ítems guardan solo la clave. Los links están en `docs/gifs_nube.json` y se pasan al código con `node scripts/generarGifs.js`, que genera `constants/gifsNube.js` (no se edita a mano). Para sumar una seña nueva, ver "Sumar una seña nueva" en `docs/skills/SKILL.md`
 - El progreso se guarda como `{ leccionesCompletadas: { nivelId: [seccionId] } }` — mismo formato, solo cambia que la unidad ahora se llama "sección" en lugar de "lección"

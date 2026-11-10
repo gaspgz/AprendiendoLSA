@@ -1,6 +1,6 @@
 ---
 name: aprendiendo-lsa
-description: Contexto completo del proyecto "Aprendiendo LSA", una app móvil React Native / Expo para aprender Lengua de Señas Argentina con gamificación estilo Duolingo. Usar este skill siempre que el usuario mencione LSA, Aprendiendo LSA, la app de señas, el proyecto escolar de Bialik, o cuando haga preguntas de código relacionadas con React Native, Expo Router, GIFs locales, sistema de vidas, MockAPI, o cualquier pantalla (HomeScreen, SenasScreen, ProfileScreen, LoginScreen, CustomTabBar) del proyecto. También activar cuando el usuario mencione a "Cambiando miradas", el sistema de progreso de lecciones, o el reconocimiento de señas con cámara.
+description: Contexto completo del proyecto "Aprendiendo LSA", una app móvil React Native / Expo para aprender Lengua de Señas Argentina con gamificación estilo Duolingo. Usar este skill siempre que el usuario mencione LSA, Aprendiendo LSA, la app de señas, el proyecto escolar de Bialik, o cuando haga preguntas de código relacionadas con React Native, Expo Router, GIFs de señas (SenaGif, docs/gifs_nube.json), sistema de vidas, MockAPI, o cualquier pantalla (HomeScreen, SenasScreen, ProfileScreen, LoginScreen, CustomTabBar) del proyecto. También activar cuando el usuario mencione a "Cambiando miradas", el sistema de progreso de lecciones, o el reconocimiento de señas con cámara.
 ---
 
 # Proyecto Aprendiendo LSA — Contexto completo
@@ -25,7 +25,7 @@ App móvil en React Native / Expo para aprender **Lengua de Señas Argentina (LS
 | Navegación | Expo Router (carpeta `app/`) |
 | Backend temporal | MockAPI (fake REST API) |
 | Persistencia local | AsyncStorage (`@react-native-async-storage/async-storage`) |
-| Assets | GIFs locales (no videos, demasiado pesados) |
+| GIFs de señas | En la API del curso, no en el proyecto (no videos: son demasiado pesados). Se muestran con `<SenaGif>` (expo-image, quedan en la caché del celular) |
 | Auth | MockAPI por ahora, base de datos real pendiente |
 
 ---
@@ -45,15 +45,22 @@ components/
   CustomTabBar.jsx     ← Tab bar personalizado (reemplaza el de Expo)
   SenasScreen.jsx      ← Diccionario de señas con GIFs y buscador
   ProfileScreen.jsx    ← Perfil de usuario con stats y logros
+  SenaGif.jsx          ← Muestra una seña desde su clave (GIF de la nube)
 
 services/
   api.js               ← Todas las llamadas a MockAPI
   sesion.js            ← Guardar/leer/borrar sesión con AsyncStorage
+  precargaSenas.js     ← Precarga los GIFs al abrir una lección
 
-assets/
-  gifs/
-    abecedario/        ← A.gif, B.gif ... Z.gif, NN.gif (para la Ñ)
-    presentaciones/    ← apellido.gif, comoestas.gif, etc.
+constants/
+  gifsNube.js          ← Links de los GIFs. Lo genera scripts/generarGifs.js: NO editar a mano
+
+docs/
+  gifs_nube.json       ← Link de cada GIF de seña en la API, uno por clave
+
+scripts/
+  generarGifs.js       ← docs/gifs_nube.json → constants/gifsNube.js
+  subir-senas.mjs      ← Sube a la API los GIFs de senas_listas/
 ```
 
 ---
@@ -72,17 +79,25 @@ const [leccionActiva, setLeccionActiva] = useState(null);
 router.push('/nivel/2');
 ```
 
-### 2. GIFs siempre con require() estático
-React Native no permite require() dinámico. Siempre declarar un objeto de mapeo con requires fijos.
+### 2. Las señas se muestran con `<SenaGif clave="..." />`
+Los GIFs de las señas están en la API del curso, no en el proyecto. Para mostrar una seña se usa siempre `components/SenaGif.jsx` con su clave (la misma que usa NIVELES: `"A"`, `"CH"`, `"hola"`, `"n10"`...). La caja la define `style`, igual que antes con `<Image>`.
 
 ```jsx
 // ✅ CORRECTO
-const GIFS = { A: require('../../assets/gifs/abecedario/A.gif') };
-const src = GIFS[letra];
+import SenaGif from "../../components/SenaGif";
 
-// ❌ NUNCA — crashea en RN
-require(`../../assets/gifs/abecedario/${letra}.gif`);
+<SenaGif clave="A" style={styles.gifGrande} />
+<SenaGif clave={item.gifPalabra} style={styles.gifOpcion} />
+
+// ❌ NUNCA: GIFs en el proyecto ni links sueltos
+require("../../assets/....gif");
+<Image source={{ uri: "https://..." }} />
 ```
+
+- Mientras carga muestra una ruedita en la caja; si falla, "No se pudo cargar la seña" y "Reintentar". expo-image la guarda en la caché del celular: cada GIF se baja una sola vez.
+- Los links están en `docs/gifs_nube.json` y se pasan al código con `node scripts/generarGifs.js`, que genera `constants/gifsNube.js`. **`constants/gifsNube.js` no se edita a mano.**
+- Las claves no se cambian nunca: las usan NIVELES, Señas y la firma de las lecciones a medias (cambiar una borra el avance guardado).
+- Señas usa otros nombres para algunas señas (`Ch`, `Ll`, `1`…`1000`); la traducción a la clave está en un solo lugar: `CLAVE_EN_LA_APP` en `app/(tabs)/SenasScreen.jsx`.
 
 ### 3. Sombra + border radius en Android: dos capas
 `elevation` y `overflow: 'hidden'` se cancelan en Android. Siempre dos Views anidados:
@@ -105,6 +120,39 @@ Sin este prop el placeholder es invisible en iOS.
 ```jsx
 <TextInput placeholderTextColor="#9CA3AF" ... />
 ```
+
+---
+
+## Sumar una seña nueva
+
+0. **Antes que nada:** la seña tiene que estar validada por la comunidad sorda ("Cambiando miradas"). Nunca se suma una seña sin esa validación.
+1. **Subir el GIF a la API.** El nombre del archivo es la clave de la seña: **sin tildes ni ñ** (por ejemplo `cunado.gif`, o `NN.gif` para la Ñ) y de hasta 5 MB. Con el script del equipo:
+   - poner el archivo en `senas_listas/<categoria>/<clave>.gif`;
+   - probar con `node --env-file=.env scripts/subir-senas.mjs` (solo muestra qué haría);
+   - subir con `node --env-file=.env scripts/subir-senas.mjs --subir`.
+
+   Si se vuelve a subir una seña que ya estaba, la API le da un **link nuevo**: hay que actualizarlo en el paso 2. Con el link viejo, los celulares que ya lo bajaron seguirían mostrando el GIF anterior.
+2. **Agregar su entrada a `docs/gifs_nube.json`**, en `gifs` (una sola por clave, sin links repetidos). Los datos de la API (`clave`, `categoria`, `etiqueta`, `gif`, `id`) salen de la lista `GET https://ort.nilosolutions.com/api/lsa/senas`, la misma que lee `subir-senas.mjs`:
+   ```json
+   {
+     "claveApp": "colores",
+     "claveNube": "colores",
+     "categoriaNube": "colores",
+     "etiquetaNube": "colores",
+     "gif": "https://ort.nilosolutions.com/api/lsa/uploads/xxxxxxxxxxxx.gif",
+     "idNube": "xxxxxxxxxxxx",
+     "estado": "nuevo",
+     "diferencia": null,
+     "bytes": 1234567
+   }
+   ```
+   `estado` y `diferencia` vienen de la verificación de la migración (`identico` o `reexportado` contra el GIF local de antes); en una seña nueva van `"nuevo"` y `null`. `bytes` es el tamaño del GIF.
+3. **Correr `node scripts/generarGifs.js`** parado en la carpeta del proyecto. Regenera `constants/gifsNube.js`; si una clave o un link están repetidos, o un link no es https, avisa y no escribe nada.
+4. **Usar la clave:**
+   - en **NIVELES** (`app/(tabs)/index.jsx`), en el campo del ítem: `letra`, `gifLetra`, `gifPalabra`, `opcionesLetras`, `opcionesGifs` o `secuencia`. Si se inventa otro campo para GIFs, sumarlo a `CAMPOS_GIF` (lo usan la precarga y la firma de la lección);
+   - en **Señas** (`app/(tabs)/SenasScreen.jsx`), agregando el nombre y su título al `NOMBRES_*` de la categoría. Si en Señas se llama distinto que la clave, sumarlo a `CLAVE_EN_LA_APP`.
+
+   Si una clave no tiene link, `SenaGif` avisa con `console.warn` y muestra "No se pudo cargar la seña".
 
 ---
 
@@ -164,6 +212,7 @@ Accent azul:     #3D4FBB
 - ProfileScreen con stats, logros, edición de nombre/email
 - CustomTabBar personalizado (reemplaza el de Expo), con fixes para iOS y Android
 - Sistema de vidas con countdown de regeneración
+- GIFs de señas desde la API del curso con `SenaGif`; al abrir una lección se esperan los 3 primeros y el resto se baja en segundo plano
 
 ### 🔄 En progreso
 - Integración completa con MockAPI para progreso y vidas

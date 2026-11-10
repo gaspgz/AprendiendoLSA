@@ -69,9 +69,9 @@ const nivelCompleto = (nivel, leccionesCompletadas) =>
   leccionesHechasDelNivel(nivel, leccionesCompletadas).length ===
     nivel.lecciones.length;
 
-// Seña que enseña un ítem, por su clave de GIF: las letras la tienen en
-// `letra` (clave de GIFS) y las palabras en `gifPalabra` (de GIFS_PALABRAS).
-// null si el ítem no es de enseñanza. El prefijo separa letras de palabras.
+// Seña que enseña un ítem, por su clave de GIF (constants/gifsNube.js): las
+// letras la tienen en `letra` y las palabras en `gifPalabra`. null si el ítem
+// no es de enseñanza. El prefijo separa letras de palabras.
 const senaEnsenada = (item) => {
   if (item.tipo === "ensenanza") return `letra:${item.letra}`;
   if (item.tipo === "ensenanza_palabra") return `palabra:${item.gifPalabra}`;
