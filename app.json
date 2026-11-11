@@ -42,7 +42,14 @@
       "expo-image",
       "expo-font",
       "expo-status-bar",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Aprendiendo LSA usa la cámara para tu foto de perfil.",
+          "photosPermission": "Aprendiendo LSA usa tus fotos para elegir tu foto de perfil."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

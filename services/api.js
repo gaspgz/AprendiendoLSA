@@ -57,7 +57,7 @@ const apiFetch = async (path, options = {}) => {
 const ERROR_CONEXION = "No se pudo conectar. Revisá tu conexión.";
 
 // Traduce el código de estado a un mensaje legible para el usuario.
-const mensajeError = (status, data, porDefecto) => {
+export const mensajeError = (status, data, porDefecto) => {
   if (status === 0) return ERROR_CONEXION;
   const mensajes = {
     401: "Clave de API inválida o vencida.",
@@ -153,6 +153,13 @@ export const actualizarUsuario = async (id, datos) => {
 
   return { ok: true, usuario: data };
 };
+
+// ── Eliminar usuario ──
+// DELETE /usuarios/{id}. Devuelve { ok, data, status } tal cual, así quien la
+// llama decide qué hacer con un 404 (la cuenta ya no existe) o con status 0
+// (sin conexión). Si la API responde sin cuerpo (204), data es null.
+export const eliminarUsuario = async (id) =>
+  apiFetch(`${ENDPOINTS.usuarios}/${id}`, { method: "DELETE" });
 
 // ─── Cerrar sesión remota ─────────────────────────────────────────────
 // Marca la sesión como inactiva en el servidor: PUT /sesiones/{id} con
