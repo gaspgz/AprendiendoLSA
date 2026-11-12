@@ -47,7 +47,8 @@
         "expo-image-picker",
         {
           "cameraPermission": "Aprendiendo LSA usa la cámara para tu foto de perfil.",
-          "photosPermission": "Aprendiendo LSA usa tus fotos para elegir tu foto de perfil."
+          "photosPermission": "Aprendiendo LSA usa tus fotos para elegir tu foto de perfil.",
+          "microphonePermission": false
         }
       ]
     ],

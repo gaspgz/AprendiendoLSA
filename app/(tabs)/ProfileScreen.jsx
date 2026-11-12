@@ -5,7 +5,6 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Linking,
   Modal,
   Platform,
@@ -39,6 +38,7 @@ import {
   obtenerSesion,
   obtenerSesionId,
 } from "../../services/sesion";
+import { avisar, confirmar } from "../../utils/dialogos";
 import { NIVELES } from "./index";
 
 // ─── Helpers de datos ────────────────────────────────────────────────
@@ -179,7 +179,7 @@ const ModalEditar = ({
 
   const handleGuardar = () => {
     if (!nombre.trim()) {
-      Alert.alert("Error", "Completá tu nombre.");
+      avisar("Error", "Completá tu nombre.");
       return;
     }
     onGuardar(nombre.trim());
@@ -249,30 +249,6 @@ const ModalEditar = ({
 };
 
 // ─── Eliminar cuenta ─────────────────────────────────────────────────
-// Pregunta antes de hacer algo y devuelve true si se confirmó. En la web
-// Alert.alert con botones no aparece: ahí se usa window.confirm.
-const confirmar = (titulo, mensaje, textoBoton) => {
-  if (Platform.OS === "web") {
-    return Promise.resolve(window.confirm(`${titulo}\n\n${mensaje}`));
-  }
-  return new Promise((resolver) => {
-    Alert.alert(
-      titulo,
-      mensaje,
-      [
-        { text: "Cancelar", style: "cancel", onPress: () => resolver(false) },
-        {
-          text: textoBoton,
-          style: "destructive",
-          onPress: () => resolver(true),
-        },
-      ],
-      // Android: tocar afuera cierra el cartel; cuenta como "Cancelar"
-      { cancelable: true, onDismiss: () => resolver(false) },
-    );
-  });
-};
-
 // Lo que el celular guarda de una cuenta, además de la sesión. "Cerrar
 // sesión" lo deja a propósito (si volvés a entrar sigue ahí); al eliminar la
 // cuenta se borra. Salen de: index.jsx (progreso_ y vidas_),
@@ -680,7 +656,7 @@ const ProfileScreen = () => {
       // Solo el nombre: el PUT es parcial, no toca los otros campos (xpTotal)
       const res = await actualizarUsuario(usuario.id, { nombre: nombreNuevo });
       if (!res.ok) {
-        Alert.alert("Error", res.error);
+        avisar("Error", res.error);
         return;
       }
 
@@ -701,26 +677,24 @@ const ProfileScreen = () => {
     }
   };
 
-  const handleCerrarSesion = () => {
-    Alert.alert("Cerrar sesión", "¿Estás seguro que querés cerrar sesión?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Cerrar sesión",
-        style: "destructive",
-        onPress: async () => {
-          // Igual que el MenuPerfil de index.jsx: si la API falla (sin
-          // internet, endpoint caído), el logout local sigue igual
-          try {
-            const sesionId = await obtenerSesionId();
-            await cerrarSesionRemota(sesionId);
-          } catch {
-            // se sigue igual
-          }
-          await cerrarSesion();
-          router.replace("/LoginScreen");
-        },
-      },
-    ]);
+  const handleCerrarSesion = async () => {
+    const seguro = await confirmar(
+      "Cerrar sesión",
+      "¿Estás seguro que querés cerrar sesión?",
+      "Cerrar sesión",
+    );
+    if (!seguro) return;
+
+    // Igual que el MenuPerfil de index.jsx: si la API falla (sin
+    // internet, endpoint caído), el logout local sigue igual
+    try {
+      const sesionId = await obtenerSesionId();
+      await cerrarSesionRemota(sesionId);
+    } catch {
+      // se sigue igual
+    }
+    await cerrarSesion();
+    router.replace("/LoginScreen");
   };
 
   // ── Ajustes: eliminar cuenta ──
