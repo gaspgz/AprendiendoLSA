@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aprendiendo LSA — Aprende Lengua de Señas Argentina desde cero</title>
+  <meta name="description" content="Aprendiendo LSA es la app para aprender Lengua de Señas Argentina con niveles, ejercicios y juegos. Más de 160 señas revisadas y validadas por personas sordas e hipoacúsicas. Muy pronto en Google Play y App Store.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#EEF1FB">
+
+  <!-- REEMPLAZAR: cuando tengan dominio, descomentar y poner la URL real -->
+  <!-- <link rel="canonical" href="https://TU-DOMINIO.com/"> -->
+
+  <!-- Open Graph: para que el link se vea bien al compartirlo -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Aprendiendo LSA — Aprende Lengua de Señas Argentina desde cero">
+  <meta property="og:description" content="Niveles, ejercicios y juegos para aprender LSA a tu ritmo. Más de 160 señas validadas por personas sordas e hipoacúsicas.">
+  <meta property="og:locale" content="es_AR">
+  <!-- REEMPLAZAR TU-DOMINIO.com por el dominio real al publicar -->
+  <meta property="og:url" content="https://TU-DOMINIO.com/">
+  <meta property="og:image" content="https://TU-DOMINIO.com/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aprendiendo LSA — Aprende Lengua de Señas Argentina desde cero">
+  <meta name="twitter:description" content="Niveles, ejercicios y juegos para aprender LSA a tu ritmo.">
+  <meta name="twitter:image" content="https://TU-DOMINIO.com/img/og.jpg">
+
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Aprendiendo LSA",
+    "description": "App para aprender Lengua de Señas Argentina (LSA) desde cero, con niveles, ejercicios prácticos y juegos. Señas revisadas y validadas por personas sordas e hipoacúsicas.",
+    "operatingSystem": "ANDROID, IOS",
+    "applicationCategory": "EducationalApplication",
+    "inLanguage": "es",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ARS" },
+    "author": { "@type": "Organization", "name": "Aprendiendo LSA", "email": "proyectoaprendiendolsa@gmail.com" }
+  }
+  </script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <div class="progreso" aria-hidden="true"><span id="barra-progreso"></span></div>
+
+  <header class="cabecera" id="cabecera">
+    <nav class="cabecera-nav" aria-label="Principal">
+      <a class="marca" href="#">
+        <img src="img/logo.png" alt="" width="40" height="40">
+        <span>Aprendiendo LSA</span>
+      </a>
+      <ul class="cabecera-enlaces">
+        <li><a href="#la-app">La app</a></li>
+        <li><a href="#niveles">Niveles</a></li>
+        <li><a href="#capturas">Capturas</a></li>
+        <li><a href="#equipo">Quiénes somos</a></li>
+      </ul>
+      <a class="btn btn-chico" href="#descargar">Descargar</a>
+    </nav>
+  </header>
+
+  <main id="contenido">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <svg class="hero-zigzag" aria-hidden="true" viewBox="0 0 520 740" fill="none">
+        <path d="M60 30 L300 160 L80 320 L330 470 L120 620 L360 730" stroke="#F5CE5A" stroke-width="3" stroke-dasharray="2 14" stroke-linecap="round"/>
+        <circle cx="60" cy="30" r="9" fill="#F5CE5A"/>
+        <circle cx="300" cy="160" r="9" fill="#F5CE5A"/>
+        <circle cx="80" cy="320" r="9" fill="#E3E9FB"/>
+        <circle cx="330" cy="470" r="9" fill="#E3E9FB"/>
+        <circle cx="120" cy="620" r="9" fill="#E3E9FB"/>
+      </svg>
+
+      <div class="hero-texto">
+        <p class="hero-insignia">App para aprender Lengua de Señas Argentina</p>
+        <h1>Aprende Lengua de Señas Argentina desde cero</h1>
+        <p class="hero-bajada">Niveles, ejercicios y juegos para que aprender LSA sea accesible, práctico y entretenido.</p>
+        <div class="tiendas">
+          <!-- REEMPLAZAR: pegar acá el link real de Google Play y sacar data-pendiente -->
+          <a class="btn btn-tienda" id="link-googleplay" href="#" data-pendiente>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            Google Play
+            <span class="pronto">Muy pronto</span>
+          </a>
+          <!-- REEMPLAZAR: pegar acá el link real del App Store y sacar data-pendiente -->
+          <a class="btn btn-tienda btn-tienda-sec" id="link-appstore" href="#" data-pendiente>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            App Store
+            <span class="pronto">Muy pronto</span>
+          </a>
+        </div>
+        <p class="hero-nota">Gratis. Pensada para empezar sin saber nada.</p>
+      </div>
+
+      <div class="hero-visual">
+        <figure class="telefono telefono-hero">
+          <img src="img/pantalla-mapa.webp" alt="Pantalla de inicio de Aprendiendo LSA: el camino de niveles con el nivel uno en curso, tres vidas y acceso al perfil." width="736" height="1600" fetchpriority="high">
+        </figure>
+        <div class="chip chip-xp" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2.5l2.6 6 6.4.5-4.9 4.3 1.5 6.2-5.6-3.4-5.6 3.4 1.5-6.2L3 9l6.4-.5z" fill="#F5CE5A" stroke="#E4B83A" stroke-width="1"/></svg>
+          +50 XP
+        </div>
+        <div class="chip chip-nivel" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F5CE5A"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#1A1A2E" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Nivel I completado
+        </div>
+        <div class="chip chip-vidas" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DATOS ============ -->
+    <section class="datos" aria-label="La app en números">
+      <div class="dato">
+        <span class="dato-numero"><span data-contador="7">0</span></span>
+        <span class="dato-etiqueta">niveles para avanzar a tu ritmo</span>
+      </div>
+      <div class="dato">
+        <span class="dato-numero"><span data-contador="40">0</span></span>
+        <span class="dato-etiqueta">lecciones cortas y jugables</span>
+      </div>
+      <div class="dato">
+        <span class="dato-numero">+<span data-contador="160">0</span></span>
+        <span class="dato-etiqueta">señas en video, buscables en el diccionario</span>
+      </div>
+    </section>
+
+    <!-- ============ MARQUESINA ============ -->
+    <div class="marquesina" aria-hidden="true">
+      <div class="marquesina-pista">
+        <span>Hola</span><i></i><span>Gracias</span><i></i><span>Familia</span><i></i><span>Perdón</span><i></i><span>Amigo</span><i></i><span>Feliz</span><i></i><span>Abuelo</span><i></i><span>Bien</span><i></i><span>Agua</span><i></i><span>Chau</span><i></i>
+        <span>Hola</span><i></i><span>Gracias</span><i></i><span>Familia</span><i></i><span>Perdón</span><i></i><span>Amigo</span><i></i><span>Feliz</span><i></i><span>Abuelo</span><i></i><span>Bien</span><i></i><span>Agua</span><i></i><span>Chau</span><i></i>
+      </div>
+    </div>
+
+    <!-- ============ POR QUÉ ============ -->
+    <section class="porque seccion" id="por-que">
+      <div class="porque-columna revelar">
+        <h2>Aprender LSA no debería ser tan difícil</h2>
+        <p>En Argentina, la Lengua de Señas Argentina es el idioma con el que se comunican muchas personas sordas. Aun así, aprenderla por cuenta propia sigue siendo complicado: la mayoría de los recursos son clases presenciales o videos sueltos, sin un camino claro para practicar ni para avanzar a tu propio ritmo.</p>
+        <p>Aprendiendo LSA propone otra forma: un recorrido guiado, de a poco y jugando, para que cualquier persona —estudiantes, docentes, familias, empresas— pueda incorporar la lengua y acercarse a la comunidad sorda.</p>
+      </div>
+    </section>
+
+    <!-- ============ LA APP ============ -->
+    <section class="pilares seccion" id="la-app">
+      <h2 class="revelar">Una app que te lleva de la mano</h2>
+      <div class="pilares-grilla">
+        <article class="tarjeta tinte-lila revelar">
+          <svg class="tarjeta-icono" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M10 38 L24 28 L14 18 L30 8" stroke="#3D4FBB" stroke-width="2.5" fill="none" stroke-dasharray="1 7" stroke-linecap="round"/>
+            <circle cx="10" cy="38" r="6" fill="#F5CE5A" stroke="#E4B83A" stroke-width="2"/>
+            <circle cx="14" cy="18" r="5" fill="#fff" stroke="#3D4FBB" stroke-width="2"/>
+            <circle cx="30" cy="8" r="5" fill="#fff" stroke="#C8D3F5" stroke-width="2"/>
+          </svg>
+          <h3>Niveles progresivos</h3>
+          <p>Un camino de 7 niveles que va del abecedario dactilológico a las conversaciones de todos los días. Cada nivel se desbloquea al completar el anterior.</p>
+        </article>
+        <article class="tarjeta tinte-verde revelar">
+          <svg class="tarjeta-icono" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="8" y="8" width="32" height="32" rx="9" fill="#fff" stroke="#3D4FBB" stroke-width="2"/>
+            <path d="M16 24.5l5.5 5.5L32 19" stroke="#3D4FBB" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h3>Ejercicios prácticos</h3>
+          <p>Miras cada seña en video real: eliges la correcta, reconoces letras y formas palabras. Para avanzar, cada respuesta tiene que estar bien.</p>
+        </article>
+        <article class="tarjeta tinte-crema revelar">
+          <svg class="tarjeta-icono" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M18 34c-6-4.5-9-8-9-11.4C9 19.5 11.3 17 14 17c1.6 0 3 .7 4 2 1-1.3 2.4-2 4-2 2.7 0 5 2.5 5 5.6 0 3.4-3 6.9-9 11.4z" fill="#EF4B57"/>
+            <path d="M33 10l1.8 4.2 4.5.4-3.4 3 1 4.4-3.9-2.4-3.9 2.4 1-4.4-3.4-3 4.5-.4z" fill="#F5CE5A" stroke="#E4B83A" stroke-width="1.2"/>
+          </svg>
+          <h3>Juego y motivación</h3>
+          <p>Vidas, experiencia y logros: una mecánica pensada para que practicar todos los días dé ganas, como en tu juego favorito.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ NIVELES ============ -->
+    <section class="camino seccion" id="niveles">
+      <h2 class="revelar">Un camino de 7 niveles</h2>
+      <p class="camino-bajada revelar">Empiezas deletreando tu nombre y terminas hablando de tu familia.</p>
+      <ol class="ruta">
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>I</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel I</span><h3>Abecedario dactilológico</h3><p>Las letras, una por una, para deletrear lo que sea.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>II</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel II</span><h3>Pronombres</h3><p>Yo, tú, él: la base para armar cualquier frase.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>III</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel III</span><h3>Palabras básicas y preguntas</h3><p>Lo esencial para entender y hacerte entender.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>IV</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel IV</span><h3>Interacciones cotidianas</h3><p>Saludos, pedidos y charlas de todos los días.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>V</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel V</span><h3>Sentimientos</h3><p>Expresar cómo te sientes también se aprende.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>VI</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel VI</span><h3>Números</h3><p>Del cero en adelante: edades, precios, fechas.</p></div>
+        </li>
+        <li class="nodo">
+          <span class="nodo-circulo" aria-hidden="true"><b>VII</b><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-8.5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div class="nodo-info"><span class="nodo-chip">Nivel VII</span><h3>Familia y vínculos</h3><p>Las personas de tu vida, en señas.</p></div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ CAPTURAS ============ -->
+    <section class="galeria seccion" id="capturas">
+      <div class="galeria-encabezado revelar">
+        <h2>La app por dentro</h2>
+        <span class="vidas" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 20.5C6 16 3.5 12.6 3.5 9.4 3.5 7 5.4 5 7.9 5c1.6 0 3 .8 4.1 2.2C13.1 5.8 14.5 5 16.1 5c2.5 0 4.4 2 4.4 4.4 0 3.2-2.5 6.6-8.5 11.1z" fill="#EF4B57"/></svg>
+        </span>
+      </div>
+
+      <div class="carrusel" role="region" aria-roledescription="carrusel" aria-label="Capturas de la app" tabindex="0">
+        <div class="carrusel-pista" id="carrusel-pista">
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-diccionario.webp" alt="Pestaña Señas: buscador y categorías del diccionario, como abecedario dactilológico, presentaciones y sentimientos." loading="lazy" width="736" height="1600"></div>
+            <figcaption>Diccionario de señas por categorías</figcaption>
+          </figure>
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-sena.webp" alt="Ficha de la seña Abuelo con su video demostrativo, dentro de la categoría familia y vínculos." loading="lazy" width="589" height="1280"></div>
+            <figcaption>Cada seña, en video real</figcaption>
+          </figure>
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-lecciones.webp" alt="Lecciones del nivel uno, abecedario dactilológico: la primera en curso y las siguientes bloqueadas." loading="lazy" width="736" height="1600"></div>
+            <figcaption>Lecciones cortas dentro de cada nivel</figcaption>
+          </figure>
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-eligi-sena.webp" alt="Ejercicio: elegir entre varios videos la seña correcta para la letra A." loading="lazy" width="736" height="1600"></div>
+            <figcaption>Ejercicio: elige la seña correcta</figcaption>
+          </figure>
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-que-letra.webp" alt="Ejercicio: mirar una seña en video y responder qué letra es." loading="lazy" width="736" height="1600"></div>
+            <figcaption>Ejercicio: ¿qué letra es esta?</figcaption>
+          </figure>
+          <figure class="diapositiva">
+            <div class="telefono"><img src="img/pantalla-forma-palabra.webp" alt="Ejercicio: mirar una secuencia de señas y formar la palabra con las letras disponibles." loading="lazy" width="736" height="1600"></div>
+            <figcaption>Ejercicio: forma la palabra</figcaption>
+          </figure>
+        </div>
+        <div class="carrusel-controles">
+          <button class="carrusel-flecha" id="flecha-prev" type="button" aria-label="Captura anterior">
+            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="carrusel-puntos" id="carrusel-puntos"></div>
+          <button class="carrusel-flecha" id="flecha-next" type="button" aria-label="Captura siguiente">
+            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VALIDACIÓN ============ -->
+    <section class="validacion seccion">
+      <div class="validacion-tarjeta revelar">
+        <p class="validacion-frase">Cada seña fue revisada y validada por personas sordas e hipoacúsicas.</p>
+        <p class="validacion-detalle">La LSA es una lengua con identidad y cultura propias. Por eso el contenido de la app se construye junto a la comunidad, cuidando que cada seña sea correcta y real.</p>
+      </div>
+    </section>
+
+    <!-- ============ EQUIPO ============ -->
+    <section class="equipo seccion" id="equipo">
+      <h2 class="revelar">Quiénes somos</h2>
+      <p class="equipo-texto revelar">Creamos Aprendiendo LSA con una idea simple: que aprender a comunicarse con más personas esté al alcance de cualquiera, y que la inclusión se practique todos los días.</p>
+      <ul class="equipo-lista">
+        <li class="persona revelar"><span class="persona-inicial tinte-lila">G</span>Gaspar Gorelik Zonis</li>
+        <li class="persona revelar"><span class="persona-inicial tinte-crema">S</span>Silvio Cuffini</li>
+        <li class="persona revelar"><span class="persona-inicial tinte-verde">S</span>Shaiel Kuschelevsky</li>
+      </ul>
+    </section>
+
+    <!-- ============ CIERRE ============ -->
+    <section class="cierre seccion" id="descargar">
+      <div class="cierre-tarjeta revelar">
+        <h2>Empieza a aprender LSA hoy</h2>
+        <p>La app llega muy pronto a Google Play y al App Store. Síguenos en Instagram y entérate primero del lanzamiento.</p>
+        <div class="tiendas">
+          <!-- REEMPLAZAR: mismos links de las tiendas que arriba -->
+          <a class="btn btn-dorado" href="#" data-pendiente>Google Play <span class="pronto pronto-oscuro">Muy pronto</span></a>
+          <a class="btn btn-contorno" href="#" data-pendiente>App Store <span class="pronto pronto-oscuro">Muy pronto</span></a>
+        </div>
+        <a class="cierre-instagram" href="https://www.instagram.com/aprendiendo_lsa" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="17.2" cy="6.8" r="1.4" fill="currentColor"/></svg>
+          @aprendiendo_lsa
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="pie-contenido">
+      <a class="marca" href="#">
+        <img src="img/logo.png" alt="" width="34" height="34">
+        <span>Aprendiendo LSA</span>
+      </a>
+      <ul class="pie-enlaces">
+        <li>
+          <a href="mailto:proyectoaprendiendolsa@gmail.com">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            proyectoaprendiendolsa@gmail.com
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/aprendiendo_lsa" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="17.2" cy="6.8" r="1.4" fill="currentColor"/></svg>
+            @aprendiendo_lsa
+          </a>
+        </li>
+      </ul>
+      <p class="pie-firma">Hecho a mano, con las manos.</p>
+      <p class="pie-copy">© 2026 Aprendiendo LSA</p>
+    </div>
+  </footer>
+
+  <div class="aviso" id="aviso" role="status" aria-live="polite" hidden>¡Muy pronto! La app está llegando a las tiendas.</div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
