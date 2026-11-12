@@ -19,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FullWindowOverlay } from "react-native-screens";
 
+import AvatarUsuario from "../../components/AvatarUsuario";
 import SenaGif, { linkDeSena } from "../../components/SenaGif";
 import Tutorial from "../../components/Tutorial";
 import {
@@ -29,6 +30,7 @@ import {
   obtenerProgreso,
   obtenerVidas,
 } from "../../services/api";
+import { versionFotoPerfil } from "../../services/fotoPerfil";
 import {
   borrarLeccionEnCurso,
   claveLeccionEnCurso,
@@ -9522,6 +9524,13 @@ export default function HomeScreen() {
   });
   const [nombreUsuario, setNombreUsuario] = useState("");
 
+  // ── foto del botón de perfil (components/AvatarUsuario.jsx) ──
+  // fotoApi: el campo foto del usuario de la sesión. versionFoto: la de
+  // services/fotoPerfil.js, que cambia al guardar o quitar la foto. Se
+  // revisan cada vez que el mapa vuelve a estar en pantalla.
+  const [fotoApi, setFotoApi] = useState(null);
+  const [versionFoto, setVersionFoto] = useState(0);
+
   // ── estado del nivel abierto ──
   const [nivelAbierto, setNivelAbierto] = useState(null);
   const [leccionActiva, setLeccionActiva] = useState(null);
@@ -9577,6 +9586,14 @@ export default function HomeScreen() {
 
         const uid = String(usuario.id);
 
+        // El nombre y la foto del botón de perfil (AvatarUsuario) se revisan
+        // en CADA foco, también si es el mismo usuario: si se cambiaron en el
+        // Perfil, se ven al volver. Si no cambiaron, quedan los mismos
+        // valores y la foto no se toca.
+        setNombreUsuario(usuario.nombre ?? "");
+        setFotoApi(usuario.foto ?? null);
+        setVersionFoto(versionFotoPerfil(uid));
+
         // Mismo usuario que ya está cargado → no hace falta pedir todo de nuevo
         if (uid === userIdRef.current) return;
 
@@ -9584,7 +9601,6 @@ export default function HomeScreen() {
         xpTotalRef.current = usuario.xpTotal ?? null;
         setCargando(true);
         setUserId(uid);
-        setNombreUsuario(usuario.nombre ?? "");
         setNivelAbierto(null);
         setLeccionActiva(null);
         setEnCurso({});
@@ -10129,8 +10145,17 @@ export default function HomeScreen() {
           style={styles.perfilBtn}
           onPress={() => setMenuPerfilVisible(true)}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Menú de perfil"
         >
-          <Text style={styles.perfilIcon}>👤</Text>
+          {/* 34 px dentro del círculo blanco de 40: queda un borde de 3 px */}
+          <AvatarUsuario
+            uid={userId}
+            nombre={nombreUsuario}
+            fotoApi={fotoApi}
+            tamano={34}
+            version={versionFoto}
+          />
         </TouchableOpacity>
       </View>
 
@@ -10220,7 +10245,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  perfilIcon: { fontSize: 20 },
 
   // Círculos
   circulo: {

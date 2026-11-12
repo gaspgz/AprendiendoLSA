@@ -28,6 +28,25 @@ const claveFoto = (uid) => `foto_perfil_${String(uid).trim()}`;
 // El archivo de la foto en la carpeta de documentos (solo en el celular)
 const archivoFoto = (uid) => new File(Paths.document, `${claveFoto(uid)}.jpg`);
 
+// ─── Versión de la foto ──────────────────────────────────────────────
+// En el celular la foto nueva pisa al mismo archivo: la ruta no cambia
+// aunque cambie la foto. Para saber si cambió sin volver a leerla, cada
+// cuenta tiene un número que sube cada vez que se guarda o se quita su foto
+// (también si falla: así se vuelve a leer lo que de verdad quedó). Vive en
+// memoria y alcanza, porque la foto solo cambia desde esta app; al abrirla
+// de nuevo arranca en 0 y la foto se lee igual.
+// Lo usa el mapa (app/(tabs)/index.jsx) para refrescar AvatarUsuario.
+const versiones = new Map(); // uid → número
+
+const subirVersion = (uid) => {
+  const clave = String(uid).trim();
+  versiones.set(clave, (versiones.get(clave) ?? 0) + 1);
+};
+
+// La versión de la foto de la cuenta: 0 si no cambió desde que se abrió la app
+export const versionFotoPerfil = (uid) =>
+  versiones.get(String(uid).trim()) ?? 0;
+
 // Recorta el cuadrado del centro (en la web el picker no recorta) y lo
 // achica a 400×400 en JPEG. Devuelve la uri nueva (en la web, un data URI),
 // o null si no se pudo.
@@ -77,6 +96,8 @@ export const guardarFotoLocal = async (uid, uri) => {
   } catch (e) {
     console.log("No se pudo guardar la foto en el celular:", e);
     return null;
+  } finally {
+    subirVersion(uid); // ver versionFotoPerfil
   }
 };
 
@@ -113,6 +134,8 @@ export const borrarFotoLocal = async (uid) => {
   } catch (e) {
     console.log("No se pudo borrar la foto guardada:", e);
     return false;
+  } finally {
+    subirVersion(uid); // ver versionFotoPerfil
   }
 };
 
