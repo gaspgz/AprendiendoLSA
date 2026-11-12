@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CampoPassword from "../components/CampoPassword";
 import { cerrarSesionRemota, loginUsuario } from "../services/api";
 import { guardarSesion, obtenerSesionId } from "../services/sesion";
 
@@ -75,7 +76,7 @@ const LoginScreen = () => {
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Contraseña</Text>
-          <TextInput
+          <CampoPassword
             style={styles.input}
             placeholder="Tu contraseña"
             placeholderTextColor="#9CA3AF"
@@ -84,8 +85,9 @@ const LoginScreen = () => {
               setPassword(t);
               setError("");
             }}
-            secureTextEntry
             editable={!cargando}
+            textContentType="password"
+            autoComplete="password"
           />
         </View>
 
