@@ -387,8 +387,9 @@ const CATEGORIAS = [
 
 // ─── Modal de GIF con swipe ───────────────────────────────────────────
 const VideoModal = ({ visible, items, indice, onNavegar, onClose }) => {
-  if (!items || items.length === 0) return null;
-  const item = items[indice];
+  // Los hooks (useRef) van siempre ANTES de cualquier return: React necesita
+  // que se llamen en el mismo orden en cada render. Si la lista vuelve a quedar
+  // vacía, el return de abajo ya no rompe la pantalla.
 
   // Refs para que el PanResponder (creado una sola vez) siempre lea valores frescos
   const indiceRef = useRef(indice);
@@ -410,6 +411,9 @@ const VideoModal = ({ visible, items, indice, onNavegar, onClose }) => {
       },
     }),
   ).current;
+
+  if (!items || items.length === 0) return null;
+  const item = items[indice];
 
   return (
     <Modal
