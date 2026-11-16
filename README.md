@@ -1,50 +1,39 @@
-# Welcome to your Expo app 👋
+# Aprendiendo LSA
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App para aprender **Lengua de Señas Argentina** jugando: niveles, lecciones, vidas, experiencia (XP), racha y logros.
+Hecha con **React Native + Expo (SDK 58)**. Los datos (usuarios, progreso, vidas) y los GIF de las señas vienen de la
+API del curso (Python + FastAPI), documentada en https://ort.nilosolutions.com/api/lsa/docs
 
-## Get started
+## Cómo correrla en tu compu
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Necesitás **Node.js 22.13 o más nuevo** (lo pide Expo SDK 58) y la app **Expo Go** en el celular (de la tienda; abre proyectos con SDK 58).
 
 ```bash
-npm run reset-project
+git clone https://github.com/gaspgz/AprendiendoLSA.git
+cd AprendiendoLSA
+npm ci                 # instala exactamente lo del package-lock.json
+cp .env.example .env   # y completá EXPO_PUBLIC_LSA_API_KEY con la clave del curso (te la da el profe)
+npx expo start         # aparece un QR: escanealo con Expo Go
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Otra red o wifi de la escuela que bloquea: `npx expo start --tunnel`.
+- En el navegador: `npx expo start --web`.
+- Sin compilar nada: el QR de la última versión de `main` está en https://ort.nilosolutions.com/expo/
 
-## Learn more
+## Dónde está cada cosa
 
-To learn more about developing your project with Expo, look at the following resources:
+| Carpeta | Qué hay |
+|---|---|
+| `app/(tabs)/` | Las pestañas: `index.jsx` (mapa de niveles y lecciones), `SenasScreen.jsx` (diccionario), `ProfileScreen.jsx` |
+| `app/LoginScreen.js`, `app/registro.jsx` | Entrar y crear cuenta |
+| `services/` | `api.js` (todos los pedidos a la API pasan por `apiFetch`), sesión, logros, foto de perfil, precarga de GIF |
+| `components/` | `SenaGif.jsx`, barra de pestañas, pantalla sin conexión |
+| `docs/` | Contenido de los niveles y notas del proyecto |
+| `landing/` | Página web de presentación |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Antes de subir cambios
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo lint          # revisa errores comunes (por ejemplo, hooks dentro de un if)
+```
+El archivo `.env` no se sube nunca (está en `.gitignore`).
