@@ -55,10 +55,18 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 // que se genera desde docs/gifs_nube.json con scripts/generarGifs.js.
 
 // Señas que en la app se ven iguales: cuentan como UNA sola seña, igual que
-// "él" y "ella" (las dos son el_ella). En los ejercicios, dos señas de un
-// mismo grupo nunca van juntas en las opciones ni en un banco, y la escritura
-// libre las acepta todas (respuestasAlternativas). Para otro par, sumalo acá.
-export const SENAS_EQUIVALENTES = [["hola", "chau"]];
+// "él" y "ella" (las dos son el_ella). La verificación de todos los ejercicios
+// usa esta lista (indicesCorrectos y sonSenasEquivalentes, más abajo): si en
+// las opciones, los GIFs o el banco de un ítem hay dos señas de un mismo
+// grupo, las dos valen como correctas, y la escritura libre acepta cualquiera
+// del grupo. Para otro par, sumalo acá con la clave o el nombre tal como
+// aparece en los ítems (da igual mayúsculas y tildes de vocales): no hay que
+// tocar ejercicio por ejercicio.
+export const SENAS_EQUIVALENTES = [
+  ["hola", "chau"],
+  // La seña de "vos" y la de "tuyo" son muy parecidas (decisión del equipo)
+  ["vos", "tuyo"],
+];
 
 // Un número se puede escribir con dígitos o con letras: las dos valen.
 const NUMEROS_EN_LETRAS = {
@@ -110,6 +118,78 @@ const normalizarTexto = (s) =>
     .replace(/[¿?¡!.,]/g, "")
     .replace(/\s+/g, " ")
     .trim();
+
+// ── Respuestas correctas de un ítem ───────────────────────────────────
+// Para comparar señas: minúsculas, sin espacios alrededor ni tildes en las
+// vocales ("Mío" y "mio" son la misma). No usa normalizarTexto porque esa
+// también le saca la tilde a la ñ, y N y Ñ son letras distintas del abecedario.
+const normalizarSena = (s) =>
+  (s ?? "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[áéíóúü]/g, (c) => "aeiouu"["áéíóúü".indexOf(c)]);
+
+// Grupo de SENAS_EQUIVALENTES al que pertenece una seña (por su clave o por
+// su nombre, sin importar mayúsculas ni tildes), o null si no tiene.
+const grupoDeEquivalentes = (sena) => {
+  const buscada = normalizarSena(sena);
+  if (!buscada) return null;
+  return (
+    SENAS_EQUIVALENTES.find((grupo) =>
+      grupo.some((otra) => normalizarSena(otra) === buscada),
+    ) ?? null
+  );
+};
+
+// true si son la misma seña o se ven iguales ("vos" y "tuyo")
+const sonSenasEquivalentes = (a, b) => {
+  const na = normalizarSena(a);
+  const nb = normalizarSena(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  const grupo = grupoDeEquivalentes(a);
+  return grupo !== null && grupo === grupoDeEquivalentes(b);
+};
+
+// Índices de las opciones de un ítem que valen como correctas, la original
+// primero: `correcta` (un índice, como siempre) o `correctas` (varios), más
+// las opciones que se ven igual que alguna de esas (SENAS_EQUIVALENTES).
+// `opciones` es la lista del ítem (opciones, opcionesLetras u opcionesGifs).
+// Los índices se comparan con === porque 0 es un índice válido.
+const indicesCorrectos = (item, opciones = []) => {
+  const base = [
+    ...(typeof item.correcta === "number" ? [item.correcta] : []),
+    ...(Array.isArray(item.correctas) ? item.correctas : []),
+  ];
+  const indices = new Set(base);
+  opciones.forEach((opcion, i) => {
+    if (base.some((c) => sonSenasEquivalentes(opcion, opciones[c])))
+      indices.add(i);
+  });
+  return [...indices];
+};
+
+// Las opciones correctas escritas, para el cartel de error: "vos o tuyo"
+const nombresDeOpciones = (opciones, indices) =>
+  indices.map((i) => opciones[i]).join(" o ");
+
+// Si lo elegido vale solo por parecerse a la respuesta original, el texto
+// chico que lo explica; null si eligió la original o no hay equivalentes.
+const notaEquivalencia = (elegida, original) =>
+  elegida != null &&
+  original != null &&
+  normalizarSena(elegida) !== normalizarSena(original) &&
+  sonSenasEquivalentes(elegida, original)
+    ? `También es correcta: la seña de "${elegida}" y "${original}" es muy parecida`
+    : null;
+
+// Lo mismo en un ítem de opciones: la elegida contra la original (la
+// primera de `correctos`). null si no eligió nada.
+const notaDeOpcion = (opciones, correctos, seleccionado) =>
+  seleccionado === null || seleccionado === undefined || !correctos.length
+    ? null
+    : notaEquivalencia(opciones[seleccionado], opciones[correctos[0]]);
 
 // ══════════════════════════════════════════════════════════════════════
 //  CONFIG
@@ -2421,8 +2501,6 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "chau",
             respuestaCorrecta: "chau",
-            // Se ve igual que hola (SENAS_EQUIVALENTES): las dos valen
-            respuestasAlternativas: ["hola"],
           },
           {
             tipo: "que_palabra_opciones",
@@ -2451,8 +2529,6 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "hola",
             respuestaCorrecta: "hola",
-            // Se ve igual que chau (SENAS_EQUIVALENTES): las dos valen
-            respuestasAlternativas: ["chau"],
           },
           {
             tipo: "que_palabra_opciones",
@@ -3023,8 +3099,6 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "chau",
             respuestaCorrecta: "chau",
-            // Se ve igual que hola (SENAS_EQUIVALENTES): las dos valen
-            respuestasAlternativas: ["hola"],
           },
           {
             tipo: "que_palabra_opciones",
@@ -3234,8 +3308,6 @@ export const NIVELES = [
             tipo: "escritura_libre",
             gifPalabra: "hola",
             respuestaCorrecta: "hola",
-            // Se ve igual que chau (SENAS_EQUIVALENTES): las dos valen
-            respuestasAlternativas: ["chau"],
           },
           {
             tipo: "escritura_libre",
@@ -7685,7 +7757,9 @@ const ItemElegirSena = ({
 }) => {
   const [seleccionado, setSelec] = useState(null);
   const [confirmado, setConf] = useState(false);
-  const esCorrecta = seleccionado === item.correcta;
+  // Opciones que valen (correcta/correctas y equivalentes); el 0 es válido
+  const correctos = indicesCorrectos(item, item.opcionesLetras);
+  const esCorrecta = correctos.includes(seleccionado);
 
   const confirmar = () => {
     if (seleccionado === null) return;
@@ -7718,7 +7792,7 @@ const ItemElegirSena = ({
             let borderColor = "#E0E0E0";
             let bgColor = "#F5F6FA";
             if (confirmado) {
-              if (i === item.correcta) {
+              if (correctos.includes(i)) {
                 borderColor = "#2E7D32";
                 bgColor = "#C8F5D3";
               } else if (i === seleccionado) {
@@ -7825,7 +7899,9 @@ const ItemQueLEtra = ({
 }) => {
   const [seleccionado, setSelec] = useState(null);
   const [confirmado, setConf] = useState(false);
-  const esCorrecta = seleccionado === item.correcta;
+  // Opciones que valen (correcta/correctas y equivalentes); el 0 es válido
+  const correctos = indicesCorrectos(item, item.opciones);
+  const esCorrecta = correctos.includes(seleccionado);
 
   const confirmar = () => {
     if (seleccionado === null) return;
@@ -7841,13 +7917,13 @@ const ItemQueLEtra = ({
 
   const bgOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
-    if (i === item.correcta) return "#C8F5D3";
+    if (correctos.includes(i)) return "#C8F5D3";
     if (i === seleccionado) return "#FFCDD2";
     return "#F5F6FA";
   };
   const bdOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
-    if (i === item.correcta) return "#2E7D32";
+    if (correctos.includes(i)) return "#2E7D32";
     if (i === seleccionado) return "#C62828";
     return "#E0E0E0";
   };
@@ -7900,7 +7976,7 @@ const ItemQueLEtra = ({
           >
             {esCorrecta
               ? "¡Correcto! 🎉"
-              : `Incorrecto ❌ — La respuesta es ${item.opciones[item.correcta]}`}
+              : `Incorrecto ❌ — La respuesta es ${nombresDeOpciones(item.opciones, correctos)}`}
           </Text>
         </View>
       )}
@@ -7938,6 +8014,34 @@ const ItemQueLEtra = ({
   );
 };
 
+// ── Casilleros de "Formá la palabra" y "Armá la frase" ───────────────
+// Cada casillero guarda el índice (en letrasDisponibles o en el banco) de la
+// ficha que se puso, o VACIO si no tiene nada. El índice 0 es una ficha válida
+// (la primera de la grilla): un casillero se compara siempre con estaVacio y
+// nunca como booleano (`if (slot)`, `slot ? ... : ""`, `slot && ...`), porque
+// 0 es falsy y la primera ficha se vería como un casillero vacío.
+const VACIO = null;
+const estaVacio = (slot) => slot === VACIO;
+const casillerosVacios = (cantidad) => Array(cantidad).fill(VACIO);
+
+// Pone la ficha `idx` en el primer casillero vacío. Si no hay lugar o la ficha
+// ya está puesta, devuelve los mismos casilleros.
+const ponerFicha = (slots, idx) => {
+  const primerVacio = slots.findIndex(estaVacio);
+  if (primerVacio === -1 || slots.includes(idx)) return slots;
+  const nuevo = [...slots];
+  nuevo[primerVacio] = idx;
+  return nuevo;
+};
+
+// Vacía el casillero `slotIdx` (si ya estaba vacío, devuelve los mismos)
+const sacarFicha = (slots, slotIdx) => {
+  if (estaVacio(slots[slotIdx])) return slots;
+  const nuevo = [...slots];
+  nuevo[slotIdx] = VACIO;
+  return nuevo;
+};
+
 const ItemQuePalabra = ({
   item,
   idx,
@@ -7948,30 +8052,29 @@ const ItemQuePalabra = ({
   onSalir,
 }) => {
   const n = item.secuencia.length;
-  const [slots, setSlots] = useState(() => Array(n).fill(null));
+  // Índice en letrasDisponibles de la letra de cada casillero (ver VACIO)
+  const [slots, setSlots] = useState(() => casillerosVacios(n));
   const [confirmado, setConf] = useState(false);
 
-  const letrasUsadas = new Set(slots.filter((s) => s !== null));
-  const palabraIngresada = slots
-    .map((s) => (s !== null ? item.letrasDisponibles[s] : ""))
-    .join("");
+  // Letra de un casillero ("" si está vacío), para armar la palabra
+  const letraDelSlot = (slot) =>
+    estaVacio(slot) ? "" : item.letrasDisponibles[slot];
+  // Lo que dibuja un casillero: su letra, o un espacio si está vacío, así el
+  // texto nunca arranca sin contenido (ver palabraSlotLetraAncho)
+  const textoDelSlot = (slot) => (estaVacio(slot) ? " " : letraDelSlot(slot));
+  const letrasUsadas = new Set(slots.filter((s) => !estaVacio(s)));
+  const palabraIngresada = slots.map(letraDelSlot).join("");
   const esCorrecta = palabraIngresada === item.palabraCorrecta;
-  const completo = slots.every((s) => s !== null);
+  const completo = !slots.some(estaVacio);
 
   const tapLetra = (letraIdx) => {
     if (confirmado || letrasUsadas.has(letraIdx)) return;
-    const primerVacio = slots.findIndex((s) => s === null);
-    if (primerVacio === -1) return;
-    const nuevo = [...slots];
-    nuevo[primerVacio] = letraIdx;
-    setSlots(nuevo);
+    setSlots(ponerFicha(slots, letraIdx));
   };
 
   const tapSlot = (slotIdx) => {
-    if (confirmado || slots[slotIdx] === null) return;
-    const nuevo = [...slots];
-    nuevo[slotIdx] = null;
-    setSlots(nuevo);
+    if (confirmado) return;
+    setSlots(sacarFicha(slots, slotIdx));
   };
 
   const confirmar = () => {
@@ -7982,7 +8085,7 @@ const ItemQuePalabra = ({
 
   const siguiente = () => {
     if (!esCorrecta) {
-      setSlots(Array(n).fill(null));
+      setSlots(casillerosVacios(n));
       setConf(false);
     } else onCorrecto();
   };
@@ -8034,14 +8137,23 @@ const ItemQuePalabra = ({
                 style={[
                   styles.palabraSlot,
                   { width: gifW },
-                  slots[i] !== null && styles.palabraSlotLleno,
+                  !estaVacio(slots[i]) && styles.palabraSlotLleno,
                   confirmado && esCorrecta && styles.palabraSlotCorrecto,
                   confirmado && !esCorrecta && styles.palabraSlotError,
                 ]}
                 onPress={() => tapSlot(i)}
               >
-                <Text style={styles.palabraSlotLetra}>
-                  {slots[i] !== null ? item.letrasDisponibles[slots[i]] : ""}
+                {/* La key es la letra del casillero: con cada letra nueva el
+                    texto se crea de nuevo y se mide de cero. No es `letra`,
+                    que es la del GIF y nunca cambia */}
+                <Text
+                  key={textoDelSlot(slots[i])}
+                  style={[
+                    styles.palabraSlotLetra,
+                    styles.palabraSlotLetraAncho,
+                  ]}
+                >
+                  {textoDelSlot(slots[i])}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -8168,7 +8280,11 @@ const ItemElegirSenaPalabra = ({
 }) => {
   const [seleccionado, setSelec] = useState(null);
   const [confirmado, setConf] = useState(false);
-  const esCorrecta = seleccionado === item.correcta;
+  // Opciones que valen (correcta/correctas y equivalentes); el 0 es válido
+  const correctos = indicesCorrectos(item, item.opcionesGifs);
+  const esCorrecta = correctos.includes(seleccionado);
+  // Si eligió una seña que vale por parecerse a la original, se le explica
+  const nota = notaDeOpcion(item.opcionesGifs, correctos, seleccionado);
 
   const confirmar = () => {
     if (seleccionado === null) return;
@@ -8200,7 +8316,7 @@ const ItemElegirSenaPalabra = ({
             let borderColor = "#E0E0E0";
             let bgColor = "#F5F6FA";
             if (confirmado) {
-              if (i === item.correcta) {
+              if (correctos.includes(i)) {
                 borderColor = "#2E7D32";
                 bgColor = "#C8F5D3";
               } else if (i === seleccionado) {
@@ -8260,6 +8376,11 @@ const ItemElegirSenaPalabra = ({
           >
             {esCorrecta ? "¡Correcto! 🎉" : "Incorrecto ❌ — Intentá de nuevo"}
           </Text>
+          {esCorrecta && nota ? (
+            <Text style={[styles.feedbackNota, { color: "#1B5E20" }]}>
+              {nota}
+            </Text>
+          ) : null}
         </View>
       )}
       <View style={styles.ejercicioBtnWrap}>
@@ -8308,7 +8429,11 @@ const ItemQuePalabraOpciones = ({
 }) => {
   const [seleccionado, setSelec] = useState(null);
   const [confirmado, setConf] = useState(false);
-  const esCorrecta = seleccionado === item.correcta;
+  // Opciones que valen (correcta/correctas y equivalentes); el 0 es válido
+  const correctos = indicesCorrectos(item, item.opciones);
+  const esCorrecta = correctos.includes(seleccionado);
+  // Si eligió una seña que vale por parecerse a la original, se le explica
+  const nota = notaDeOpcion(item.opciones, correctos, seleccionado);
 
   const confirmar = () => {
     if (seleccionado === null) return;
@@ -8324,13 +8449,13 @@ const ItemQuePalabraOpciones = ({
 
   const bgOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
-    if (i === item.correcta) return "#C8F5D3";
+    if (correctos.includes(i)) return "#C8F5D3";
     if (i === seleccionado) return "#FFCDD2";
     return "#F5F6FA";
   };
   const bdOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
-    if (i === item.correcta) return "#2E7D32";
+    if (correctos.includes(i)) return "#2E7D32";
     if (i === seleccionado) return "#C62828";
     return "#E0E0E0";
   };
@@ -8385,8 +8510,13 @@ const ItemQuePalabraOpciones = ({
           >
             {esCorrecta
               ? "¡Correcto! 🎉"
-              : `Incorrecto ❌ — La respuesta es ${item.opciones[item.correcta]}`}
+              : `Incorrecto ❌ — La respuesta es ${nombresDeOpciones(item.opciones, correctos)}`}
           </Text>
+          {esCorrecta && nota ? (
+            <Text style={[styles.feedbackNota, { color: "#1B5E20" }]}>
+              {nota}
+            </Text>
+          ) : null}
         </View>
       )}
       <View style={styles.ejercicioBtnWrap}>
@@ -8440,12 +8570,23 @@ const ItemEscrituraLibre = ({
   // respuestasAlternativas (opcional): otras respuestas que también valen,
   // como "ella" para "él/ella". Los espacios alrededor de "/" no cuentan.
   const comparable = (s) => normalizarTexto(s).replace(/\s*\/\s*/g, "/");
+  // Las señas que se ven igual que la de este GIF (SENAS_EQUIVALENTES)
+  // también valen: "tuyo" para el GIF de "vos".
+  const equivalentes = (
+    grupoDeEquivalentes(item.respuestaCorrecta) ?? []
+  ).filter((s) => comparable(s) !== comparable(item.respuestaCorrecta));
   const aceptadas = [
     item.respuestaCorrecta,
     ...(enLetras ? [enLetras] : []),
     ...(item.respuestasAlternativas ?? []),
+    ...equivalentes,
   ];
   const esCorrecta = aceptadas.some((r) => comparable(r) === comparable(texto));
+  // Si escribió una equivalente, se le explica
+  const escrita = equivalentes.find((s) => comparable(s) === comparable(texto));
+  const nota = escrita
+    ? notaEquivalencia(escrita, item.respuestaCorrecta)
+    : null;
 
   const confirmar = () => {
     if (!texto.trim()) return;
@@ -8520,6 +8661,11 @@ const ItemEscrituraLibre = ({
               ? "¡Correcto! 🎉"
               : `Incorrecto ❌ — La respuesta es ${item.respuestaCorrecta}`}
           </Text>
+          {esCorrecta && nota ? (
+            <Text style={[styles.feedbackNota, { color: "#1B5E20" }]}>
+              {nota}
+            </Text>
+          ) : null}
         </View>
       )}
       <View style={styles.ejercicioBtnWrap}>
@@ -8664,18 +8810,29 @@ const ItemFraseSenas = ({
   const armar = item.modo === "armar";
   const n = item.secuencia.length;
   const [actual, setActual] = useState(0); // seña que muestra el visor
-  const [slots, setSlots] = useState(() => Array(n).fill(null)); // "armar"
+  const [slots, setSlots] = useState(() => casillerosVacios(n)); // "armar"
   const [seleccionado, setSelec] = useState(null); // "elegir"
   const [confirmado, setConf] = useState(false);
 
-  // En "armar" cada espacio guarda el índice de una palabra del banco
-  const usadas = new Set(slots.filter((s) => s !== null));
-  const completo = armar
-    ? slots.every((s) => s !== null)
-    : seleccionado !== null;
+  // En "armar" cada espacio guarda el índice de una palabra del banco (ver
+  // VACIO). Vale la palabra esperada o una que se ve igual
+  // (SENAS_EQUIVALENTES). En "elegir", correctos son las frases que valen.
+  const usadas = new Set(slots.filter((s) => !estaVacio(s)));
+  const completo = armar ? !slots.some(estaVacio) : seleccionado !== null;
+  const correctos = indicesCorrectos(item, item.opciones);
   const esCorrecta = armar
-    ? slots.every((s, i) => s !== null && item.banco[s] === item.palabras[i])
-    : seleccionado === item.correcta;
+    ? slots.every(
+        (s, i) =>
+          !estaVacio(s) &&
+          sonSenasEquivalentes(item.banco[s], item.palabras[i]),
+      )
+    : correctos.includes(seleccionado);
+  // Si lo puesto vale por parecerse a lo esperado, el texto que lo explica
+  const nota = armar
+    ? slots
+        .map((s, i) => notaEquivalencia(item.banco[s], item.palabras[i]))
+        .find(Boolean)
+    : notaDeOpcion(item.opciones, correctos, seleccionado);
   const fijas = item.fijas ?? {};
   // Todos los espacios en una fila: ancho útil (padding 20 por lado) menos
   // los gaps de 8 de palabraGifsRow, con un máximo de 120. Cada palabra fija
@@ -8691,21 +8848,16 @@ const ItemFraseSenas = ({
 
   const tapPalabra = (bancoIdx) => {
     if (confirmado || usadas.has(bancoIdx)) return;
-    const primerVacio = slots.findIndex((s) => s === null);
-    if (primerVacio === -1) return;
-    const nuevo = [...slots];
-    nuevo[primerVacio] = bancoIdx;
+    const nuevo = ponerFicha(slots, bancoIdx);
     setSlots(nuevo);
     // El visor pasa solo a la seña del siguiente espacio vacío
-    const siguienteVacio = nuevo.findIndex((s) => s === null);
+    const siguienteVacio = nuevo.findIndex(estaVacio);
     if (siguienteVacio !== -1) setActual(siguienteVacio);
   };
 
   const tapSlot = (slotIdx) => {
-    if (confirmado || slots[slotIdx] === null) return;
-    const nuevo = [...slots];
-    nuevo[slotIdx] = null;
-    setSlots(nuevo);
+    if (confirmado || estaVacio(slots[slotIdx])) return;
+    setSlots(sacarFicha(slots, slotIdx));
     setActual(slotIdx); // se ve la seña del espacio que se vació
   };
 
@@ -8719,7 +8871,7 @@ const ItemFraseSenas = ({
       onCorrecto();
       return;
     }
-    setSlots(Array(n).fill(null));
+    setSlots(casillerosVacios(n));
     setSelec(null);
     setConf(false);
     if (armar) setActual(0);
@@ -8727,13 +8879,13 @@ const ItemFraseSenas = ({
 
   const bgOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#C8D3F5" : "#F5F6FA";
-    if (i === item.correcta) return "#C8F5D3";
+    if (correctos.includes(i)) return "#C8F5D3";
     if (i === seleccionado) return "#FFCDD2";
     return "#F5F6FA";
   };
   const bdOp = (i) => {
     if (!confirmado) return seleccionado === i ? "#3D4FBB" : "#E0E0E0";
-    if (i === item.correcta) return "#2E7D32";
+    if (correctos.includes(i)) return "#2E7D32";
     if (i === seleccionado) return "#C62828";
     return "#E0E0E0";
   };
@@ -8772,7 +8924,7 @@ const ItemFraseSenas = ({
                     style={[
                       styles.palabraSlot,
                       { width: anchoSlot, paddingHorizontal: 4 },
-                      s !== null && styles.palabraSlotLleno,
+                      !estaVacio(s) && styles.palabraSlotLleno,
                       i === actual && !confirmado && styles.fraseSlotActual,
                       confirmado && esCorrecta && styles.palabraSlotCorrecto,
                       confirmado && !esCorrecta && styles.palabraSlotError,
@@ -8785,7 +8937,7 @@ const ItemFraseSenas = ({
                       adjustsFontSizeToFit
                       minimumFontScale={0.6}
                     >
-                      {s !== null ? item.banco[s] : ""}
+                      {estaVacio(s) ? "" : item.banco[s]}
                     </Text>
                   </TouchableOpacity>
                 </Fragment>
@@ -8861,6 +9013,11 @@ const ItemFraseSenas = ({
               ? "¡Correcto! 🎉"
               : `Incorrecto ❌ — La frase es: ${textoDeFrase(item)}`}
           </Text>
+          {esCorrecta && nota ? (
+            <Text style={[styles.feedbackNota, { color: "#1B5E20" }]}>
+              {nota}
+            </Text>
+          ) : null}
         </View>
       )}
       <View style={styles.ejercicioBtnWrap}>
@@ -10596,6 +10753,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
+  // Texto chico debajo de "¡Correcto!" cuando la respuesta vale por parecerse
+  // a la original (SENAS_EQUIVALENTES)
+  feedbackNota: {
+    fontSize: 12,
+    fontWeight: "500",
+    textAlign: "center",
+    lineHeight: 16,
+    marginTop: 4,
+  },
   ejercicioBtnWrap: { paddingHorizontal: 16, paddingBottom: 20 },
   btnPrincipal: {
     backgroundColor: "#C8D3F5",
@@ -10723,6 +10889,11 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1A1A2E",
   },
+  // Texto de un casillero de "Formá la palabra": ocupa todo el casillero y
+  // centra la letra, en vez de medirse según la letra. En el celular la I
+  // quedaba en el casillero pero no se dibujaba. Por lo mismo, el texto se
+  // vuelve a crear con cada letra (key) y, vacío, dibuja un espacio.
+  palabraSlotLetraAncho: { width: "100%", textAlign: "center" },
   letrasDisponiblesLabel: {
     fontSize: 14,
     fontWeight: "700",

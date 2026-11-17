@@ -213,6 +213,11 @@ Solo existe **Tipo 0 — Múltiple choice de texto**: se muestra una pregunta en
 }
 ```
 
+### Más de una respuesta correcta
+
+- `correcta` sigue siendo un índice. Si un ítem tiene varias opciones válidas se puede usar `correctas: [i, j]` (sola o junto con `correcta`): la verificación acepta cualquiera de los dos formatos y pinta de verde todas las opciones que valen.
+- Las señas que se ven iguales están en `SENAS_EQUIVALENTES` (`app/(tabs)/index.jsx`), por ejemplo `["vos", "tuyo"]`. Si en un ítem aparecen dos señas del mismo grupo (opciones de texto, GIFs, banco de una frase o escritura libre), las dos valen como correctas: no resta vida y debajo de "¡Correcto!" sale "También es correcta: la seña de "vos" y "tuyo" es muy parecida". Para otro par, sumarlo a esa lista; no hay que tocar ejercicio por ejercicio.
+
 ---
 
 ## Reglas de diseño pedagógico
