@@ -1,3 +1,6 @@
+import * as FileSystem from "expo-file-system";
+import { Platform } from "react-native";
+
 import { avisarSesionVencida, obtenerToken } from "./sesion";
 
 // ── URL base y endpoints de la API del profesor ──
@@ -26,6 +29,20 @@ export const ENDPOINTS = {
   vidas: (id) => `${API_BASE}/usuarios/${id}/vidas`,
   completar: (id) => `${API_BASE}/usuarios/${id}/progreso/completar`,
   config: `${API_BASE}/config`,
+  ranking: `${API_BASE}/ranking`,
+};
+
+// Las cabeceras que lleva toda llamada: la clave del curso y, si hay token
+// del login guardado, el "Authorization". conToken dice si lo llevó: un 401
+// solo significa "sesión vencida" si el pedido iba con token.
+// La usan apiFetch y subirFotoPerfil (que en el celular no pasa por fetch).
+const cabecerasAuth = async (sinToken) => {
+  const headers = { "X-API-Key": API_KEY ?? "" };
+  if (sinToken) return { headers, conToken: false };
+  const token = await obtenerToken();
+  if (!token) return { headers, conToken: false };
+  headers.Authorization = `Bearer ${token}`;
+  return { headers, conToken: true };
 };
 
 // ── Helper interno: toda llamada a la API pasa por acá ──
@@ -48,19 +65,12 @@ const apiFetch = async (
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
   try {
     const esFormulario = opciones.body instanceof FormData;
+    const { headers: auth, conToken } = await cabecerasAuth(sinToken);
     const headers = {
       ...opciones.headers,
       ...(esFormulario ? {} : { "Content-Type": "application/json" }),
-      "X-API-Key": API_KEY ?? "",
+      ...auth,
     };
-    let conToken = false;
-    if (!sinToken) {
-      const token = await obtenerToken();
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-        conToken = true;
-      }
-    }
     const res = await fetch(url, { ...opciones, headers });
 
     // Un 403 NO cierra la sesión (por ejemplo, tocar datos de otra cuenta):
@@ -199,36 +209,105 @@ const dataUriABlob = (uri) => {
   return new Blob([bytes], { type: tipo });
 };
 
+// En la web la foto procesada es un data URI: se manda como archivo dentro
+// de un FormData, que el navegador arma bien.
+const subirFotoWeb = async (url, uri, headers) => {
+  const form = new FormData();
+  form.append("archivo", dataUriABlob(uri), "foto.jpg");
+  // Sin Content-Type a mano: lo pone fetch, con el "boundary" del formulario
+  const res = await fetch(url, { method: "POST", headers, body: form });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    // respuesta vacía o que no es JSON
+  }
+  return { status: res.status, data };
+};
+
+// En el celular NO se usa fetch. El FormData de React Native no manda el
+// archivo: manda su RUTA, y después el celular la vuelve a leer como si
+// fuera una dirección web (RCTNetworking la convierte en NSURL y se la pasa
+// a RCTFileRequestHandler). Si en esa ida y vuelta la ruta no queda igual
+// —en Expo Go la carpeta de la app tiene caracteres escapados— no encuentra
+// el archivo y el envío falla ANTES de salir, sin respuesta: de ahí el
+// "sin conexión" con internet que pasaba en los dos iPhone. El servidor no
+// tiene nada que ver: el mismo multipart desde una computadora anda.
+// expo-file-system sube el archivo con el sistema del celular (NSURLSession
+// en iOS, OkHttp en Android) sin esa traducción: la ruta nunca sale de la
+// capa de archivos de Expo, la misma que ya guarda y lee bien la copia
+// local. En la web se deja el FormData, que ahí anda.
+const subirFotoCelular = async (url, uri, headers) => {
+  const archivo = new FileSystem.File(uri);
+  const res = await archivo.upload(url, {
+    httpMethod: "POST",
+    uploadType: FileSystem.UploadType.MULTIPART,
+    fieldName: "archivo",
+    mimeType: "image/jpeg",
+    headers, // el Content-Type del formulario lo pone expo-file-system
+    // En iOS, sin esto la subida va por una sesión en segundo plano, que
+    // puede tardar en arrancar; acá el usuario está esperando con la hoja
+    // abierta. Android no tiene esta opción y la ignora.
+    ...(Platform.OS === "ios" ? { sessionType: "foreground" } : {}),
+  });
+  let data = null;
+  try {
+    data = JSON.parse(res.body);
+  } catch {
+    // respuesta vacía o que no es JSON
+  }
+  return { status: res.status, data };
+};
+
 // ── Subir la foto de perfil ──
 // POST /usuarios/{id}/foto, como formulario (multipart) con el campo
 // "archivo": la API guarda la imagen Y se la deja puesta al usuario, en una
-// sola llamada. Pide el token del login (solo el dueño cambia su foto).
+// sola llamada. Manda el token del login, como el resto de la app.
 // Devuelve { ok, usuario, status }: usuario viene con "foto" apuntando a la
-// dirección nueva (cambia con cada subida). Si falla, { ok, error, status }.
+// dirección nueva (cambia con cada subida). Si falla, { ok, error, status,
+// detalle }, donde detalle es el motivo de verdad, para el console.log de
+// services/fotoPerfil.js (status 0 = no hubo respuesta).
 export const subirFotoPerfil = async (id, uri) => {
-  const form = new FormData();
-  if (uri.startsWith("data:")) {
-    // En la web la foto procesada es un data URI: se convierte en Blob
-    form.append("archivo", dataUriABlob(uri), "foto.jpg");
-  } else {
-    // En el celular alcanza con la ruta del archivo
-    form.append("archivo", { uri, name: "foto.jpg", type: "image/jpeg" });
+  const url = `${ENDPOINTS.usuarios}/${id}/foto`;
+  const { headers, conToken } = await cabecerasAuth();
+
+  let status = 0;
+  let data = null;
+  let detalle = null;
+  try {
+    const res =
+      Platform.OS === "web"
+        ? await subirFotoWeb(url, uri, headers)
+        : await subirFotoCelular(url, uri, headers);
+    status = res.status;
+    data = res.data;
+  } catch (e) {
+    // No hubo respuesta: sin internet, el archivo ya no está, etc.
+    detalle = e?.message || String(e);
   }
 
-  const { ok, data, status } = await apiFetch(
-    `${ENDPOINTS.usuarios}/${id}/foto`,
-    { method: "POST", body: form },
-  );
+  // Igual que en apiFetch: un 401 con token es la sesión vencida
+  if (status === 401 && conToken) {
+    avisarSesionVencida();
+  }
 
-  if (!ok) {
+  if (status < 200 || status >= 300) {
     return {
       ok: false,
       status,
+      detalle,
       error: mensajeError(status, data, "No se pudo guardar la foto."),
     };
   }
   return { ok: true, status, usuario: data?.usuario ?? data };
 };
+
+// ── Ranking ──
+// GET /ranking?limite=N. Devuelve { ok, data, status }; data es una lista
+// ordenada de mayor a menor XP, con { puesto, id, nombre, xpTotal } por
+// usuario (no trae nada privado: ni email ni contraseña).
+export const obtenerRanking = async (limite) =>
+  apiFetch(`${ENDPOINTS.ranking}?limite=${limite}`);
 
 // ── Eliminar usuario ──
 // DELETE /usuarios/{id}. Devuelve { ok, data, status } tal cual, así quien la

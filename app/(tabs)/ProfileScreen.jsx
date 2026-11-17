@@ -16,12 +16,14 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AvatarUsuario from "../../components/AvatarUsuario";
 import {
   actualizarUsuario,
   cerrarSesionRemota,
   eliminarUsuario,
   mensajeError,
   obtenerProgreso,
+  obtenerRanking,
   obtenerUsuario,
 } from "../../services/api";
 import {
@@ -145,6 +147,52 @@ const calcularLogros = ({
     obtenido: totalNiveles > 0 && nivelesCompletados === totalNiveles,
   },
 ];
+
+// ─── Ranking ─────────────────────────────────────────────────────────
+// Se muestran los 5 primeros. Se piden más puestos para saber en cuál está
+// el usuario cuando no entró en el top 5 (la API ordena de mayor a menor XP
+// y cada fila trae su "puesto").
+const TOP = 5;
+const LIMITE_RANKING = 100;
+
+// 🥇🥈🥉 para los tres primeros; del cuarto en adelante, el número
+const MEDALLAS = ["🥇", "🥈", "🥉"];
+const medalla = (puesto) => MEDALLAS[puesto - 1] ?? String(puesto);
+
+// "Pappo Blues" → "Pappo B."; con una sola palabra queda tal cual
+const nombreCorto = (nombre) => {
+  const partes = String(nombre ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (partes.length < 2) return partes[0] ?? "";
+  return `${partes[0]} ${partes[1][0].toUpperCase()}.`;
+};
+
+// Una fila: el puesto, la foto, el nombre y el XP. Nada más: el ranking no
+// trae (ni se muestra) el email ni ningún otro dato de la persona.
+const FilaRanking = ({ fila, puesto, esVos }) => (
+  <View style={[styles.rankFila, esVos && styles.rankFilaVos]}>
+    {/* El puesto no crece con la letra grande del sistema: no entraría */}
+    <Text style={styles.rankPuesto} allowFontScaling={false}>
+      {medalla(puesto)}
+    </Text>
+    <AvatarUsuario
+      uid={fila.id}
+      nombre={fila.nombre}
+      fotoApi={fila.foto ?? null}
+      tamano={36}
+    />
+    {/* El nombre es lo único que se achica: el XP siempre entra entero */}
+    <View style={styles.rankNombreWrap}>
+      <Text style={styles.rankNombre} numberOfLines={1}>
+        {nombreCorto(fila.nombre)}
+      </Text>
+      {esVos && <Text style={styles.rankVos}>(vos)</Text>}
+    </View>
+    <Text style={styles.rankXp}>{fila.xpTotal ?? 0} XP</Text>
+  </View>
+);
 
 // ─── Tarjeta de stat ─────────────────────────────────────────────────
 const StatCard = ({ icono, valor, label, color }) => (
@@ -582,6 +630,8 @@ const ProfileScreen = () => {
   // Se tocó "Cambiar foto" en Editar: en iOS la hoja espera a que Editar
   // termine de cerrarse (ver cambiarFotoDesdeEditar)
   const fotoAlCerrarEditar = useRef(false);
+  // Ranking: null mientras carga, { filas } o { error }
+  const [ranking, setRanking] = useState(null);
 
   // La pestaña queda montada: se recarga cada vez que toma foco, así si
   // completaste una lección y volvés al perfil el XP ya está actualizado
@@ -652,6 +702,38 @@ const ProfileScreen = () => {
       };
     }, []),
   );
+
+  // El ranking se pide aparte del perfil: tarda distinto y se puede
+  // reintentar solo. Devuelve la función para cancelarlo, así useFocusEffect
+  // descarta lo que llegue después de salir de la pestaña. También la llama
+  // el botón "Reintentar".
+  const pedirRanking = useCallback(() => {
+    let cancelado = false;
+    setRanking(null);
+
+    (async () => {
+      const { ok, data, status } = await obtenerRanking(LIMITE_RANKING);
+      if (cancelado) return;
+      setRanking(
+        ok && Array.isArray(data)
+          ? { filas: data }
+          : {
+              error: mensajeError(
+                status,
+                data,
+                "No se pudo cargar el ranking.",
+              ),
+            },
+      );
+    })();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Se recarga cada vez que la pestaña Perfil toma foco
+  useFocusEffect(pedirRanking);
 
   if (!perfil) {
     return (
@@ -883,6 +965,12 @@ const ProfileScreen = () => {
     ? Math.round((nivelesCompletados / totalNiveles) * 100)
     : 0;
 
+  // ── Ranking: el top 5 y, si el usuario no entró, su propia fila ──
+  const esElUsuario = (fila) => String(fila.id) === String(usuario.id);
+  const topRanking = ranking?.filas?.slice(0, TOP) ?? [];
+  const miFila = ranking?.filas?.find(esElUsuario) ?? null;
+  const estoyEnElTop = topRanking.some(esElUsuario);
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <ScrollView
@@ -1002,6 +1090,60 @@ const ProfileScreen = () => {
               label="Señas aprendidas"
               color="#8C7CF0"
             />
+          </View>
+        </View>
+
+        {/* ── Ranking ── */}
+        <View style={styles.seccion}>
+          <Text style={styles.seccionTitulo}>🏆 Ranking</Text>
+          <View style={styles.rankCard}>
+            {!ranking ? (
+              <ActivityIndicator color="#3D4FBB" style={styles.rankCargando} />
+            ) : ranking.error ? (
+              /* La caja roja de siempre, con "Reintentar" adentro */
+              <View style={[styles.errorWrap, styles.rankError]}>
+                <Text style={styles.errorTxt}>⚠️ {ranking.error}</Text>
+                <TouchableOpacity
+                  style={styles.rankReintentar}
+                  onPress={() => pedirRanking()}
+                  accessibilityRole="button"
+                  accessibilityLabel="Reintentar"
+                >
+                  <Text style={styles.rankReintentarTxt}>Reintentar</Text>
+                </TouchableOpacity>
+              </View>
+            ) : topRanking.length === 0 ? (
+              <Text style={styles.rankVacio}>
+                Todavía no hay nadie en el ranking
+              </Text>
+            ) : (
+              <>
+                {topRanking.map((fila, i) => (
+                  <FilaRanking
+                    key={fila.id}
+                    fila={fila}
+                    puesto={fila.puesto ?? i + 1}
+                    esVos={esElUsuario(fila)}
+                  />
+                ))}
+                {!estoyEnElTop &&
+                  (miFila ? (
+                    /* Fuera del top 5, pero se sabe en qué puesto está */
+                    <>
+                      <Text style={styles.rankPuntos}>···</Text>
+                      <FilaRanking
+                        fila={miFila}
+                        puesto={miFila.puesto ?? 0}
+                        esVos
+                      />
+                    </>
+                  ) : (
+                    <Text style={styles.rankFuera}>
+                      Todavía no estás en el top 5. ¡Seguí sumando XP!
+                    </Text>
+                  ))}
+              </>
+            )}
           </View>
         </View>
 
@@ -1242,6 +1384,93 @@ const styles = StyleSheet.create({
   },
   logroDesc: { fontSize: 11, color: "#888", textAlign: "center" },
   logroTextoBloqueado: { color: "#BDBDBD" },
+
+  // Ranking (tarjeta como la de "Progreso general": sin sombra, así que no
+  // hacen falta dos Views anidados para Android)
+  rankCard: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E0E4F0",
+  },
+  rankCargando: { marginVertical: 24 },
+  rankError: { marginBottom: 0 },
+  rankReintentar: {
+    alignSelf: "flex-start",
+    marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#FFCDD2",
+  },
+  rankReintentarTxt: { fontSize: 14, fontWeight: "700", color: "#C62828" },
+  rankVacio: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    paddingVertical: 12,
+  },
+  rankFuera: {
+    fontSize: 13,
+    color: "#888",
+    textAlign: "center",
+    marginTop: 6,
+  },
+  rankPuntos: {
+    fontSize: 16,
+    color: "#BDBDBD",
+    textAlign: "center",
+    marginVertical: 2,
+  },
+  rankFila: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  // La fila del usuario, resaltada
+  rankFilaVos: { backgroundColor: "#FFF8E1", borderColor: "#F5CE5A" },
+  rankPuesto: {
+    width: 26,
+    marginRight: 8,
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#555",
+    textAlign: "center",
+  },
+  rankNombreWrap: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10,
+  },
+  // flexShrink: solo el nombre se achica (con "…"); el XP entra siempre
+  rankNombre: {
+    flexShrink: 1,
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A2E",
+  },
+  rankVos: {
+    flexShrink: 0,
+    marginLeft: 4,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#E8A000",
+  },
+  rankXp: {
+    flexShrink: 0,
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#E8A000",
+  },
 
   // Cerrar sesión
   btnCerrarSesion: {

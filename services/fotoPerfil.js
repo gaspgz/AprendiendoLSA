@@ -1,3 +1,4 @@
+import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { File, Paths } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
@@ -187,6 +188,22 @@ export const borrarFotoLocal = async (uid) => {
 
 const ERROR_SESION =
   "Tu sesión venció. Volvé a iniciar sesión para cambiar la foto.";
+const ERROR_SIN_INTERNET = "No hay conexión. La foto no se guardó.";
+const ERROR_SUBIDA = "No se pudo subir la foto. Probá de nuevo.";
+
+// ¿De verdad no hay internet? Se mira igual que en
+// components/PantallaSinConexion.jsx: sin conexión es que alguno de los dos
+// diga false. null es "todavía no se sabe" y no cuenta. Si no se pudo
+// comprobar, se da por hecho que hay: así no se culpa a la conexión de un
+// error que es de otra cosa.
+const sinInternet = async () => {
+  try {
+    const estado = await NetInfo.fetch();
+    return estado.isConnected === false || estado.isInternetReachable === false;
+  } catch {
+    return false;
+  }
+};
 
 // Guarda la foto nueva de la cuenta: la sube a la API y deja la copia en el
 // celular. Devuelve:
@@ -197,10 +214,23 @@ const ERROR_SESION =
 export const guardarFotoPerfil = async (uid, uri) => {
   const res = await subirFotoPerfil(uid, uri);
   if (!res.ok) {
+    // Para verlo en la terminal de Metro si vuelve a fallar. No lleva nada
+    // privado: ni el token, ni el email, ni la foto; solo el código y el
+    // motivo que dio el celular.
+    console.log(
+      `No se pudo subir la foto (status ${res.status}):`,
+      res.detalle || res.error,
+    );
+    // status 0 = no hubo respuesta. Puede ser que no haya internet, pero
+    // también que el envío fallara con internet: se pregunta antes de echarle
+    // la culpa a la conexión.
     if (res.status === 0) {
-      return { ok: false, error: "No hay conexión. La foto no se guardó." };
+      return {
+        ok: false,
+        error: (await sinInternet()) ? ERROR_SIN_INTERNET : ERROR_SUBIDA,
+      };
     }
-    // Del 401 se encarga apiFetch: avisa que la sesión venció y
+    // Del 401 se encarga subirFotoPerfil: avisa que la sesión venció y
     // app/_layout.tsx saca al login. Acá solo se dice por qué (se ve un
     // momento, hasta que la app navega sola).
     if (res.status === 401) {
