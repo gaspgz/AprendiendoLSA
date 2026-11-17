@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -20,8 +20,24 @@ const LoginScreen = () => {
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  // Se llegó acá porque la sesión venció: app/_layout.tsx manda vencida=1.
+  // Si se llega de otra forma (cerrar sesión, registro) no viene y no se
+  // muestra nada.
+  const { vencida } = useLocalSearchParams();
+  const [avisoVencida, setAvisoVencida] = useState(vencida === "1");
+
+  // Si la pantalla ya estaba montada, el valor inicial del useState queda
+  // congelado: se ajusta durante el render (el mismo patrón que el nombre
+  // en ModalEditar del Perfil) en vez de con un useEffect.
+  const [vencidaAnterior, setVencidaAnterior] = useState(vencida);
+  if (vencida !== vencidaAnterior) {
+    setVencidaAnterior(vencida);
+    setAvisoVencida(vencida === "1");
+  }
+
   const handleLogin = async () => {
     setError("");
+    setAvisoVencida(false);
 
     if (!email.trim() || !password.trim()) {
       setError("Completá todos los campos.");
@@ -45,9 +61,14 @@ const LoginScreen = () => {
       cerrarSesionRemota(sesionAnterior);
     }
 
-    // Guardar sesión local: usuario + id del registro POST en MockAPI
-    // ↑ antes solo se pasaba resultado.usuario; ahora también sesion_id
-    await guardarSesion(resultado.usuario, resultado.sesion_id);
+    // Guardar sesión local: usuario + id del registro POST en MockAPI +
+    // el token del login (hace falta para cambiar la foto de perfil).
+    // Si el login no trajo token va null: borra el de la cuenta anterior.
+    await guardarSesion(
+      resultado.usuario,
+      resultado.sesion_id,
+      resultado.token ?? null,
+    );
 
     router.replace("/(tabs)");
   };
@@ -56,6 +77,15 @@ const LoginScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Inicio de sesión</Text>
+
+        {/* Aviso de sesión vencida: se va al escribir o al iniciar sesión */}
+        {avisoVencida && (
+          <View style={styles.avisoWrap}>
+            <Text style={styles.avisoTxt}>
+              Tu sesión venció. Volvé a iniciar sesión.
+            </Text>
+          </View>
+        )}
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
@@ -67,6 +97,7 @@ const LoginScreen = () => {
             onChangeText={(t) => {
               setEmail(t);
               setError("");
+              setAvisoVencida(false);
             }}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -84,6 +115,7 @@ const LoginScreen = () => {
             onChangeText={(t) => {
               setPassword(t);
               setError("");
+              setAvisoVencida(false);
             }}
             editable={!cargando}
             textContentType="password"
@@ -172,6 +204,16 @@ const styles = StyleSheet.create({
     borderColor: "#FFCDD2",
   },
   errorTxt: { fontSize: 14, color: "#C62828", fontWeight: "500" },
+  // Aviso de sesión vencida: como la caja de error, pero en el lila de la app
+  avisoWrap: {
+    backgroundColor: "#EEF1FB",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#C8D3F5",
+  },
+  avisoTxt: { fontSize: 14, color: "#3D4FBB", fontWeight: "500" },
   loginButton: {
     backgroundColor: "#C8D3F5",
     borderRadius: 25,

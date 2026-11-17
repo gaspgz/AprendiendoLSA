@@ -1,3 +1,5 @@
+import { avisarSesionVencida, obtenerToken } from "./sesion";
+
 // ── URL base y endpoints de la API del profesor ──
 export const API_BASE = "https://ort.nilosolutions.com/api/lsa";
 
@@ -27,19 +29,45 @@ export const ENDPOINTS = {
 };
 
 // ── Helper interno: toda llamada a la API pasa por acá ──
-// Siempre agrega Content-Type y X-API-Key, y devuelve { ok, data, status }.
+// Siempre agrega X-API-Key, y devuelve { ok, data, status }.
 // status 0 = no hubo respuesta (sin conexión, timeout, DNS...).
-const apiFetch = async (path, options = {}) => {
+// Si hay un token del login guardado, agrega "Authorization: Bearer ...",
+// que le dice a la API quién pide; con sinToken: true no lo manda (el login
+// y el registro, donde todavía no hay token o quedó el de otra cuenta).
+// Content-Type va en application/json salvo que el body sea un FormData:
+// ahí lo tiene que poner fetch solo (con el "boundary" del formulario); si
+// lo ponemos a mano, la subida llega rota.
+// Si un pedido que llevaba token recibe un 401, el token venció (dura 30
+// días): se avisa con avisarSesionVencida() y app/_layout.tsx saca al login.
+// Con sinAvisoVencida: true no se avisa (lo usa cerrarSesionRemota, donde un
+// 401 no importa porque ya se está cerrando la sesión).
+const apiFetch = async (
+  path,
+  { sinToken, sinAvisoVencida, ...opciones } = {},
+) => {
   const url = path.startsWith("http") ? path : `${API_BASE}${path}`;
   try {
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        "Content-Type": "application/json",
-        "X-API-Key": API_KEY ?? "",
-      },
-    });
+    const esFormulario = opciones.body instanceof FormData;
+    const headers = {
+      ...opciones.headers,
+      ...(esFormulario ? {} : { "Content-Type": "application/json" }),
+      "X-API-Key": API_KEY ?? "",
+    };
+    let conToken = false;
+    if (!sinToken) {
+      const token = await obtenerToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+        conToken = true;
+      }
+    }
+    const res = await fetch(url, { ...opciones, headers });
+
+    // Un 403 NO cierra la sesión (por ejemplo, tocar datos de otra cuenta):
+    // se maneja como cualquier otro error.
+    if (res.status === 401 && conToken && !sinAvisoVencida) {
+      avisarSesionVencida();
+    }
 
     let data = null;
     try {
@@ -75,6 +103,9 @@ const crearSesion = async (usuarioId, email) => {
   const { ok, data } = await apiFetch(ENDPOINTS.sesiones, {
     method: "POST",
     body: JSON.stringify({ usuario_id: String(usuarioId), email }),
+    // Parte del login: el token nuevo todavía no se guardó, y el que pueda
+    // haber es de la cuenta anterior
+    sinToken: true,
   });
   return ok && data?.id ? data.id : null;
 };
@@ -84,6 +115,7 @@ export const loginUsuario = async (email, password) => {
   const { data, status } = await apiFetch(ENDPOINTS.login, {
     method: "POST",
     body: JSON.stringify({ email, password }),
+    sinToken: true, // acá recién se consigue el token
   });
 
   if (status === 0) return { ok: false, error: ERROR_CONEXION };
@@ -101,7 +133,9 @@ export const loginUsuario = async (email, password) => {
     sesion_id = await crearSesion(usuario.id, usuario.email ?? email);
   }
 
-  return { ok: true, usuario, sesion_id };
+  // El token dice quién pide: hace falta para lo que solo puede hacer el
+  // dueño de la cuenta (hoy, cambiar su foto de perfil)
+  return { ok: true, usuario, sesion_id, token: data.token ?? null };
 };
 
 // ── Registro ──
@@ -109,6 +143,7 @@ export const registrarUsuario = async ({ nombre, email, password }) => {
   const { ok, data, status } = await apiFetch(ENDPOINTS.registro, {
     method: "POST",
     body: JSON.stringify({ nombre, email, password }),
+    sinToken: true, // la cuenta recién se está creando
   });
 
   if (status === 0) return { ok: false, error: ERROR_CONEXION };
@@ -154,6 +189,47 @@ export const actualizarUsuario = async (id, datos) => {
   return { ok: true, usuario: data };
 };
 
+// "data:image/jpeg;base64,xxxx" → Blob, para subirlo como archivo en la web
+const dataUriABlob = (uri) => {
+  const [cabecera, base64] = uri.split(",");
+  const tipo = cabecera.match(/^data:(.*?)[;,]/)?.[1] || "image/jpeg";
+  const letras = atob(base64);
+  const bytes = new Uint8Array(letras.length);
+  for (let i = 0; i < letras.length; i++) bytes[i] = letras.charCodeAt(i);
+  return new Blob([bytes], { type: tipo });
+};
+
+// ── Subir la foto de perfil ──
+// POST /usuarios/{id}/foto, como formulario (multipart) con el campo
+// "archivo": la API guarda la imagen Y se la deja puesta al usuario, en una
+// sola llamada. Pide el token del login (solo el dueño cambia su foto).
+// Devuelve { ok, usuario, status }: usuario viene con "foto" apuntando a la
+// dirección nueva (cambia con cada subida). Si falla, { ok, error, status }.
+export const subirFotoPerfil = async (id, uri) => {
+  const form = new FormData();
+  if (uri.startsWith("data:")) {
+    // En la web la foto procesada es un data URI: se convierte en Blob
+    form.append("archivo", dataUriABlob(uri), "foto.jpg");
+  } else {
+    // En el celular alcanza con la ruta del archivo
+    form.append("archivo", { uri, name: "foto.jpg", type: "image/jpeg" });
+  }
+
+  const { ok, data, status } = await apiFetch(
+    `${ENDPOINTS.usuarios}/${id}/foto`,
+    { method: "POST", body: form },
+  );
+
+  if (!ok) {
+    return {
+      ok: false,
+      status,
+      error: mensajeError(status, data, "No se pudo guardar la foto."),
+    };
+  }
+  return { ok: true, status, usuario: data?.usuario ?? data };
+};
+
 // ── Eliminar usuario ──
 // DELETE /usuarios/{id}. Devuelve { ok, data, status } tal cual, así quien la
 // llama decide qué hacer con un 404 (la cuenta ya no existe) o con status 0
@@ -171,6 +247,9 @@ export const cerrarSesionRemota = async (sesion_id) => {
   const { ok, data } = await apiFetch(`${ENDPOINTS.sesiones}/${sesion_id}`, {
     method: "PUT",
     body: JSON.stringify({ activa: false }),
+    // Un 401 acá no tiene que mandar al login: o se está cerrando la sesión
+    // a propósito, o es la sesión anterior que el login deja cerrada.
+    sinAvisoVencida: true,
   });
 
   if (!ok) {

@@ -26,6 +26,7 @@ import {
 } from "../../services/api";
 import {
   borrarFotoLocal,
+  fotoAMostrar,
   guardarFotoPerfil,
   obtenerFotoLocal,
   procesarFoto,
@@ -333,8 +334,9 @@ const OPCIONES_FOTO = {
 
 // Armada igual que ModalEditar. Primero las opciones y, después de elegir
 // una foto, la vista previa con "Guardar" y "Cancelar". Mientras procesa,
-// guarda o quita la foto, no se puede cerrar.
-// onCambio(uri): se guardó una foto nueva (o se quitó: uri null).
+// sube o quita la foto, no se puede cerrar.
+// onCambio: se guardó una foto nueva (el resultado de guardarFotoPerfil) o
+// se quitó la copia del celular (null).
 const ModalFoto = ({ visible, uid, hayFoto, onCambio, onCerrar }) => {
   const [fotoNueva, setFotoNueva] = useState(null); // la de la vista previa
   const [ocupado, setOcupado] = useState(null); // "procesando", "guardando" o "quitando"
@@ -403,13 +405,13 @@ const ModalFoto = ({ visible, uid, hayFoto, onCambio, onCerrar }) => {
   const guardar = async () => {
     setOcupado("guardando");
     setError(null);
-    const guardada = await guardarFotoPerfil(uid, fotoNueva); // null si falla
-    if (guardada) {
-      onCambio(guardada); // se cierra la hoja con "Guardando..." a la vista
+    const resultado = await guardarFotoPerfil(uid, fotoNueva);
+    if (resultado.ok) {
+      onCambio(resultado); // se cierra la hoja con "Subiendo..." a la vista
       return;
     }
     setOcupado(null);
-    setError({ texto: "No se pudo guardar la foto. Probá de nuevo." });
+    setError({ texto: resultado.error });
   };
 
   const quitar = async () => {
@@ -501,7 +503,7 @@ const ModalFoto = ({ visible, uid, hayFoto, onCambio, onCerrar }) => {
                 accessibilityLabel="Guardar foto"
               >
                 <Text style={styles.btnGuardarTxt}>
-                  {ocupado === "guardando" ? "Guardando..." : "Guardar"}
+                  {ocupado === "guardando" ? "Subiendo..." : "Guardar"}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -571,9 +573,10 @@ const ProfileScreen = () => {
   const [modalAjustes, setModalAjustes] = useState(false);
   const [eliminando, setEliminando] = useState(false);
   const [errorAjustes, setErrorAjustes] = useState("");
-  // Foto de perfil guardada en el celular: de qué cuenta es (así nunca se ve
-  // la de otra) y "version", que cambia cada vez que se guarda o se quita
-  const [foto, setFoto] = useState({ uid: null, uri: null, version: 0 });
+  // Foto de perfil: la copia guardada en el celular ({ uri, servidor } o
+  // null), de qué cuenta es (así nunca se ve la de otra) y "version", que
+  // cambia cada vez que se guarda o se quita
+  const [foto, setFoto] = useState({ uid: null, guardada: null, version: 0 });
   const [fotoRota, setFotoRota] = useState(null); // la que no se pudo mostrar
   const [modalFoto, setModalFoto] = useState(false);
   // Se tocó "Cambiar foto" en Editar: en iOS la hoja espera a que Editar
@@ -598,9 +601,12 @@ const ProfileScreen = () => {
         // Si se entró con otra cuenta, no mostrar los datos de la anterior
         setPerfil((prev) => (prev?.usuario.id === sesion.id ? prev : null));
 
-        // La foto guardada en el celular, de esta cuenta (sin esperar a la API)
-        obtenerFotoLocal(sesion.id).then((uri) => {
-          if (!cancelado) setFoto((prev) => ({ ...prev, uid: sesion.id, uri }));
+        // La copia guardada en el celular, de esta cuenta (sin esperar a la
+        // API)
+        obtenerFotoLocal(sesion.id).then((guardada) => {
+          if (!cancelado) {
+            setFoto((prev) => ({ ...prev, uid: sesion.id, guardada }));
+          }
         });
 
         // Los logros que se ganan jugando ("Lección perfecta") están en el
@@ -622,6 +628,23 @@ const ProfileScreen = () => {
             : prev?.leccionesCompletadas || {},
           logrosGuardados,
         }));
+
+        // Si la foto se cambió desde otro celular, la copia guardada acá es
+        // de otra foto: se descarta y pasa a verse la del servidor
+        const fotoApi = (resUsuario.ok && resUsuario.usuario?.foto) || null;
+        if (fotoApi) {
+          const guardada = await obtenerFotoLocal(sesion.id);
+          if (guardada && guardada.servidor !== fotoApi) {
+            await borrarFotoLocal(sesion.id);
+            if (!cancelado) {
+              setFoto((prev) =>
+                String(prev.uid) === String(sesion.id)
+                  ? { ...prev, guardada: null }
+                  : prev,
+              );
+            }
+          }
+        }
       })();
 
       return () => {
@@ -686,7 +709,8 @@ const ProfileScreen = () => {
     if (!seguro) return;
 
     // Igual que el MenuPerfil de index.jsx: si la API falla (sin
-    // internet, endpoint caído), el logout local sigue igual
+    // internet, endpoint caído), el logout local sigue igual. El PUT a la
+    // API va ANTES de cerrarSesion(), que borra el token que ese pedido usa.
     try {
       const sesionId = await obtenerSesionId();
       await cerrarSesionRemota(sesionId);
@@ -749,6 +773,8 @@ const ProfileScreen = () => {
         console.log("No se pudo borrar todo lo guardado de la cuenta:", e);
       }
       // También la foto de perfil (el archivo y su key). No tira error.
+      // TODO (API): cuando la API tenga cómo borrar la foto del servidor
+      // (el profesor la está armando), borrarla también acá.
       await borrarFotoLocal(cuenta.id);
       setModalAjustes(false);
       router.replace("/LoginScreen");
@@ -762,16 +788,37 @@ const ProfileScreen = () => {
   };
 
   // ── Foto de perfil ──
-  // La del celular (si es de esta cuenta); si no, la de la API
-  // (usuario.foto); si no, las iniciales
-  const fotoLocal = String(foto.uid) === String(usuario.id) ? foto.uri : null;
-  const fotoAvatar = fotoLocal || usuario.foto || null;
+  // Con la copia del celular (solo si es de esta cuenta) y la foto del
+  // servidor (usuario.foto) se decide cuál se ve (services/fotoPerfil.js)
+  const guardadaLocal =
+    String(foto.uid) === String(usuario.id) ? foto.guardada : null;
+  const fotoServidor = usuario.foto || null;
+  const mostrada = fotoAMostrar(guardadaLocal, fotoServidor);
+  // "Quitar foto" solo saca la copia del celular: se ofrece únicamente
+  // cuando la foto que se ve no está en el servidor (borrarla allá todavía
+  // no se puede)
+  const fotoSoloLocal = !fotoServidor && !!guardadaLocal?.uri;
 
   const abrirFoto = () => setModalFoto(true);
 
-  // La hoja guardó una foto nueva (uri) o la quitó (null)
-  const fotoCambiada = (uri) => {
-    setFoto((prev) => ({ uid: usuario.id, uri, version: prev.version + 1 }));
+  // La hoja guardó una foto nueva ({ uri, servidor, usuario }) o quitó la
+  // copia del celular (null)
+  const fotoCambiada = (resultado) => {
+    setFoto((prev) => ({
+      uid: usuario.id,
+      guardada: resultado
+        ? { uri: resultado.uri, servidor: resultado.servidor }
+        : null,
+      version: prev.version + 1,
+    }));
+    // El usuario que devolvió la API trae la foto nueva (la sesión ya quedó
+    // actualizada en guardarFotoPerfil)
+    if (resultado?.usuario) {
+      setPerfil((prev) => ({
+        ...prev,
+        usuario: { ...prev.usuario, ...resultado.usuario },
+      }));
+    }
     setFotoRota(null);
     setModalFoto(false);
   };
@@ -873,16 +920,22 @@ const ProfileScreen = () => {
             accessibilityRole="button"
             accessibilityLabel="Cambiar foto de perfil"
           >
-            {fotoAvatar && fotoAvatar !== fotoRota ? (
+            {mostrada && mostrada.uri !== fotoRota ? (
               <Image
-                // La foto del celular siempre está en el mismo archivo: sin
-                // caché y con otra key cuando cambia, si no se vería la vieja
-                key={foto.version}
-                source={{ uri: fotoAvatar }}
+                // La copia del celular está siempre en el mismo archivo: sin
+                // caché y con otra key cuando cambia, si no se vería la
+                // vieja. La del servidor va a la caché de disco, con su
+                // dirección en la key (cada subida da una dirección nueva).
+                key={
+                  mostrada.local
+                    ? `celular|${foto.version}`
+                    : `api|${mostrada.uri}`
+                }
+                source={{ uri: mostrada.uri }}
                 style={styles.avatarImg}
                 contentFit="cover"
-                cachePolicy={fotoLocal ? "none" : "disk"}
-                onError={() => setFotoRota(fotoAvatar)}
+                cachePolicy={mostrada.local ? "none" : "disk"}
+                onError={() => setFotoRota(mostrada.uri)}
               />
             ) : (
               <View style={styles.avatarFallback}>
@@ -1021,7 +1074,7 @@ const ProfileScreen = () => {
       <ModalFoto
         visible={modalFoto}
         uid={usuario.id}
-        hayFoto={!!fotoLocal}
+        hayFoto={fotoSoloLocal}
         onCambio={fotoCambiada}
         onCerrar={() => setModalFoto(false)}
       />
